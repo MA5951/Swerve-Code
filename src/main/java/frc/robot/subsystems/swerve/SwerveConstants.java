@@ -10,7 +10,7 @@ public class SwerveConstants {
         public final static double WEIGHT = 47.0;// KILOGRAM
 
         // Modules constants
-        private final static double TURNING_GEAR_RATIO = 150d / 7;
+        public final static double TURNING_GEAR_RATIO = 150d / 7;
         private final static double DRIVE_GEAR_RATIO = 6.75;
         private final static int ENCODER_RESOLUTION = 2048;
         private final static double WHEEL_RADIUS = 0.05;
@@ -18,9 +18,8 @@ public class SwerveConstants {
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 0.1;
 
         public final static double DISTANCE_PER_PULSE = (2 * WHEEL_RADIUS * Math.PI)
-                        / (ENCODER_RESOLUTION * DRIVE_GEAR_RATIO);
-        public final static double ANGLE_PER_PULSE = 360d /
-                        (ENCODER_RESOLUTION * TURNING_GEAR_RATIO);
+                        /  DRIVE_GEAR_RATIO;
+        public final static double ANGLE_PER_PULSE = 18 * 1.875;
 
         // front left module
         public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 360 - 85;

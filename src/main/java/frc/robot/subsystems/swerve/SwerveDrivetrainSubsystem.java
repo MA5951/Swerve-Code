@@ -369,7 +369,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     acc = (frontLeftModule.getDriveVelocity() - lastVelocity) / RobotConstants.KDELTA_TIME;
-    odometry.update(getRotation2d(), getSwerveModulePositions());
+    //odometry.update(getRotation2d(), getSwerveModulePositions());
 
     lastVelocity = frontLeftModule.getDriveVelocity();
 
@@ -382,6 +382,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     board.addNum("rear left v", rearLeftModule.getDriveVelocity());
     board.addNum("front right v", frontRightModule.getDriveVelocity());
     board.addNum("rear right v", rearRightModule.getDriveVelocity());
+
+    board.addNum("pose drive", frontLeftModule.getDrivePosition());
+
+    frontLeftModule.driveUsingPID(1);
 
     field.setRobotPose(getPose());
   }
