@@ -45,7 +45,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   private Double angleAlign;
 
   public boolean isXReversed = true;
-  public boolean isYReversed = true;
+  public boolean isYReversed = false;
   public boolean isXYReversed = true;
 
   private double offsetAngle = 0;
@@ -85,7 +85,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   private final AHRS navx = new AHRS(SPI.Port.kMXP);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
-      rearLeftLocation, rearRightLocation);
+    rearLeftLocation, rearRightLocation);
 
   private final static SwerveModule frontLeftModule = new SwerveModuleTalonFX(
       "frontLeftModule",
@@ -94,7 +94,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       PortMap.Swerve.leftFrontAbsoluteEncoder,
       SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-      SwerveConstants.FRONF_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
+      SwerveConstants.FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
       SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER);
 
   private final static SwerveModule frontRightModule = new SwerveModuleTalonFX(
@@ -104,7 +104,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       PortMap.Swerve.rightFrontAbsoluteEncoder,
       SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-      SwerveConstants.FRONF_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
+      SwerveConstants.FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
       SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER);
 
   private final static SwerveModule rearLeftModule = new SwerveModuleTalonFX(
@@ -208,7 +208,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    return -navx.getAngle();
+    return navx.getAngle();
   }
 
   public double getRoll() {
@@ -253,10 +253,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   public void setModules(SwerveModuleState[] states) {
     SwerveDriveKinematics.desaturateWheelSpeeds(states, SwerveConstants.MAX_VELOCITY);
-    rearLeftModule.setDesiredState(states[0]);
-    frontLeftModule.setDesiredState(states[1]);
-    rearRightModule.setDesiredState(states[2]);
-    frontRightModule.setDesiredState(states[3]);
+    frontLeftModule.setDesiredState(states[0]);
+    rearLeftModule.setDesiredState(states[1]);
+    frontRightModule.setDesiredState(states[2]);
+    rearRightModule.setDesiredState(states[3]);
 
   }
 
@@ -369,7 +369,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     acc = (frontLeftModule.getDriveVelocity() - lastVelocity) / RobotConstants.KDELTA_TIME;
-    //odometry.update(getRotation2d(), getSwerveModulePositions());
+    // odometry.update(getRotation2d(), getSwerveModulePositions());
 
     lastVelocity = frontLeftModule.getDriveVelocity();
 
@@ -385,7 +385,15 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     board.addNum("pose drive", frontLeftModule.getDrivePosition());
 
-    frontLeftModule.driveUsingPID(1);
+    board.addNum("abs fl", frontLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("abs fr", frontRightModule.getAbsoluteEncoderPosition());
+    board.addNum("abs rr", rearRightModule.getAbsoluteEncoderPosition());
+    board.addNum("abs rl", rearLeftModule.getAbsoluteEncoderPosition());
+
+
+    board.addNum("current", frontLeftModule.getCurrent());
+
+    board.addNum("navx", getFusedHeading());
 
     field.setRobotPose(getPose());
   }

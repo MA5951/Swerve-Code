@@ -5,8 +5,11 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -19,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
+  public static final CommandPS4Controller ps4 = new CommandPS4Controller(0);
+
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -27,22 +32,16 @@ public class RobotContainer {
     configureBindings();
   }
 
-  /**
-   * Use this method to define your trigger->command mappings. Triggers can be
-   * created via the
-   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-   * an arbitrary
-   * predicate, or via the named factories in {@link
-   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for
-   * {@link
-   * CommandXboxController
-   * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
-   * PS4} controllers or
-   * {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
-   * joysticks}.
-   */
-  private void configureBindings() {
 
+  private void configureBindings() {
+    ps4.triangle().whileTrue(
+      new InstantCommand(SwerveDrivetrainSubsystem.getInstance()::updateOffset));
+
+    ps4.R2().whileTrue(
+      new InstantCommand(
+        () -> SwerveDrivetrainSubsystem.getInstance().FactorVelocityTo(0.4))
+    ).whileFalse(new InstantCommand(
+      () -> SwerveDrivetrainSubsystem.getInstance().FactorVelocityTo(1)));
   }
 
   /**

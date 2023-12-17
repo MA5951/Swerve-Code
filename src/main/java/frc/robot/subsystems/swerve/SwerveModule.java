@@ -29,6 +29,8 @@ public abstract class SwerveModule {
 
     public abstract void setAccelerationLimit(double limit);
 
+    public abstract double getCurrent();
+
     public SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 getDrivePosition(), new Rotation2d(Math.toRadians(getTurningPosition())));

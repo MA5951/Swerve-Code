@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.DriveSwerveCommand;
 import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 
 /**
@@ -96,6 +97,13 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    CommandScheduler.getInstance().setDefaultCommand(
+        SwerveDrivetrainSubsystem.getInstance(),
+        new DriveSwerveCommand(
+            RobotContainer.ps4::getLeftX,
+            RobotContainer.ps4::getLeftY,
+            RobotContainer.ps4::getRightX));
   }
 
   /** This function is called periodically during operator control. */
