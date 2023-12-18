@@ -3,11 +3,9 @@ package frc.robot.subsystems.swerve;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.StaticBrake;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -34,7 +32,6 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
     private PositionVoltage m_angleSetter = new PositionVoltage(0);
     private VelocityTorqueCurrentFOC m_velocitySetter = new VelocityTorqueCurrentFOC(0);
-    // private VelocityVoltage m_velocitySetter = new VelocityVoltage(0);
 
     private StatusSignal<Double> m_drivePosition;
     private StatusSignal<Double> m_driveVelocity;
@@ -42,6 +39,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
     private StatusSignal<Double> m_steerVelocity;
 
     private double angleOffset;
+    private double dirvePoseOffset;
 
     public SwerveModuleTalonFX(String tabName, int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
@@ -114,13 +112,11 @@ public class SwerveModuleTalonFX extends SwerveModule {
         driveMotor.getConfigurator().apply(driveConfiguration);
     }
 
-    public void setAccelerationLimit(double limit) {
-        TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
-        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
-
-        closedLoopRampsConfigs.DutyCycleClosedLoopRampPeriod = limit;
-
-        driveMotor.getConfigurator().apply(driveConfiguration);
+    public void resetEncoders() {
+        angleOffset = ((getAbsoluteEncoderPosition() - offsetEncoder)
+            / SwerveConstants.ANGLE_PER_PULSE) - 
+            m_steerPosition.getValue();
+        dirvePoseOffset = - m_drivePosition.getValue();
     }
 
     public double getAbsoluteEncoderPosition() {
@@ -133,12 +129,13 @@ public class SwerveModuleTalonFX extends SwerveModule {
     public double getDrivePosition() {
         m_drivePosition.refresh();
         return m_drivePosition.getValue()
-                * SwerveConstants.DISTANCE_PER_PULSE;
+                * SwerveConstants.DISTANCE_PER_PULSE
+                + dirvePoseOffset * SwerveConstants.DISTANCE_PER_PULSE;
     }
 
     public double getTurningPosition() {
         m_steerPosition.refresh();
-        return (m_steerPosition.getValue().doubleValue()
+        return (m_steerPosition.getValue()
                 * SwerveConstants.ANGLE_PER_PULSE) + 
                 angleOffset * SwerveConstants.ANGLE_PER_PULSE;
     }
@@ -157,10 +154,13 @@ public class SwerveModuleTalonFX extends SwerveModule {
                 SwerveConstants.VELOCITY_TIME_UNIT_IN_SECONDS;
     }
 
-    public void resetEncoders() {
-        angleOffset = ((getAbsoluteEncoderPosition() - offsetEncoder)
-            / SwerveConstants.ANGLE_PER_PULSE) - 
-            m_steerPosition.getValue();  
+    public void setAccelerationLimit(double limit) {
+        TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
+        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
+
+        closedLoopRampsConfigs.DutyCycleClosedLoopRampPeriod = limit;
+
+        driveMotor.getConfigurator().apply(driveConfiguration);
     }
 
     public void turningMotorSetPower(double power) {

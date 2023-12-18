@@ -42,8 +42,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   private PIDController CONTROLLER_Y;
   private PIDController thetaPID;
 
-  private Double angleAlign;
-
   public boolean isXReversed = true;
   public boolean isYReversed = false;
   public boolean isXYReversed = true;
@@ -195,16 +193,25 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     rearRightModule.resetEncoders();
   }
 
+  public void resetOdometry(Pose2d pose) {
+    odometry.resetPosition(getRotation2d(), getSwerveModulePositions(), pose);
+  }
+
+  public void updateOffset() {
+    offsetAngle = getFusedHeading();
+  }
+
+  public void resetNavx() {
+    navx.reset();
+    navx.zeroYaw();
+  }
+
   public double getAngularVelocity() {
     return this.kinematics.toChassisSpeeds(getSwerveModuleStates()).omegaRadiansPerSecond;
   }
 
   public double getRadialAcceleration() {
     return Math.pow(getAngularVelocity(), 2) * SwerveConstants.RADIUS;
-  }
-
-  public void updateOffset() {
-    offsetAngle = getFusedHeading();
   }
 
   public double getFusedHeading() {
@@ -219,13 +226,16 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     return navx.getPitch();
   }
 
-  public Rotation2d getRotation2d() {
-    return new Rotation2d(Math.toRadians(getFusedHeading()));
+  public double getVelocity() {
+    return frontLeftModule.getDriveVelocity();
   }
 
-  public void resetNavx() {
-    navx.reset();
-    navx.zeroYaw();
+  public double getAcceleration() {
+    return acc;
+  }
+
+  public Rotation2d getRotation2d() {
+    return new Rotation2d(Math.toRadians(getFusedHeading()));
   }
 
   public Pose2d getPose() {
@@ -236,12 +246,9 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     return kinematics;
   }
 
-  public PIDController getThetaPID() {
-    return thetaPID;
-  }
-
-  public void resetOdometry(Pose2d pose) {
-    odometry.resetPosition(getRotation2d(), getSwerveModulePositions(), pose);
+  public void FactorVelocityTo(double factor) {
+    maxVelocity = SwerveConstants.MAX_VELOCITY * factor;
+    maxAngularVelocity = SwerveConstants.MAX_ANGULAR_VELOCITY * factor;
   }
 
   public void stop() {
@@ -267,23 +274,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
                 new Rotation2d(Math.toRadians((getFusedHeading() - offsetAngle))))
                 : new ChassisSpeeds(x, y, omega));
     setModules(states);
-  }
-
-  public void FactorVelocityTo(double factor) {
-    maxVelocity = SwerveConstants.MAX_VELOCITY * factor;
-    maxAngularVelocity = SwerveConstants.MAX_ANGULAR_VELOCITY * factor;
-  }
-
-  public void setAngleAlign(Double angle) {
-    angleAlign = angle;
-  }
-
-  public Double getAngleAlign() {
-    return angleAlign;
-  }
-
-  public double getVelocity() {
-    return frontLeftModule.getDriveVelocity();
   }
 
   public void odometrySetUpForAutonomous(PathPlannerTrajectory trajectory) {
@@ -342,10 +332,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     rearRightModule.setAccelerationLimit(limit);
   }
 
-  public double getAcceleration() {
-    return acc;
-  }
-
   public void setOffsetangle(double offset) {
     offsetAngle = offset;
   }
@@ -367,9 +353,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     acc = (frontLeftModule.getDriveVelocity() - lastVelocity) / RobotConstants.KDELTA_TIME;
-    // odometry.update(getRotation2d(), getSwerveModulePositions());
+    odometry.update(getRotation2d(), getSwerveModulePositions());
 
     lastVelocity = frontLeftModule.getDriveVelocity();
 
