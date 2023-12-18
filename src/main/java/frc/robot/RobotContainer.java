@@ -20,7 +20,8 @@ import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
  */
 public class RobotContainer {
 
-  public static final CommandPS4Controller ps4 = new CommandPS4Controller(0);
+  public static final CommandPS4Controller ps4 = 
+    new CommandPS4Controller(PortMap.Controllers.driverJostick);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

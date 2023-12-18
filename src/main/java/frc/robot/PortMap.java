@@ -18,4 +18,8 @@ public class PortMap {
     public static final int rightBackDriveID = 2;
     public static final int rightBackTurningID = 3;
   }
+
+  public static class Controllers {
+    public static final int driverJostick = 0;
+  }
 }
