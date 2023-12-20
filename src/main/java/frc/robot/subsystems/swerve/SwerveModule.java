@@ -43,7 +43,7 @@ public abstract class SwerveModule {
 
     public void setDesiredState(SwerveModuleState desiredState) {
         SwerveModuleState optimizedState = SwerveModule.optimize(desiredState,
-                getTurningPosition(), getDriveVelocity());
+                getTurningPosition());
         if (optimizedState.speedMetersPerSecond != 0) {
             turningUsingPID(optimizedState.angle.getDegrees());
         } else {
@@ -58,7 +58,7 @@ public abstract class SwerveModule {
     }
 
     private static SwerveModuleState optimize(SwerveModuleState desiredState,
-            double currentAngle, double currV) {
+            double currentAngle) {
         double angleDiff = (desiredState.angle.getDegrees() - currentAngle) % 360;
         double targetAngle = currentAngle + angleDiff;
         double targetSpeed = desiredState.speedMetersPerSecond;

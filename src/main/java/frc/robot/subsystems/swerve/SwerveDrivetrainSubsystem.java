@@ -358,28 +358,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
     lastVelocity = frontLeftModule.getDriveVelocity();
 
-    board.addNum("front left angle", frontLeftModule.getTurningPosition());
-    board.addNum("rear left angle", rearLeftModule.getTurningPosition());
-    board.addNum("front right angle", frontRightModule.getTurningPosition());
-    board.addNum("rear right angle", rearRightModule.getTurningPosition());
-
-    board.addNum("front left v", frontLeftModule.getDriveVelocity());
-    board.addNum("rear left v", rearLeftModule.getDriveVelocity());
-    board.addNum("front right v", frontRightModule.getDriveVelocity());
-    board.addNum("rear right v", rearRightModule.getDriveVelocity());
-
-    board.addNum("pose drive", frontLeftModule.getDrivePosition());
-
-    board.addNum("abs fl", frontLeftModule.getAbsoluteEncoderPosition());
-    board.addNum("abs fr", frontRightModule.getAbsoluteEncoderPosition());
-    board.addNum("abs rr", rearRightModule.getAbsoluteEncoderPosition());
-    board.addNum("abs rl", rearLeftModule.getAbsoluteEncoderPosition());
-
-
-    board.addNum("current", frontLeftModule.getCurrent());
-
-    board.addNum("navx", getFusedHeading());
-
     field.setRobotPose(getPose());
   }
 }

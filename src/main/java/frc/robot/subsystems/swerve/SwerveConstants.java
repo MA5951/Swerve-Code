@@ -52,13 +52,13 @@ public class SwerveConstants {
         public final static double closedloopRamp = 0;
         // Current Limit
         public final static int turningContinuousCurrentLimit = 25;
-        public final static int turningPeakCurrentLimit = 40;
+        public final static int turningPeakCurrentLimit = 400;
         public final static double turningPeakCurrentDuration = 0.1;
         public final static boolean turningEnableCurrentLimit = true;
 
         // Modules drive config
         // PID
-        public final static double DRIVE_PID_KP = 3.1;// 0.06 * 12;
+        public final static double DRIVE_PID_KP = 3.1;
         public final static double DRIVE_PID_KI = 0;
         public final static double DRIVE_PID_KD = 0.03;
         public final static double DRIVE_KS = 0.05 * 12;
@@ -94,22 +94,4 @@ public class SwerveConstants {
         public final static double PROFILED_THATA_KI = 0.003;
         public final static double PROFILED_THATA_KD = 0;
         public final static double MAX_ANGULAR_ACCELERATION = 15;
-
-        // auto balance constants
-        public final static double AUTO_BALANCE_KP = 0.04;
-        public final static double AUTO_BALANCE_KI = 0;
-        public final static double AUTO_BALANCE_KD = 0.007;
-        public final static double BALANCE_POSITION_TOLERANCE = 1.5;
-        public final static double BALANCE_DELAY = 0;
-        public final static double BALANCE_SETPOINT = 0;
-
-        // center to climb automation constants
-        public final static double ANGLE_BEFORE_CLIMB = 15;
-        public final static double TIME_TO_CLIMB = 5;
-
-        public final static double Tstop = 0.25;
-        public final static double maxAccelerationForOpenElevator = 2.7;
-        public final static double accelerationLimitForOpenElevator = (MAX_VELOCITY / maxAccelerationForOpenElevator);
-        public final static double maxVelocityOpenElevatorFctor = ((maxAccelerationForOpenElevator * Tstop)
-                        / MAX_VELOCITY);
 }
