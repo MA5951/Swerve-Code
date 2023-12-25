@@ -95,5 +95,4 @@ public class SwerveConstants {
         public final static double PROFILED_THATA_KD = 0;
         public final static double MAX_ANGULAR_ACCELERATION = 15;
 
-        public final static string CANBUS_NETWORK = "Swerve";
 }

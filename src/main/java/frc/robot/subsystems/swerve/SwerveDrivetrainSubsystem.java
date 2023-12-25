@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.PortMap;
 
 public class SwerveDrivetrainSubsystem extends SubsystemBase {
@@ -93,7 +94,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final static SwerveModule frontRightModule = new SwerveModuleTalonFX(
       "frontRightModule",
@@ -103,7 +105,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final static SwerveModule rearLeftModule = new SwerveModuleTalonFX(
       "rearLeftModule",
@@ -113,7 +116,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final static SwerveModule rearRightModule = new SwerveModuleTalonFX(
       "rearRightModule",
@@ -123,7 +127,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(kinematics,
       new Rotation2d(0), getSwerveModulePositions(),

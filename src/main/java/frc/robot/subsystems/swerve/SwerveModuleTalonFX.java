@@ -13,6 +13,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 
+
 public class SwerveModuleTalonFX extends SwerveModule {
 
     private final TalonFX driveMotor;
@@ -43,8 +44,8 @@ public class SwerveModuleTalonFX extends SwerveModule {
     public SwerveModuleTalonFX(String tabName, int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
             boolean isTurningMotorReversed, boolean isAbsoluteEncoderReversed,
-            double offsetEncoder) {
-        this.absoluteEcoder = new CANcoder(absoluteEncoderID , SwerveConstants.CANBUS_NETWORK);
+            double offsetEncoder , String canbus) {
+        this.absoluteEcoder = new CANcoder(absoluteEncoderID ,canbus);
 
         this.offsetEncoder = offsetEncoder;
         this.isAbsoluteEncoderReversed = isAbsoluteEncoderReversed;
@@ -52,8 +53,8 @@ public class SwerveModuleTalonFX extends SwerveModule {
         this.isDriveMotorReversed = isDriveMotorReversed;
         this.isTurningMotorReversed = isTurningMotorReversed;
 
-        this.driveMotor = new TalonFX(driveID , SwerveConstants.CANBUS_NETWORK);
-        this.turningMotor = new TalonFX(turningID , SwerveConstants.CANBUS_NETWORK);
+        this.driveMotor = new TalonFX(driveID ,canbus);
+        this.turningMotor = new TalonFX(turningID , canbus);
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
