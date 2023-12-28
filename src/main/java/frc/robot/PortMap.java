@@ -17,6 +17,8 @@ public class PortMap {
     public static final int rightBackAbsoluteEncoder = 24;
     public static final int rightBackDriveID = 2;
     public static final int rightBackTurningID = 3;
+
+    public static final int pigeonID = 0; // TODO:
   }
 
   public static class Controllers {

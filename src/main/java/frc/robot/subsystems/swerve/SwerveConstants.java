@@ -94,4 +94,9 @@ public class SwerveConstants {
         public final static double PROFILED_THATA_KI = 0.003;
         public final static double PROFILED_THATA_KD = 0;
         public final static double MAX_ANGULAR_ACCELERATION = 15;
+
+        // gyro drift detection
+        public static final double ANGLE_CHANGE_THRESHOLD = 1.0; // TODO: 
+        public static final double DETECTION_TIME = 0.1;         // in seconds TODO:
+        public static final double UPDATE_RATE = 20.0;           // Update rate in Hz
 }
