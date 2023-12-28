@@ -5,6 +5,7 @@
 package frc.robot.subsystems.swerve;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.sensors.Pigeon2;
 import com.ma5951.utils.MAShuffleboard;
 import com.ma5951.utils.RobotConstants;
 import com.pathplanner.lib.PathConstraints;
@@ -25,6 +26,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -48,6 +50,14 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
   private double offsetAngle = 0;
   private double startAngle = 0;
+
+  private boolean pigeonDrift = false;
+  private boolean navxDrift = false;
+
+  private double accumulatedAngularVelocity = 0.0;
+  private double lastNavXAngle = 0.0;
+  private double lastPigeonYaw = 0.0;
+  private double lastTimestamp = 0.0;
 
   private double acc = 0;
   private double lastVelocity = 0;
@@ -81,6 +91,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       -SwerveConstants.LENGTH / 2);
 
   private final AHRS navx = new AHRS(SPI.Port.kMXP);
+  private final Pigeon2 pigeon = new Pigeon2(PortMap.Swerve.pigeonID);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
     rearLeftLocation, rearRightLocation);
@@ -153,6 +164,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   private SwerveDrivetrainSubsystem() {
 
     resetNavx();
+    resetPigeon();
 
     this.board = new MAShuffleboard("swerve");
 
@@ -206,6 +218,10 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     navx.zeroYaw();
   }
 
+  public void resetPigeon() {
+    pigeon.setYaw(0);
+  }
+
   public double getAngularVelocity() {
     return this.kinematics.toChassisSpeeds(getSwerveModuleStates()).omegaRadiansPerSecond;
   }
@@ -215,15 +231,22 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    return navx.getAngle();
+    if (navxDrift && !pigeonDrift) {
+      return pigeon.getYaw();
+    } else if (!navxDrift && pigeonDrift) {
+      return navx.getAngle();
+    } else {
+      return ((pigeon.getYaw() * (1 - (getAngularVelocity() / SwerveConstants.MAX_ANGULAR_VELOCITY)) + 
+               navx.getAngle() * (getAngularVelocity() / SwerveConstants.MAX_ANGULAR_VELOCITY)));
+    }
   }
 
   public double getRoll() {
-    return navx.getRoll();
+    return pigeon.getRoll();
   }
 
   public double getPitch() {
-    return navx.getPitch();
+    return pigeon.getPitch();
   }
 
   public double getVelocity() {
@@ -284,6 +307,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       tPathPlannerTrajectory = trajectory;
     }
     resetNavx();
+    resetPigeon();
     Pose2d pose = new Pose2d(
         tPathPlannerTrajectory.getInitialPose().getX(),
         tPathPlannerTrajectory.getInitialPose().getY(),
@@ -359,5 +383,28 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     lastVelocity = frontLeftModule.getDriveVelocity();
 
     field.setRobotPose(getPose());
+
+
+    double currentTimestamp = Timer.getFPGATimestamp();
+    double deltaTime = currentTimestamp - lastTimestamp;
+
+    if (deltaTime >= SwerveConstants.DETECTION_TIME) {
+        double expectedChange = accumulatedAngularVelocity * SwerveConstants.DETECTION_TIME;
+
+        if (Math.abs(navx.getAngle() - lastNavXAngle - expectedChange) >= SwerveConstants.ANGLE_CHANGE_THRESHOLD) {
+            navxDrift = true;
+        } else {
+            navxDrift = false;
+        }
+
+        if (Math.abs(pigeon.getYaw() - lastPigeonYaw - expectedChange) >= SwerveConstants.ANGLE_CHANGE_THRESHOLD) {
+            pigeonDrift = true;
+        } else {
+            pigeonDrift = false;
+        }
+
+        accumulatedAngularVelocity = 0.0;
+        lastTimestamp = currentTimestamp;
+    }
   }
 }
