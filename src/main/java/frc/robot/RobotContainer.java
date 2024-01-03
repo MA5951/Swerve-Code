@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ma5951.utils.Limelight;
+
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
@@ -22,6 +25,9 @@ public class RobotContainer {
 
   public static final CommandPS4Controller ps4 = 
     new CommandPS4Controller(PortMap.Controllers.driverJostick);
+
+  public static final Limelight LIMELIGHT = new Limelight(
+    "limelight", new Transform3d());
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

@@ -19,25 +19,25 @@ public class SwerveConstants {
         public final static double ANGLE_PER_PULSE = 360d / TURNING_GEAR_RATIO;
 
         // front left module
-        public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 88;
+        public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 87.6;
         public final static boolean FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
         public final static boolean FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
         public final static boolean FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = true;
 
         // front right module
-        public final static double FRONT_RIGHT_MODULE_OFFSET_ENCODER = 77.255859375;
+        public final static double FRONT_RIGHT_MODULE_OFFSET_ENCODER = 78;
         public final static boolean FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
         public final static boolean FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
         public final static boolean FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = true;
 
         // rear left module
-        public final static double REAR_LEFT_MODULE_OFFSET_ENCODER = 207.59765625;
+        public final static double REAR_LEFT_MODULE_OFFSET_ENCODER = 215;
         public final static boolean REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
         public final static boolean REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
         public final static boolean REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = true;
 
         // rear right module
-        public final static double REAR_RIGHT_MODULE_OFFSET_ENCODER = 77;
+        public final static double REAR_RIGHT_MODULE_OFFSET_ENCODER = 79;
         public final static boolean REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
         public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
         public final static boolean REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = true;
@@ -60,9 +60,9 @@ public class SwerveConstants {
         // PID
         public final static double DRIVE_PID_KP = 3.1;
         public final static double DRIVE_PID_KI = 0;
-        public final static double DRIVE_PID_KD = 0.03;
-        public final static double DRIVE_KS = 0.05 * 12;
-        public final static double DRIVE_KV = 0.206 * 12;
+        public final static double DRIVE_PID_KD = 0;//0.03;
+        public final static double DRIVE_KS = 0; //
+        public final static double DRIVE_KV = 0.18 * 12;
         // Current Limit
         public final static int DRIVE_CONTINUOS_CURRENT_LIMIT = 35;
         public final static int DRIVE_PEAK_CURRENT_LIMIT = 400;
@@ -94,4 +94,6 @@ public class SwerveConstants {
         public final static double PROFILED_THATA_KI = 0.003;
         public final static double PROFILED_THATA_KD = 0;
         public final static double MAX_ANGULAR_ACCELERATION = 15;
+
+        public final static double Max_Dis_from_Cam = 10; // TODO
 }

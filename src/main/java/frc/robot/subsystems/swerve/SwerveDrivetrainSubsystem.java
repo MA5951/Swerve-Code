@@ -4,7 +4,8 @@
 
 package frc.robot.subsystems.swerve;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ma5951.utils.MAShuffleboard;
 import com.ma5951.utils.RobotConstants;
 import com.pathplanner.lib.PathConstraints;
@@ -24,7 +25,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -32,7 +32,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.PortMap;
+import frc.robot.RobotContainer;
 
 public class SwerveDrivetrainSubsystem extends SubsystemBase {
 
@@ -47,7 +49,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   public boolean isXYReversed = true;
 
   private double offsetAngle = 0;
-  private double startAngle = 0;
 
   private double acc = 0;
   private double lastVelocity = 0;
@@ -80,7 +81,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.WIDTH / 2,
       -SwerveConstants.LENGTH / 2);
 
-  private final AHRS navx = new AHRS(SPI.Port.kMXP);
+  private final Pigeon2 gyro = new Pigeon2(PortMap.Swerve.Pigeon2ID, Constants.CanBus.CANivoreBus);
 
   private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
     rearLeftLocation, rearRightLocation);
@@ -93,7 +94,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final static SwerveModule frontRightModule = new SwerveModuleTalonFX(
       "frontRightModule",
@@ -103,7 +105,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final static SwerveModule rearLeftModule = new SwerveModuleTalonFX(
       "rearLeftModule",
@@ -113,7 +116,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final static SwerveModule rearRightModule = new SwerveModuleTalonFX(
       "rearRightModule",
@@ -123,7 +127,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
       SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
       SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
       SwerveConstants.REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-      SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER);
+      SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER,
+      Constants.CanBus.CANivoreBus);
 
   private final SwerveDrivePoseEstimator odometry = new SwerveDrivePoseEstimator(kinematics,
       new Rotation2d(0), getSwerveModulePositions(),
@@ -152,7 +157,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   /** Creates a new DrivetrainSubsystem. */
   private SwerveDrivetrainSubsystem() {
 
-    resetNavx();
+    resetGyro();
 
     this.board = new MAShuffleboard("swerve");
 
@@ -201,9 +206,8 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     offsetAngle = getFusedHeading();
   }
 
-  public void resetNavx() {
-    navx.reset();
-    navx.zeroYaw();
+  public void resetGyro() {
+    gyro.reset();
   }
 
   public double getAngularVelocity() {
@@ -215,15 +219,21 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    return navx.getAngle();
+    StatusSignal<Double> yaw = gyro.getYaw();
+    yaw.refresh();
+    return yaw.getValue();
   }
 
   public double getRoll() {
-    return navx.getRoll();
+    StatusSignal<Double> roll = gyro.getRoll();
+    roll.refresh();
+    return roll.getValue();
   }
 
   public double getPitch() {
-    return navx.getPitch();
+    StatusSignal<Double> pitch = gyro.getPitch();
+    pitch.refresh();
+    return pitch.getValue();
   }
 
   public double getVelocity() {
@@ -264,7 +274,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     rearLeftModule.setDesiredState(states[1]);
     frontRightModule.setDesiredState(states[2]);
     rearRightModule.setDesiredState(states[3]);
-
   }
 
   public void drive(double x, double y, double omega, boolean fieldRelative) {
@@ -283,7 +292,7 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     } else {
       tPathPlannerTrajectory = trajectory;
     }
-    resetNavx();
+    resetGyro();
     Pose2d pose = new Pose2d(
         tPathPlannerTrajectory.getInitialPose().getX(),
         tPathPlannerTrajectory.getInitialPose().getY(),
@@ -336,14 +345,6 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     offsetAngle = offset;
   }
 
-  public void setSatrtAngle() {
-    startAngle = getFusedHeading();
-  }
-
-  public void setOffsetAfterAuto() {
-    setOffsetangle(startAngle + 180);
-  }
-
   public static SwerveDrivetrainSubsystem getInstance() {
     if (swerve == null) {
       swerve = new SwerveDrivetrainSubsystem();
@@ -359,5 +360,25 @@ public class SwerveDrivetrainSubsystem extends SubsystemBase {
     lastVelocity = frontLeftModule.getDriveVelocity();
 
     field.setRobotPose(getPose());
+
+    board.addNum("yaw", getFusedHeading());
+    board.addNum("roll", getRoll());
+    board.addNum("pitch", getPitch());
+
+    board.addNum("afl", frontLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("afr", frontRightModule.getAbsoluteEncoderPosition());
+    board.addNum("arl", rearLeftModule.getAbsoluteEncoderPosition());
+    board.addNum("arr", rearRightModule.getAbsoluteEncoderPosition());
+
+    board.addNum("fl angle", frontLeftModule.getTurningPosition());
+    board.addNum("fr angle", frontRightModule.getTurningPosition());
+    board.addNum("rl angle", rearLeftModule.getTurningPosition());
+    board.addNum("rr angle", rearRightModule.getTurningPosition());
+
+    Pose2d estPose = RobotContainer.LIMELIGHT.getEstPose();
+    if (!DriverStation.isAutonomous()
+      && RobotContainer.LIMELIGHT.hasTarget()) {
+        resetOdometry(estPose);
+      }
   }
 }
