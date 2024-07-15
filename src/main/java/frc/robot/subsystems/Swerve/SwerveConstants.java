@@ -1,11 +1,10 @@
-package frc.robot.subsystems.SwerveNew;
+package frc.robot.subsystems.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
-import frc.robot.subsystems.SwerveNew.Utils.ModuleLimits;
-import frc.robot.subsystems.SwerveNew.Utils.SwerveModule;
+import frc.robot.Utils.ModuleLimits;
 
 public class SwerveConstants {
         // swerve constants

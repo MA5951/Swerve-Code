@@ -1,4 +1,4 @@
-package frc.robot.subsystems.SwerveNew;
+package frc.robot.subsystems.Swerve;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import frc.robot.subsystems.SwerveNew.Utils.SwerveModule;
 
 public class SwerveModuleTalonFX extends SwerveModule {
 

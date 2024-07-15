@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.SwerveNew;
+package frc.robot.subsystems.Swerve;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
@@ -11,7 +11,6 @@ import com.ma5951.utils.DashBoard.MAShuffleboard;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -24,10 +23,10 @@ import frc.robot.PortMap;
 //Raer Right
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.SwerveNew.Utils.ModuleLimits;
-import frc.robot.subsystems.SwerveNew.Utils.SwerveSetpoint;
-import frc.robot.subsystems.SwerveNew.Utils.SwerveSetpointGenerator;
-import frc.robot.subsystems.SwerveNew.Utils.SwerveModule;
+import frc.robot.Utils.ModuleLimits;
+import frc.robot.Utils.OdometryUpdate;
+import frc.robot.Utils.RobotClock;
+import frc.robot.Utils.SwerveSetpoint;
 
 public class SwerveSubsystem extends SubsystemBase {
   private static SwerveSubsystem swerveSubsystem;
@@ -183,13 +182,9 @@ public class SwerveSubsystem extends SubsystemBase {
     modulesArry[3].stop();
   }
 
-  public SwerveModuleState[] generateNonOptimaisedStates(ChassisSpeeds OLDchassiSpeeds) {
-    return SwerveConstants.kinematics
-        .toSwerveModuleStates(OLDchassiSpeeds);
-  }
-
-  public SwerveModuleState[] generateOptimaisedStates(ChassisSpeeds chassiSpeeds) {
-    currentSetpoint =
+  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
+    if (optimize) {
+      currentSetpoint =
       setpointGenerator.generateSetpoint(
           new ModuleLimits(Units.feetToMeters(15.0), Units.feetToMeters(75.0), Units.degreesToRadians(1080)), currentSetpoint, chassiSpeeds, 0.02);
     SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
@@ -201,7 +196,13 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     return optimizedSetpointStates;
+    } else {
+      return SwerveConstants.kinematics
+        .toSwerveModuleStates(chassiSpeeds);
+    }
   }
+
+
 
   public void setModules(SwerveModuleState[] states) {
     SwerveConstants.frontLeftModule.setDesiredState(states[0]);
@@ -223,12 +224,12 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-  public void drive(double x, double y, double omega, boolean fieldRelative) {
+  public void drive(double x, double y, double omega, boolean fieldRelative , boolean optimize) {
     ChassisSpeeds chassisSpeeds = fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega,
                   new Rotation2d(
                     Math.toRadians((getFusedHeading() - offsetAngle))))
                   : new ChassisSpeeds(x, y, omega);
-    SwerveModuleState[] setPointStates = generateOptimaisedStates(chassisSpeeds);
+    SwerveModuleState[] setPointStates = generateStates(chassisSpeeds , optimize);
   
     setModules(new SwerveModuleState[] {setPointStates[0] , setPointStates[2] , setPointStates[1] , setPointStates[3]});
     if (!Robot.isReal()) {
@@ -253,6 +254,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
+  public OdometryUpdate getOdometryUpdate() {
+    return new OdometryUpdate(getSwerveModulePositions(), RobotClock.getInstance().getRobotTimeStamp());
+  }
+
   public void printAbsolutePositions() {
     board.addNum("Front Left Absolute" , modulesArry[0].getAbsoluteEncoderPosition());
     board.addNum("Front Rigth Absolute" , modulesArry[1].getAbsoluteEncoderPosition());
@@ -266,6 +271,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void setCurrentLimits(ModuleLimits newLimits) {
     currentLimits = newLimits;
+  }
+
+  public Pigeon2 getGyro() {
+    return gyro;
   }
 
   public static SwerveSubsystem getInstance() {

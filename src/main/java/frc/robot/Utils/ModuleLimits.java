@@ -1,5 +1,5 @@
 
-package frc.robot.subsystems.SwerveNew.Utils;
+package frc.robot.Utils;
 
 public record ModuleLimits(
     double maxDriveVelocity, double maxDriveAcceleration, double maxSteeringVelocity) {}
