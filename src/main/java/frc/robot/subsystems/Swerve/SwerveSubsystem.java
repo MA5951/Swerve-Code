@@ -238,17 +238,8 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
-    currentSetpoint =
-      setpointGenerator.generateSetpoint(
-          currentLimits, currentSetpoint, chassisSpeeds, 0.02);
-    SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
-
-    for (int i = 0; i < modulesArry.length; i++) {
-      // Optimize setpoints
-      optimizedSetpointStates[i] =
-          SwerveModuleState.optimize(currentSetpoint.moduleStates()[i], new Rotation2d(modulesArry[i].getAbsoluteEncoderPosition()));
-    }
-    setModules(new SwerveModuleState[] {optimizedSetpointStates[0] , optimizedSetpointStates[1] , optimizedSetpointStates[2] , optimizedSetpointStates[3]});
+    SwerveModuleState[] states = generateStates(chassisSpeeds, false);
+    setModules(new SwerveModuleState[] {states[0] , states[1] , states[2] , states[3]});
       if (!Robot.isReal()) {
         simAngle += Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond) * 0.02;
     }

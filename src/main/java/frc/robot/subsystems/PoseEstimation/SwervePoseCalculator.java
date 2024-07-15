@@ -2,22 +2,28 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.Swerve;
+package frc.robot.subsystems.PoseEstimation;
 
-import java.util.function.Supplier;
-
-import frc.robot.Utils.OdometryUpdate;
+import frc.robot.subsystems.Swerve.CollisionDtector;
+import frc.robot.subsystems.Swerve.SkidDetector;
+import frc.robot.subsystems.Swerve.SwerveSubsystem;
 
 /** Add your docs here. */
-public class SwerveDriveOdometry {
+public class SwervePoseCalculator {
 
     private CollisionDtector collisionDtector;
+    private SkidDetector skidDetector;
 
-    public SwerveDriveOdometry() {
+    public SwervePoseCalculator() {
         collisionDtector = new CollisionDtector(SwerveSubsystem.getInstance().getGyro());
+        skidDetector = new SkidDetector(SwerveSubsystem.getInstance().getOdometryUpdate());
     }
 
+    
     public void update() {
         collisionDtector.update();
     }
+
+
+
 }

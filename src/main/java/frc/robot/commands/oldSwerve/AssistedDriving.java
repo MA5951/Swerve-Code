@@ -1,3 +1,4 @@
+package frc.robot.commands.oldSwerve;
 // // Copyright (c) FIRST and other WPILib contributors.
 // // Open Source Software; you can modify and/or share it under the terms of
 // // the WPILib BSD license file in the root directory of this project.
@@ -6,37 +7,52 @@
 
 // import java.util.function.Supplier;
 
+// import edu.wpi.first.math.controller.PIDController;
+// import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.kinematics.ChassisSpeeds;
 // import edu.wpi.first.wpilibj2.command.Command;
+// import frc.robot.subsystems.Conveyr.Conveyr;
+// import frc.robot.subsystems.Vision.NoteDetector;
+// import frc.robot.subsystems.swerve.SwerveConstants;
 // import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
 
-// public class DriveSwerveCommand extends Command {
+// public class AssistedDriving extends Command {
 //   /** Creates a new swerveJoystickCommand. */
 //   private final SwerveDrivetrainSubsystem swerve;
+//   //private final NoteDetector noteDetector;
+//   //private final Conveyr conveyr;
 //   // private final SlewRateLimiter xRateLimiter, yRateLimiter, turningRateLimiter;
 //   private Supplier<Double> xSpeedSupplier;
 //   private Supplier<Double> ySpeedSupplier;
 //   private Supplier<Double> turningSpeedSupplier;
 //   private boolean filedReletive;
+//   private PIDController pidController;
+//   private ChassisSpeeds robotSpeed;
 
 //   /**
 //    * @param xSpeedSupplier       Percentage (-1 - 1)
 //    * @param ySpeedSupplier       Percentage (-1 - 1)
 //    * @param turningSpeedSupplier Percentage (-1 - 1)
 //    */
-//   public DriveSwerveCommand(
+//   public AssistedDriving(
 //       Supplier<Double> xSpeedSupplier,
 //       Supplier<Double> ySpeedSupplier,
 //       Supplier<Double> turningSpeedSupplier,
 //       boolean filedReletive) {
 //     swerve = SwerveDrivetrainSubsystem.getInstance();
+//     //noteDetector = NoteDetector.getInstance();
+//     //conveyr = Conveyr.getInstance();
 //     this.xSpeedSupplier = xSpeedSupplier;
 //     this.ySpeedSupplier = ySpeedSupplier;
 //     this.turningSpeedSupplier = turningSpeedSupplier;
 //     this.filedReletive = filedReletive;
+
+//     //pidController = new PIDController(SwerveConstants.ASSISTED_INTAKE_P, SwerveConstants.ASSISTED_INTAKE_I, SwerveConstants.ASSISTED_INTAKE_D);
+
 //     addRequirements(swerve);
 //   }
 
-//   public DriveSwerveCommand(
+//   public AssistedDriving(
 //       Supplier<Double> xSpeedSupplier,
 //       Supplier<Double> ySpeedSupplier,
 //       Supplier<Double> turningSpeedSupplier) {
@@ -55,6 +71,21 @@
 //     double ySpeed = SwerveDrivetrainSubsystem.getInstance().isXYReversed ? xSpeedSupplier.get() : ySpeedSupplier.get();
 //     double turningSpeed = turningSpeedSupplier.get();
 
+//     // if (noteDetector.getNoteYLocationRelativRobot() < SwerveConstants.ASSISTED_INTAKE_DISTANCE
+//     //   && noteDetector.hasTarget()
+//     //   && !conveyr.isRing()) {
+//     //   robotSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(
+//     //     pidController.calculate(noteDetector.getNoteXLocationRelativRobot(), 0)
+//     //    * SwerveConstants.ASSISTED_INTAKE_POWER,
+//     //     0,
+//     //     0,
+//     //      new Rotation2d(
+//     //               Math.toRadians((swerve.getFusedHeading() - swerve.getOffsetAngle()))));
+//     // } else if (true) {
+      
+//     // }
+    
+    
 //     xSpeed = Math.abs(xSpeed) < 0.1 ? 0 : xSpeed;
 //     ySpeed = Math.abs(ySpeed) < 0.1 ? 0 : ySpeed;
 

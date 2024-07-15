@@ -4,19 +4,17 @@
 
 package frc.robot.subsystems.Swerve;
 
-import java.util.function.Supplier;
-
-import frc.robot.Utils.OdometryUpdate;
 
 /** Add your docs here. */
-public class SkidDetector {
+public class SwerveOdometry {
 
-    public SkidDetector(OdometryUpdate odometryUpdate) {
 
+
+    public SwerveOdometry() {
+        
     }
 
     public void update() {
-
+        
     }
-
 }
