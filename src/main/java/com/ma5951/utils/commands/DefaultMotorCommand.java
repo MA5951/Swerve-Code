@@ -6,11 +6,11 @@ package com.ma5951.utils.commands;
 
 import java.util.function.Supplier;
 
-import com.ma5951.utils.subsystem.MotorSubsystem;
+import com.ma5951.utils.Subsystems.MotorSubsystem;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class DefaultMotorCommand extends CommandBase {
+public class DefaultMotorCommand extends Command {
   /** Creates a new DefultMotorCommand. */
   private MotorSubsystem subsystem;
   private Supplier<Double> power;

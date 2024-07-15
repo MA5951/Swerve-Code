@@ -7,14 +7,14 @@ package com.ma5951.utils.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.Supplier;
 
+import com.ma5951.utils.Subsystems.ControllableSubsystem;
 import com.ma5951.utils.controllersConstants.PIDControllerConstants;
-import com.ma5951.utils.subsystem.ControllableSubsystem;
 
-public class ControlCommandPID extends CommandBase {
+public class ControlCommandPID extends Command {
   /** Creates a new MAControlCommand. */
 
   private ControllableSubsystem subsystem;

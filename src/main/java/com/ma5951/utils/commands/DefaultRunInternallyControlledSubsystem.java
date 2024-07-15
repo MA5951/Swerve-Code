@@ -4,19 +4,19 @@
 
 package com.ma5951.utils.commands;
 
-import com.ma5951.utils.subsystem.DefaultInternallyControlledSubsystem;
+import com.ma5951.utils.Subsystems.DefaultInternallyControlledSubsystem;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class DefaultRunInternallyControlledSubsystem extends CommandBase {
+public class DefaultRunInternallyControlledSubsystem extends Command {
   /** Creates a new DefultControlCommandInSubsystemControl. */
   private DefaultInternallyControlledSubsystem subsystem;
-  private double setPointWhenCantMove;
+  private double powerWhenCantMove;
 
   public DefaultRunInternallyControlledSubsystem(
-      DefaultInternallyControlledSubsystem subsystem, double setPointWhenCantMove) {
+      DefaultInternallyControlledSubsystem subsystem, double powerWhenCantMove) {
     this.subsystem = subsystem;
-    this.setPointWhenCantMove = setPointWhenCantMove;
+    this.powerWhenCantMove = powerWhenCantMove;
     addRequirements(subsystem);
   }
 
@@ -28,17 +28,17 @@ public class DefaultRunInternallyControlledSubsystem extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (subsystem.canMove()) {
-      subsystem.calculate(subsystem.getSetPoint());
+    if (!subsystem.canMove()) {
+      subsystem.setPower(powerWhenCantMove);
     } else {
-      subsystem.setSetPoint(setPointWhenCantMove);
-      subsystem.calculate(setPointWhenCantMove);
+      subsystem.calculate(subsystem.getSetPoint());
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    subsystem.setPower(0);
   }
 
   // Returns true when the command should end.

@@ -4,13 +4,13 @@
 
 package com.ma5951.utils.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.Supplier;
 
-import com.ma5951.utils.subsystem.PistonSubsystem;
+import com.ma5951.utils.Subsystems.PistonSubsystem;
 
-public class PistonCommand extends CommandBase {
+public class PistonCommand extends Command {
   private PistonSubsystem subsystem;
   private Supplier<Boolean> value;
 

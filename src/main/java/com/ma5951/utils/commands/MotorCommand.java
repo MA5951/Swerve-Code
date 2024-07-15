@@ -4,13 +4,13 @@
 
 package com.ma5951.utils.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.Supplier;
 
-import com.ma5951.utils.subsystem.MotorSubsystem;
+import com.ma5951.utils.Subsystems.MotorSubsystem;
 
-public class MotorCommand extends CommandBase {
+public class MotorCommand extends Command {
 
   private MotorSubsystem subsystem;
   private Supplier<Double> power;

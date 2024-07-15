@@ -6,16 +6,16 @@ package com.ma5951.utils.commands;
 
 import java.util.function.Supplier;
 
+import com.ma5951.utils.Subsystems.ControllableSubsystem;
 import com.ma5951.utils.controllersConstants.ProfiledPIDControllerConstants;
-import com.ma5951.utils.subsystem.ControllableSubsystem;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class ControlCommandProfiledPID extends CommandBase {
+public class ControlCommandProfiledPID extends Command {
   private ControllableSubsystem subsystem;
   private Supplier<TrapezoidProfile.State> goal;
   private ProfiledPIDController ProfiledPID;
