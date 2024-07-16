@@ -40,14 +40,12 @@ public abstract class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState) {
-        SwerveModuleState optimizedState = SwerveModule.optimize(desiredState,
-                getTurningPosition());
-        if (optimizedState.speedMetersPerSecond != 0) {
-            turningUsingPID(optimizedState.angle.getDegrees());
+        if (desiredState.speedMetersPerSecond != 0 ) {
+            turningUsingPID(desiredState.angle.getDegrees());
         } else {
             turningMotorSetPower(0);
         }
-        driveUsingPID(optimizedState.speedMetersPerSecond);
+        driveUsingPID(desiredState.speedMetersPerSecond);
     }
 
     public void stop() {
@@ -55,24 +53,4 @@ public abstract class SwerveModule {
         turningMotorSetPower(0);
     }
 
-    private static SwerveModuleState optimize(SwerveModuleState desiredState,
-            double currentAngle) {
-        double angleDiff = (desiredState.angle.getDegrees() - currentAngle) % 360;
-        double targetAngle = currentAngle + angleDiff;
-        double targetSpeed = desiredState.speedMetersPerSecond;
-
-        if (angleDiff <= -270) {
-            targetAngle += 360;
-        } else if (-90 > angleDiff && angleDiff > -270) {
-            targetAngle += 180;
-            targetSpeed = -targetSpeed;
-        } else if (90 < angleDiff && angleDiff < 270) {
-            targetAngle -= 180;
-            targetSpeed = -targetSpeed;
-        } else if (angleDiff >= 270) {
-            targetAngle -= 360;
-        }
-
-        return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
-    }
 }

@@ -15,7 +15,7 @@ public class SwerveConstants {
 
         // Modules constants
         public final static double TURNING_GEAR_RATIO = 150d / 7;
-        private final static double DRIVE_GEAR_RATIO = 6.12;
+        private final static double DRIVE_GEAR_RATIO = 6.75;
         private final static double WHEEL_RADIUS = 0.0508;
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
@@ -25,25 +25,25 @@ public class SwerveConstants {
         public final static double ANGLE_PER_PULSE = 360d / TURNING_GEAR_RATIO;
 
         // front left module
-        public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 90;
+        public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 9.4;
         public final static boolean FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
         public final static boolean FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // front right module
-        public final static double FRONT_RIGHT_MODULE_OFFSET_ENCODER = 162.6;
+        public final static double FRONT_RIGHT_MODULE_OFFSET_ENCODER = 162.8;
         public final static boolean FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
         public final static boolean FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // rear left module
-        public final static double REAR_LEFT_MODULE_OFFSET_ENCODER = 104.2;
+        public final static double REAR_LEFT_MODULE_OFFSET_ENCODER = 199.6;
         public final static boolean REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
         public final static boolean REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // rear right module
-        public final static double REAR_RIGHT_MODULE_OFFSET_ENCODER = 99.5;
+        public final static double REAR_RIGHT_MODULE_OFFSET_ENCODER = 214;
         public final static boolean REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
         public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;

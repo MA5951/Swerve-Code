@@ -21,6 +21,7 @@ public class DriveController extends Command {
 
   public DriveController(CommandPS5Controller controller) {
     Controller = controller;
+    addRequirements(SwerveSubsystem.getInstance());
   }
 
   @Override

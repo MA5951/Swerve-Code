@@ -7,6 +7,8 @@ package frc.robot.subsystems.Swerve;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ma5951.utils.DashBoard.MAShuffleboard;
+import com.ma5951.utils.Logger.LoggedDouble;
+import com.ma5951.utils.Logger.LoggedSwerveStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -33,7 +35,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private SwerveSetpointGenerator setpointGenerator;
   private MAShuffleboard board;
-
+  private LoggedSwerveStates currenStates;
+  private LoggedSwerveStates setPoinStates;
+  private LoggedDouble frontLeftABS;
+  private LoggedDouble frontRightABS;
+  private LoggedDouble rearLeftABS;
+  private LoggedDouble rearRightABS;
 
   public final static SwerveModule[] modulesArry = new SwerveModule[] {
     SwerveConstants.frontLeftModule , SwerveConstants.frontRightModule , SwerveConstants.rearLeftModule , SwerveConstants.rearRightModule};
@@ -92,7 +99,7 @@ public class SwerveSubsystem extends SubsystemBase {
   });
 
   private final Pigeon2 gyro = new Pigeon2(PortMap.Swerve.Pigeon2ID, PortMap.CanBus.RioBus);
-  private Double simAngle;
+  private Double simAngle = 0d;
   private double offsetAngle = 0;
 
   public SwerveSubsystem() {
@@ -106,6 +113,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
     board = new MAShuffleboard("Swerve");
 
+    currenStates = new LoggedSwerveStates("/Swerve/Current States");
+    setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
+    frontLeftABS = new LoggedDouble("/Swerve/Modules/Front Left/Absolute Position");
+    frontRightABS = new LoggedDouble("/Swerve/Modules/Front Right/Absolute Position");
+    rearLeftABS = new LoggedDouble("/Swerve/Modules/Rear Left/Absolute Position");
+    rearRightABS = new LoggedDouble("/Swerve/Modules/Rear Right/Absolute Position");
   }
 
   public void resetEncoders() {
@@ -224,21 +237,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
-  public void drive(double x, double y, double omega, boolean fieldRelative , boolean optimize) {
-    ChassisSpeeds chassisSpeeds = fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(x, y, omega,
-                  new Rotation2d(
-                    Math.toRadians((getFusedHeading() - offsetAngle))))
-                  : new ChassisSpeeds(x, y, omega);
-    SwerveModuleState[] setPointStates = generateStates(chassisSpeeds , optimize);
-  
-    setModules(new SwerveModuleState[] {setPointStates[0] , setPointStates[2] , setPointStates[1] , setPointStates[3]});
-    if (!Robot.isReal()) {
-      simAngle += Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond) * 0.02;
-    }
-  }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, false);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, true);
+    setPoinStates.update(states);
     setModules(new SwerveModuleState[] {states[0] , states[1] , states[2] , states[3]});
       if (!Robot.isReal()) {
         simAngle += Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond) * 0.02;
@@ -281,10 +283,18 @@ public class SwerveSubsystem extends SubsystemBase {
 
 
     //Limits state meachin
-    if (RobotContainer.driveController.R2().getAsBoolean()) {
-      currentLimits = SwerveConstants.Slow10Precent;
-    } else if (RobotContainer.driveController.L2().getAsBoolean()) {
-      currentLimits = SwerveConstants.Slow40Precent;
-    }
+    // if (RobotContainer.driveController.R2().getAsBoolean()) {
+    //   currentLimits = SwerveConstants.Slow10Precent;
+    // } else if (RobotContainer.driveController.L2().getAsBoolean()) {
+    //   currentLimits = SwerveConstants.Slow40Precent;
+    // }
+
+    currenStates.update(getSwerveModuleStates());
+    frontLeftABS.update(modulesArry[0].getAbsoluteEncoderPosition());
+    frontRightABS.update(modulesArry[1].getAbsoluteEncoderPosition());
+    rearLeftABS.update(modulesArry[2].getAbsoluteEncoderPosition());
+    rearRightABS.update(modulesArry[3].getAbsoluteEncoderPosition());
+
+  
   }
 }
