@@ -1,7 +1,7 @@
 package frc.robot.subsystems.Swerve;
 
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.ClosedLoopRampsConfigs;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -40,12 +40,17 @@ public class SwerveModuleTalonFX extends SwerveModule {
     private double angleOffset;
     private double dirvePoseOffset;
 
-    public SwerveModuleTalonFX(String tabName, int driveID,
+    //Absolute Position
+    //Velocity
+    //Current
+    //Relativ Position
+
+    public SwerveModuleTalonFX(int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
             boolean isTurningMotorReversed, boolean isAbsoluteEncoderReversed,
             double offsetEncoder, String canbus) {
-        this.absoluteEcoder = new CANcoder(absoluteEncoderID, canbus);
-
+        this.absoluteEcoder = new CANcoder(absoluteEncoderID, canbus); //TODO check the doc  
+      
         this.offsetEncoder = offsetEncoder;
         this.isAbsoluteEncoderReversed = isAbsoluteEncoderReversed;
 
@@ -54,6 +59,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
         this.driveMotor = new TalonFX(driveID, canbus);
         this.turningMotor = new TalonFX(turningID, canbus);
+       
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
@@ -70,6 +76,8 @@ public class SwerveModuleTalonFX extends SwerveModule {
         TalonFXConfiguration turningConfiguration = new TalonFXConfiguration();
 
         turningConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+
+        //Use feedback
 
         turningConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
 
@@ -137,10 +145,21 @@ public class SwerveModuleTalonFX extends SwerveModule {
         angleOffset = ((getAbsoluteEncoderPosition() - offsetEncoder)
             / SwerveConstants.ANGLE_PER_PULSE) - 
             steerPosition.getValue();
+        dirvePoseOffset = - drivePosition.getValue(); //TODO check if needs 
+    }
+
+    public void resetSteer() {
+        angleOffset = ((getAbsoluteEncoderPosition() - offsetEncoder)
+            / SwerveConstants.ANGLE_PER_PULSE) - 
+            steerPosition.getValue();
+    }
+
+    public void resetDrive() {
         dirvePoseOffset = - drivePosition.getValue();
     }
 
-    public double getCurrent() {
+    //Turn to signal
+    public double getCurrent() { //CHANGE NAME AND ADD STEER
         return driveMotor.getStatorCurrent().getValue();
     }
 
@@ -171,21 +190,29 @@ public class SwerveModuleTalonFX extends SwerveModule {
                 SwerveConstants.VELOCITY_TIME_UNIT_IN_SECONDS;
     }
 
-    public void setAccelerationLimit(double limit) {
+    public void setNutralModeDrive(Boolean isBrake) {
         TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
-        ClosedLoopRampsConfigs closedLoopRampsConfigs = new ClosedLoopRampsConfigs();
-
-        closedLoopRampsConfigs.DutyCycleClosedLoopRampPeriod = limit;
-
+        driveConfiguration.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+            //cHECK IF IT IS THE RIGHT WAY
         driveMotor.getConfigurator().apply(driveConfiguration);
     }
 
+    //Add setBrake to steer
+    //Make Signal standarts and make internal signal standart
     public void turningMotorSetPower(double power) {
         turningMotor.set(power);
     }
 
     public void driveMotorSetPower(double power) {
         driveMotor.set(power);
+    }
+
+    public void turningMotorSetVoltage(double volt) {
+        turningMotor.setVoltage(volt);
+    }
+
+    public void driveMotorSetVoltage(double volt) {
+        driveMotor.setVoltage(volt);
     }
 
     public void setInvertedTurning(Boolean turningMode) {
@@ -201,11 +228,17 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
     public void driveUsingPID(double setPoint) {
         driveMotor.setControl(
-                velocitySetter.withFeedForward(
+                velocitySetter.withFeedForward( // CHEACK 
                         feedforward.calculate(
                                 setPoint))
                         .withSlot(0).withVelocity((setPoint
                                 / SwerveConstants.DISTANCE_PER_PULSE) /
                                 SwerveConstants.VELOCITY_TIME_UNIT_IN_SECONDS));
+    }
+
+    public void update() {
+        
+
+
     }
 }

@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Utils.RobotClock;
 import frc.robot.commands.Swerve.DriveController;
+import frc.robot.commands.Swerve.TeleopSwerveController;
 import frc.robot.subsystems.Swerve.SwerveSubsystem;
 
 
@@ -57,8 +58,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    CommandScheduler.getInstance().setDefaultCommand(SwerveSubsystem.getInstance()
-    , new DriveController(RobotContainer.driveController));
+    CommandScheduler.getInstance().setDefaultCommand(
+      SwerveSubsystem.getInstance(),
+      new TeleopSwerveController(RobotContainer.driveController));
   
   }
 

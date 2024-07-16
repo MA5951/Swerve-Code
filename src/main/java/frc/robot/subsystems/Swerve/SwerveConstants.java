@@ -68,7 +68,7 @@ public class SwerveConstants {
 
         //Modules
         public final static SwerveModule frontLeftModule = new SwerveModuleTalonFX(
-        "frontLeftModule",
+        
         PortMap.Swerve.leftFrontDriveID,
         PortMap.Swerve.leftFrontTurningID,
         PortMap.Swerve.leftFrontAbsoluteEncoder,
@@ -79,7 +79,7 @@ public class SwerveConstants {
         PortMap.CanBus.CANivoreBus);
 
         public final static SwerveModule frontRightModule = new SwerveModuleTalonFX(
-      "frontRightModule",
+  
         PortMap.Swerve.rightFrontDriveID,
         PortMap.Swerve.rightFrontTurningID,
         PortMap.Swerve.rightFrontAbsoluteEncoder,
@@ -90,7 +90,7 @@ public class SwerveConstants {
         PortMap.CanBus.CANivoreBus);
 
         public final static SwerveModule rearLeftModule = new SwerveModuleTalonFX(
-      "rearLeftModule",
+      
         PortMap.Swerve.leftBackDriveID,
         PortMap.Swerve.leftBackTurningID,
         PortMap.Swerve.leftBackAbsoluteEncoder,
@@ -101,7 +101,7 @@ public class SwerveConstants {
         PortMap.CanBus.CANivoreBus);
 
         public final static SwerveModule rearRightModule = new SwerveModuleTalonFX(
-        "rearRightModule",
+       
         PortMap.Swerve.rightBackDriveID,
         PortMap.Swerve.rightBackTurningID,
         PortMap.Swerve.rightBackAbsoluteEncoder,

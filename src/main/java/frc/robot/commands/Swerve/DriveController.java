@@ -6,7 +6,6 @@ package frc.robot.commands.Swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
 import frc.robot.subsystems.Swerve.SwerveSubsystem;
@@ -21,7 +20,6 @@ public class DriveController extends Command {
 
   public DriveController(CommandPS5Controller controller) {
     Controller = controller;
-    addRequirements(SwerveSubsystem.getInstance());
   }
 
   @Override
@@ -42,11 +40,16 @@ public class DriveController extends Command {
                   new Rotation2d(
                     Math.toRadians((SwerveSubsystem.getInstance().getFusedHeading()
                      - SwerveSubsystem.getInstance().getOffsetAngle()))));
-    SwerveSubsystem.getInstance().drive(speed);
+  }
+
+  public ChassisSpeeds getChassisSpeed() {
+    return speed;
   }
 
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    
+  }
 
   @Override
   public boolean isFinished() {

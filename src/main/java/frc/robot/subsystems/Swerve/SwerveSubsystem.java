@@ -12,6 +12,7 @@ import com.ma5951.utils.Logger.LoggedSwerveStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -24,7 +25,6 @@ import frc.robot.PortMap;
 //Rear Left
 //Raer Right
 import frc.robot.Robot;
-import frc.robot.RobotContainer;
 import frc.robot.Utils.ModuleLimits;
 import frc.robot.Utils.OdometryUpdate;
 import frc.robot.Utils.RobotClock;
@@ -42,7 +42,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private LoggedDouble rearLeftABS;
   private LoggedDouble rearRightABS;
 
-  public final static SwerveModule[] modulesArry = new SwerveModule[] {
+  public final static SwerveModule[] modulesArry = new SwerveModule[] {//Move to costructor and shit
     SwerveConstants.frontLeftModule , SwerveConstants.frontRightModule , SwerveConstants.rearLeftModule , SwerveConstants.rearRightModule};
   private ModuleLimits currentLimits;
 
@@ -174,8 +174,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
+  
   public double getVelocity() {
     ChassisSpeeds speeds = getRobotRelativeSpeeds();
+  //cheak 
     return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) +
       Math.pow(speeds.vyMetersPerSecond, 2));
   }
@@ -188,19 +190,12 @@ public class SwerveSubsystem extends SubsystemBase {
     return new Rotation2d(Math.toRadians(getFusedHeading()));
   }
 
-  public void stop() {
-    modulesArry[0].stop();
-    modulesArry[1].stop();
-    modulesArry[2].stop();
-    modulesArry[3].stop();
-  }
-
   public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
           new ModuleLimits(Units.feetToMeters(15.0), Units.feetToMeters(75.0), Units.degreesToRadians(1080)), currentSetpoint, chassiSpeeds, 0.02);
-    SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
+    SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];//Make peremeent
 
     for (int i = 0; i < modulesArry.length; i++) {
       // Optimize setpoints
