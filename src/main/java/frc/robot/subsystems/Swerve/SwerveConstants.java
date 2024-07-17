@@ -114,10 +114,19 @@ public class SwerveConstants {
         public final static Translation2d[] modulesLocationArry = new Translation2d[] {frontLeftLocation , frontRightLocation , rearLeftLocation , rearRightLocation};
 
         // Modules turning config
-        // PID
-        public final static double TURNING_PID_KP = 3.6;
-        public final static double TURNING_PID_KI = 0;
-        public final static double TURNING_PID_KD = 0;
+        public final static int SLOT_CONFIG = 0;
+        
+        // MotionMagic PIDF
+        public final static double TURNING_kP = 3.6;
+        public final static double TURNING_kI = 0;
+        public final static double TURNING_kD = 0;
+        public final static double TURNING_kS = 0;
+        public final static double TURNING_kV = 0;
+        public final static double TURNING_kA = 0;
+        public final static double TURNING_CTUISE_VELOCITY = 0;
+        public final static double TURNING_ACCELERATION = 0;
+        public final static double TURNING_JERK = 0;
+
         // Ramp
         public final static double OPEN_LOOP_RAMP = 0.25;
         public final static double CLOSED_LOOP_RAMP = 0;
@@ -130,11 +139,11 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_PID_KP = 0.1;
-        public final static double DRIVE_PID_KI = 0;
-        public final static double DRIVE_PID_KD = 0;
-        public final static double DRIVE_KS = 0.015 * 12;
-        public final static double DRIVE_KV = 2.4;
+        public final static double DRIVE_PID_kP = 0.1;
+        public final static double DRIVE_PID_kI = 0;
+        public final static double DRIVE_PID_kD = 0;
+        public final static double DRIVE_kS = 0.015 * 12;
+        public final static double DRIVE_kV = 2.4;
         // Current Limit
         public final static int DRIVE_PEAK_CURRENT_LIMIT_TORQUE_CURRENT = 60;
         public final static int DRIVE_PEAK_CURRENT_LIMIT = 60;
