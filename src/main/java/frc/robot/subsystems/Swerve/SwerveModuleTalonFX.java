@@ -23,7 +23,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
     private final TalonFX turningMotor;
     private final CANcoder absoluteEcoder;
 
-    private TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+    private TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
     private TalonFXConfiguration turningConfiguration = new TalonFXConfiguration();
     private CANcoderConfiguration canCoderConfig = new CANcoderConfiguration();
 
@@ -37,25 +37,15 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
 
 
-
-
-
-
     private StatusSignal<Double> drivePosition;
     private StatusSignal<Double> driveVelocity;
+    private StatusSignal<Double> driveCurrent;
     private StatusSignal<Double> steerPosition;
+    private StatusSignal<Double> steerCurrent;
     private StatusSignal<Double> absAngle;
-
-    private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(SwerveConstants.DRIVE_KS,
-            SwerveConstants.DRIVE_KV);
-
     private double angleOffset;
-    private double dirvePoseOffset;
 
-    //Absolute Position
-    //Velocity
-    //Current
-    //Relativ Position
+    
 
     public SwerveModuleTalonFX(int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
@@ -77,6 +67,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
+        driveCurrent = driveMotor.getStatorCurrent();
         steerPosition = turningMotor.getPosition();
         absAngle = absoluteEcoder.getAbsolutePosition();
         
@@ -129,9 +120,9 @@ public class SwerveModuleTalonFX extends SwerveModule {
     }
 
     private void configDriveMotor() {
-        TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
-
+        
         driveConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
+        driveConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
 
         driveConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
 
@@ -141,9 +132,12 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
         driveConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
-        driveConfiguration.Slot0.kP = SwerveConstants.DRIVE_PID_KP;
-        driveConfiguration.Slot0.kI = SwerveConstants.DRIVE_PID_KI;
-        driveConfiguration.Slot0.kD = SwerveConstants.DRIVE_PID_KD;
+        driveConfiguration.Slot0.kP = SwerveConstants.DRIVE_kP;
+        driveConfiguration.Slot0.kI = SwerveConstants.DRIVE_kI;
+        driveConfiguration.Slot0.kD = SwerveConstants.DRIVE_kD;
+        driveConfiguration.Slot0.kS = SwerveConstants.DRIVE_kS;
+        driveConfiguration.Slot0.kV = SwerveConstants.DRIVE_kV;
+
 
         driveConfiguration.TorqueCurrent.PeakForwardTorqueCurrent = 
             SwerveConstants.DRIVE_PEAK_CURRENT_LIMIT_TORQUE_CURRENT;
@@ -172,9 +166,10 @@ public class SwerveModuleTalonFX extends SwerveModule {
         absoluteEcoder.getConfigurator().apply(canCoderConfig);
     }
 
-    //Turn to signal
-    public double getCurrent() { //CHANGE NAME AND ADD STEER
-        return driveMotor.getStatorCurrent().getValue();
+   
+    public double getCurrent() {
+        driveCurrent.refresh();
+        return driveCurrent.getValueAsDouble();
     }
 
     public double getAbsoluteEncoderPosition() {
@@ -187,11 +182,6 @@ public class SwerveModuleTalonFX extends SwerveModule {
         return drivePosition.getValueAsDouble();
     }
 
-    /*
-     * Get Relativ Turn Position 
-     * 
-     * @return Degrees Of The Wheel 
-     */
     public double getTurningPosition() {
         steerPosition.refresh();
         return steerPosition.getValueAsDouble() * 360;
@@ -203,7 +193,6 @@ public class SwerveModuleTalonFX extends SwerveModule {
     }
 
     public void setNutralModeDrive(Boolean isBrake) {
-        TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
         driveConfiguration.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         driveMotor.getConfigurator().apply(driveConfiguration);
     }

@@ -15,7 +15,7 @@ public class SwerveConstants {
 
         // Modules constants
         public final static double TURNING_GEAR_RATIO = 150d / 7;
-        private final static double DRIVE_GEAR_RATIO = 6.75;
+        public final static double DRIVE_GEAR_RATIO = 6.75;
         private final static double WHEEL_RADIUS = 0.0508;
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
@@ -139,10 +139,10 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_PID_kP = 0.1;
-        public final static double DRIVE_PID_kI = 0;
-        public final static double DRIVE_PID_kD = 0;
-        public final static double DRIVE_kS = 0.015 * 12;
+        public final static double DRIVE_kP = 0.1;
+        public final static double DRIVE_kI = 0;
+        public final static double DRIVE_kD = 0;
+        public final static double DRIVE_kS = 0;
         public final static double DRIVE_kV = 2.4;
         // Current Limit
         public final static int DRIVE_PEAK_CURRENT_LIMIT_TORQUE_CURRENT = 60;
