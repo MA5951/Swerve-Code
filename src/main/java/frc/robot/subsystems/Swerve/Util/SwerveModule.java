@@ -1,9 +1,8 @@
-package frc.robot.subsystems.Swerve;
+package frc.robot.subsystems.Swerve.Util;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 
 public abstract class SwerveModule {
     

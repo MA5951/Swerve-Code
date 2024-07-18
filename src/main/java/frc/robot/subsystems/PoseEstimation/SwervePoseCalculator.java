@@ -15,7 +15,7 @@ public class SwervePoseCalculator {
     private SkidDetector skidDetector;
 
     public SwervePoseCalculator() {
-        collisionDtector = new CollisionDtector(SwerveSubsystem.getInstance().getGyro());
+        //collisionDtector = new CollisionDtector(SwerveSubsystem.getInstance().getGyro());
         skidDetector = new SkidDetector(SwerveSubsystem.getInstance().getOdometryUpdate());
     }
 

@@ -1,10 +1,19 @@
 package frc.robot.subsystems.Swerve;
 
+import javax.sound.sampled.Port;
+
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
+import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
+import frc.robot.subsystems.Swerve.IOs.GyroPiegon2;
+import frc.robot.subsystems.Swerve.IOs.GyroSim;
+import frc.robot.subsystems.Swerve.IOs.SwerveModuleSim;
+import frc.robot.subsystems.Swerve.IOs.SwerveModuleTalonFX;
+import frc.robot.subsystems.Swerve.Util.Gyro;
+import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
 public class SwerveConstants {
         // swerve constants
@@ -67,50 +76,74 @@ public class SwerveConstants {
         
         public static final double distanceFromCenter = Math.sqrt(Math.pow(WIDTH, 2) + Math.pow(LENGTH, 2)) / 2;
 
-        //Modules
-        public final static SwerveModule frontLeftModule = new SwerveModuleTalonFX(
-        "Front Left",
-        PortMap.Swerve.leftFrontDriveID,
-        PortMap.Swerve.leftFrontTurningID,
-        PortMap.Swerve.leftFrontAbsoluteEncoder,
-        SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-        SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-        SwerveConstants.FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-        SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER,
-        PortMap.CanBus.CANivoreBus);
 
-        public final static SwerveModule frontRightModule = new SwerveModuleTalonFX(
-        "Front Right",
-        PortMap.Swerve.rightFrontDriveID,
-        PortMap.Swerve.rightFrontTurningID,
-        PortMap.Swerve.rightFrontAbsoluteEncoder,
-        SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-        SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-        SwerveConstants.FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-        SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER,
-        PortMap.CanBus.CANivoreBus);
+        //IO
 
-        public final static SwerveModule rearLeftModule = new SwerveModuleTalonFX(
-        "Rear Right",
-        PortMap.Swerve.leftBackDriveID,
-        PortMap.Swerve.leftBackTurningID,
-        PortMap.Swerve.leftBackAbsoluteEncoder,
-        SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-        SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-        SwerveConstants.REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-        SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER,
-        PortMap.CanBus.CANivoreBus);
+        public static final SwerveModule[] getModulesArry() {
+                if (Robot.isReal()) {
+                        final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
+                                "Front Left",
+                                PortMap.Swerve.leftFrontDriveID,
+                                PortMap.Swerve.leftFrontTurningID,
+                                PortMap.Swerve.leftFrontAbsoluteEncoder,
+                                SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                                SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
+                                SwerveConstants.FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
+                                SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER,
+                                PortMap.CanBus.CANivoreBus);
 
-        public final static SwerveModule rearRightModule = new SwerveModuleTalonFX(
-        "Rear Left",
-        PortMap.Swerve.rightBackDriveID,
-        PortMap.Swerve.rightBackTurningID,
-        PortMap.Swerve.rightBackAbsoluteEncoder,
-        SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-        SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-        SwerveConstants.REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-        SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER,
-        PortMap.CanBus.CANivoreBus);
+                        final SwerveModule frontRightModule = new SwerveModuleTalonFX(
+                        "Front Right",
+                                PortMap.Swerve.rightFrontDriveID,
+                                PortMap.Swerve.rightFrontTurningID,
+                                PortMap.Swerve.rightFrontAbsoluteEncoder,
+                                SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                                SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
+                                SwerveConstants.FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
+                                SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER,
+                                PortMap.CanBus.CANivoreBus);
+
+                        final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
+                                "Rear Right",
+                                PortMap.Swerve.leftBackDriveID,
+                                PortMap.Swerve.leftBackTurningID,
+                                PortMap.Swerve.leftBackAbsoluteEncoder,
+                                SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                                SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
+                                SwerveConstants.REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
+                                SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER,
+                                PortMap.CanBus.CANivoreBus);
+
+                        final SwerveModule rearRightModule = new SwerveModuleTalonFX(
+                                "Rear Left",
+                                PortMap.Swerve.rightBackDriveID,
+                                PortMap.Swerve.rightBackTurningID,
+                                PortMap.Swerve.rightBackAbsoluteEncoder,
+                                SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                                SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
+                                SwerveConstants.REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
+                                SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER,
+                                PortMap.CanBus.CANivoreBus);
+                        return new SwerveModule[] {
+                frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
+                } else {
+                        final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left", 0);
+                        final SwerveModule frontRightModule = new SwerveModuleSim("Front Right", 0);
+                        final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left", 0);
+                        final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right", 0);
+
+                        return new SwerveModule[] {
+                frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
+                }
+        }
+
+        public static final Gyro getGyro() {
+                if ( Robot.isReal()) {
+                        return new GyroPiegon2("Piegon 2", PortMap.CanBus.CANivoreBus , PortMap.Swerve.Pigeon2ID);
+                } else {
+                        return new GyroSim("Gyro Sim");
+                }
+        }
 
         public final static Translation2d[] modulesLocationArry = new Translation2d[] {frontLeftLocation , frontRightLocation , rearLeftLocation , rearRightLocation};
 

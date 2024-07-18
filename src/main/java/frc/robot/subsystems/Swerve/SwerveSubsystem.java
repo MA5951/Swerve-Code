@@ -14,6 +14,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
@@ -24,11 +25,12 @@ import frc.robot.PortMap;
 //Front Right
 //Rear Left
 //Raer Right
-import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
 import frc.robot.Utils.OdometryUpdate;
 import frc.robot.Utils.RobotClock;
 import frc.robot.Utils.SwerveSetpoint;
+import frc.robot.subsystems.Swerve.Util.SwerveModule;
+import frc.robot.subsystems.Swerve.Util.Gyro;
 
 public class SwerveSubsystem extends SubsystemBase {
   private static SwerveSubsystem swerveSubsystem;
@@ -37,56 +39,29 @@ public class SwerveSubsystem extends SubsystemBase {
   private MAShuffleboard board;
   private LoggedSwerveStates currenStates;
   private LoggedSwerveStates setPoinStates;
-  private LoggedDouble frontLeftABS;
-  private LoggedDouble frontRightABS;
-  private LoggedDouble rearLeftABS;
-  private LoggedDouble rearRightABS;
 
-  public final static SwerveModule[] modulesArry = new SwerveModule[] {//Move to costructor and shit
-    SwerveConstants.frontLeftModule , SwerveConstants.frontRightModule , SwerveConstants.rearLeftModule , SwerveConstants.rearRightModule};
+  private final static SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
+  private final static Gyro gyro = SwerveConstants.getGyro();
+  private final static SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
   private ModuleLimits currentLimits;
 
-  private static SwerveModuleState[] simModulesStates = {
-    new SwerveModuleState(0, new Rotation2d(0)),
-    new SwerveModuleState(0, new Rotation2d(0)), 
-    new SwerveModuleState(0, new Rotation2d(0)),
-    new SwerveModuleState(0, new Rotation2d(0)), 
-  };
 
   private static SwerveModulePosition[] getSwerveModulePositions() {
-    if (Robot.isReal()) {
-      return new SwerveModulePosition[] {
+    return new SwerveModulePosition[] {
         modulesArry[0].getPosition(),
         modulesArry[1].getPosition(),
         modulesArry[2].getPosition(),
         modulesArry[3].getPosition()
       };
-    } else {
-      return new SwerveModulePosition[] {
-        new SwerveModulePosition(simModulesStates[0].speedMetersPerSecond, simModulesStates[0].angle),
-        new SwerveModulePosition(simModulesStates[2].speedMetersPerSecond, simModulesStates[2].angle),
-        new SwerveModulePosition(simModulesStates[1].speedMetersPerSecond, simModulesStates[1].angle),
-        new SwerveModulePosition(simModulesStates[3].speedMetersPerSecond, simModulesStates[3].angle)
-      };
-    }
   }
 
   private static SwerveModuleState[] getSwerveModuleStates() {
-    if (Robot.isReal()) {
-      return new SwerveModuleState[] {
+    return new SwerveModuleState[] {
         modulesArry[0].getState(),
         modulesArry[1].getState(),
         modulesArry[2].getState(),
         modulesArry[3].getState()
     };
-    } else {
-      return new SwerveModuleState[] {
-        simModulesStates[0],
-        simModulesStates[1],
-        simModulesStates[2],
-        simModulesStates[3]
-    };
-    }
   }
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
@@ -98,13 +73,11 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModuleState()
   });
 
-  private final Pigeon2 gyro = new Pigeon2(PortMap.Swerve.Pigeon2ID, PortMap.CanBus.RioBus);
-  private Double simAngle = 0d;
   private double offsetAngle = 0;
 
   public SwerveSubsystem() {
 
-    setpointGenerator = new SwerveSetpointGenerator(SwerveConstants.kinematics , new Translation2d[] {
+    setpointGenerator = new SwerveSetpointGenerator(kinematics , new Translation2d[] {
       SwerveConstants.frontLeftLocation,
       SwerveConstants.frontRightLocation,
       SwerveConstants.rearLeftLocation,
@@ -112,20 +85,9 @@ public class SwerveSubsystem extends SubsystemBase {
     });
 
     board = new MAShuffleboard("Swerve");
-
     currenStates = new LoggedSwerveStates("/Swerve/Current States");
     setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
-    frontLeftABS = new LoggedDouble("/Swerve/Modules/Front Left/Absolute Position");
-    frontRightABS = new LoggedDouble("/Swerve/Modules/Front Right/Absolute Position");
-    rearLeftABS = new LoggedDouble("/Swerve/Modules/Rear Left/Absolute Position");
-    rearRightABS = new LoggedDouble("/Swerve/Modules/Rear Right/Absolute Position");
-  }
 
-  public void resetEncoders() {
-    modulesArry[0].resetEncoders();
-    modulesArry[1].resetEncoders();
-    modulesArry[2].resetEncoders();
-    modulesArry[3].resetEncoders();
   }
 
   public double getOffsetAngle() {
@@ -141,37 +103,15 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public double getFusedHeading() {
-    if (Robot.isReal()) {
-      StatusSignal<Double> yaw = gyro.getYaw();
-      yaw.refresh();
-      return yaw.getValue();
-    } else {
-      if (simAngle == null) {
-        return 0d;
-      } else {
-        return simAngle;
-      }
-    }
+    return gyro.getYaw();
   }
 
   public double getRoll() {
-    if (Robot.isReal()) {
-      StatusSignal<Double> roll = gyro.getRoll();
-      roll.refresh();
-      return roll.getValue();
-    } else {
-      return 0d;
-    }
+    return gyro.getRoll();
   }
 
   public double getPitch() {
-    if (Robot.isReal()) {
-      StatusSignal<Double> pitch = gyro.getPitch();
-      pitch.refresh();
-      return pitch.getValue();
-    } else {
-      return 0d;
-    }
+    return gyro.getPitch();
   }
 
   
@@ -183,7 +123,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
-    return SwerveConstants.kinematics.toChassisSpeeds(getSwerveModuleStates());
+    return kinematics.toChassisSpeeds(getSwerveModuleStates());
   }
 
   public Rotation2d getRotation2d() {
@@ -205,52 +145,26 @@ public class SwerveSubsystem extends SubsystemBase {
 
     return optimizedSetpointStates;
     } else {
-      return SwerveConstants.kinematics
+      return kinematics
         .toSwerveModuleStates(chassiSpeeds);
     }
   }
 
-
-
   public void setModules(SwerveModuleState[] states) {
-    SwerveConstants.frontLeftModule.setDesiredState(states[0]);
-    SwerveConstants.frontRightModule.setDesiredState(states[1]);
-    SwerveConstants.rearLeftModule.setDesiredState(states[2]);
-    SwerveConstants.rearRightModule.setDesiredState(states[3]);
-    if (Robot.isReal()) {
-      
-    } else {
-      simModulesStates[0].speedMetersPerSecond += states[0].speedMetersPerSecond * 0.02;
-      simModulesStates[1].speedMetersPerSecond += states[1].speedMetersPerSecond * 0.02;
-      simModulesStates[2].speedMetersPerSecond += states[2].speedMetersPerSecond * 0.02;
-      simModulesStates[3].speedMetersPerSecond += states[3].speedMetersPerSecond * 0.02;
-
-      simModulesStates[0].angle = states[0].angle;
-      simModulesStates[1].angle = states[1].angle;
-      simModulesStates[2].angle = states[2].angle;
-      simModulesStates[3].angle = states[3].angle;
-    }
+    modulesArry[0].setDesiredState(states[0]);
+    modulesArry[1].setDesiredState(states[1]);
+    modulesArry[2].setDesiredState(states[2]);
+    modulesArry[3].setDesiredState(states[3]);
   }
 
-
   public void drive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, true);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, false);
     setPoinStates.update(states);
     setModules(new SwerveModuleState[] {states[0] , states[1] , states[2] , states[3]});
-      if (!Robot.isReal()) {
-        simAngle += Math.toDegrees(chassisSpeeds.omegaRadiansPerSecond) * 0.02;
-    }
   }
 
   public OdometryUpdate getOdometryUpdate() {
     return new OdometryUpdate(getSwerveModulePositions(), RobotClock.getInstance().getRobotTimeStamp());
-  }
-
-  public void printAbsolutePositions() {
-    board.addNum("Front Left Absolute" , modulesArry[0].getAbsoluteEncoderPosition());
-    board.addNum("Front Rigth Absolute" , modulesArry[1].getAbsoluteEncoderPosition());
-    board.addNum("Rear Left Absolute" , modulesArry[2].getAbsoluteEncoderPosition());
-    board.addNum("Rear Right Absolute" , modulesArry[3].getAbsoluteEncoderPosition());
   }
 
   public ModuleLimits getCurrentLimits() {
@@ -259,10 +173,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void setCurrentLimits(ModuleLimits newLimits) {
     currentLimits = newLimits;
-  }
-
-  public Pigeon2 getGyro() {
-    return gyro;
   }
 
   public static SwerveSubsystem getInstance() {
@@ -275,7 +185,10 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     
-
+    for (int i = 0; i < 4 ; i++) {
+      modulesArry[i].update();
+    }
+    gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
 
     //Limits state meachin
     // if (RobotContainer.driveController.R2().getAsBoolean()) {
@@ -285,11 +198,7 @@ public class SwerveSubsystem extends SubsystemBase {
     // }
 
     currenStates.update(getSwerveModuleStates());
-    frontLeftABS.update(modulesArry[0].getAbsoluteEncoderPosition());
-    frontRightABS.update(modulesArry[1].getAbsoluteEncoderPosition());
-    rearLeftABS.update(modulesArry[2].getAbsoluteEncoderPosition());
-    rearRightABS.update(modulesArry[3].getAbsoluteEncoderPosition());
 
-  
+
   }
 }

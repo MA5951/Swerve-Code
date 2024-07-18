@@ -1,13 +1,10 @@
-package frc.robot.subsystems.Swerve;
+package frc.robot.subsystems.Swerve.IOs;
 
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -16,9 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ma5951.utils.Logger.LoggedDouble;
 
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
+import frc.robot.subsystems.Swerve.SwerveConstants;
+import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
 public class SwerveModuleTalonFX extends SwerveModule {
 
@@ -61,7 +57,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
 
     
 
-    public SwerveModuleTalonFX(String moduleName , int driveID,
+    public SwerveModuleTalonFX(String moduleNameN , int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
             boolean isTurningMotorReversed,boolean isCancoderInverted,
             double offsetEncoder, String canbus) {
@@ -75,7 +71,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
         this.isTurningMotorReversed = isTurningMotorReversed;
         this.isAbsoluteEncoderReversed = isCancoderInverted;
         this.canCoderOffset = offsetEncoder;
-        this.moduleName = moduleName;
+        this.moduleName = moduleNameN;
 
         DrivePosition = new LoggedDouble("/Swerve/" + moduleName + "/Drive Position");
         DriveVelocity = new LoggedDouble("/Swerve/" + moduleName + "/Drive Velocity");
