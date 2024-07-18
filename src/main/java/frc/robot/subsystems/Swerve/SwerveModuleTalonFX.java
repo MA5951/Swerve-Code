@@ -14,8 +14,11 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.ma5951.utils.Logger.LoggedDouble;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 
 public class SwerveModuleTalonFX extends SwerveModule {
 
@@ -40,19 +43,30 @@ public class SwerveModuleTalonFX extends SwerveModule {
     private StatusSignal<Double> drivePosition;
     private StatusSignal<Double> driveVelocity;
     private StatusSignal<Double> driveCurrent;
+    private StatusSignal<Double> driveVolts;
     private StatusSignal<Double> steerPosition;
     private StatusSignal<Double> steerCurrent;
+    private StatusSignal<Double> steerVolts;
     private StatusSignal<Double> absAngle;
-    private double angleOffset;
+    private String moduleName;
+
+    private LoggedDouble DrivePosition;
+    private LoggedDouble DriveVelocity;
+    private LoggedDouble DriveCurrent;
+    private LoggedDouble DriveVolts;
+    private LoggedDouble SteerPosition;
+    private LoggedDouble SteerCurrent;
+    private LoggedDouble SteerVolts;
+    private LoggedDouble AbsAngle;
 
     
 
-    public SwerveModuleTalonFX(int driveID,
+    public SwerveModuleTalonFX(String moduleName , int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
             boolean isTurningMotorReversed,boolean isCancoderInverted,
             double offsetEncoder, String canbus) {
         
-                this.driveMotor = new TalonFX(driveID, canbus);
+        this.driveMotor = new TalonFX(driveID, canbus);
         this.turningMotor = new TalonFX(turningID, canbus);
         this.absoluteEcoder = new CANcoder(absoluteEncoderID, canbus);
       
@@ -61,21 +75,31 @@ public class SwerveModuleTalonFX extends SwerveModule {
         this.isTurningMotorReversed = isTurningMotorReversed;
         this.isAbsoluteEncoderReversed = isCancoderInverted;
         this.canCoderOffset = offsetEncoder;
+        this.moduleName = moduleName;
 
-        
+        DrivePosition = new LoggedDouble("/Swerve/" + moduleName + "/Drive Position");
+        DriveVelocity = new LoggedDouble("/Swerve/" + moduleName + "/Drive Velocity");
+        DriveCurrent = new LoggedDouble("/Swerve/" + moduleName + "/Drive Current");
+        DriveVolts = new LoggedDouble("/Swerve/" + moduleName + "/Drive Volts");
+        SteerPosition = new LoggedDouble("/Swerve/" + moduleName + "/Steer Position");
+        SteerCurrent = new LoggedDouble("/Swerve/" + moduleName + "/Steer Current");
+        SteerVolts = new LoggedDouble("/Swerve/" + moduleName + "/Steer Volts");
+        AbsAngle = new LoggedDouble("/Swerve/" + moduleName + "/Absolute Angle");
        
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
         driveCurrent = driveMotor.getStatorCurrent();
+        driveVolts = driveMotor.getMotorVoltage();
         steerPosition = turningMotor.getPosition();
+        steerCurrent = turningMotor.getStatorCurrent();
+        steerVolts = turningMotor.getMotorVoltage();
         absAngle = absoluteEcoder.getAbsolutePosition();
         
 
         configTurningMotor();
         configDriveMotor();
         configCANCoder();
-        resetEncoders();
     }
 
     private void configTurningMotor() {
@@ -83,7 +107,6 @@ public class SwerveModuleTalonFX extends SwerveModule {
         turningConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
         turningConfiguration.Feedback.RotorToSensorRatio = 1;
         turningConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.TURNING_GEAR_RATIO;
-
 
         turningConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
 
@@ -120,7 +143,6 @@ public class SwerveModuleTalonFX extends SwerveModule {
     }
 
     private void configDriveMotor() {
-        
         driveConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         driveConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
 
@@ -166,10 +188,24 @@ public class SwerveModuleTalonFX extends SwerveModule {
         absoluteEcoder.getConfigurator().apply(canCoderConfig);
     }
 
-   
-    public double getCurrent() {
+    public double getDriveCurrent() {
         driveCurrent.refresh();
         return driveCurrent.getValueAsDouble();
+    }
+
+    public double getSteerCurrent() {
+        steerCurrent.refresh();
+        return steerCurrent.getValueAsDouble();
+    }
+
+    public double getDriveVolts() {
+        driveVolts.refresh();
+        return driveVolts.getValueAsDouble();
+    }
+
+    public double getSteerVolts() {
+        steerVolts.refresh();
+        return steerVolts.getValueAsDouble();
     }
 
     public double getAbsoluteEncoderPosition() {
@@ -178,18 +214,21 @@ public class SwerveModuleTalonFX extends SwerveModule {
     }
 
     public double getDrivePosition() {
+        //Return distance in meters
         drivePosition.refresh();
-        return drivePosition.getValueAsDouble();
+        return drivePosition.getValueAsDouble() * SwerveConstants.WHEEL_CIRCUMFERENCE;
     }
 
     public double getTurningPosition() {
+        //Degrees
         steerPosition.refresh();
         return steerPosition.getValueAsDouble() * 360;
     }
 
     public double getDriveVelocity() {
+        //Meter Per Secound
         driveVelocity.refresh();
-        return driveVelocity.getValue();
+        return driveVelocity.getValue() * SwerveConstants.WHEEL_CIRCUMFERENCE;
     }
 
     public void setNutralModeDrive(Boolean isBrake) {
@@ -197,8 +236,11 @@ public class SwerveModuleTalonFX extends SwerveModule {
         driveMotor.getConfigurator().apply(driveConfiguration);
     }
 
-    //Add setBrake to steer
-    //Make Signal standarts and make internal signal standart
+    public void setNutralModeTurn(Boolean isBrake) {
+        turningConfiguration.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        turningMotor.getConfigurator().apply(turningConfiguration);
+    }
+
     public void turningMotorSetPower(double power) {
         turningMotor.set(power);
     }
@@ -215,22 +257,27 @@ public class SwerveModuleTalonFX extends SwerveModule {
         driveMotor.setVoltage(volt);
     }
 
-    public void setInvertedTurning(Boolean turningMode) {
-        turningMotor.setInverted(turningMode);
-    }
-
-    public void turningUsingPID(double setPoint) {
+    public void turningUsingPID(double setPointDEGREES) {
         //Degrees
-        turningMotor.setControl(turnController.withPosition(setPoint / 360).withSlot(SwerveConstants.SLOT_CONFIG));
+        turningMotor.setControl(turnController.withPosition(setPointDEGREES / 360).withSlot(SwerveConstants.SLOT_CONFIG));
     }
 
-    public void driveUsingPID(double setPoint) {
-        driveMotor.setControl();
+    public void driveUsingPID(double setPointMPS) {
+        //Meter Per Secound
+        driveMotor.setControl(driveController.withVelocity(setPointMPS / SwerveConstants.WHEEL_CIRCUMFERENCE).withSlot(SwerveConstants.SLOT_CONFIG));
     }
 
     public void update() {
         
-
+        DrivePosition.update(getDrivePosition());
+        DriveVelocity.update(getDriveVelocity());
+        DriveCurrent.update(getDriveCurrent());
+        DriveVolts.update(getDriveVolts());
+        SteerPosition.update(getTurningPosition());
+        SteerCurrent.update(getSteerCurrent());
+        SteerVolts.update(getSteerVolts());
+        AbsAngle.update(getAbsoluteEncoderPosition());
 
     }
+
 }

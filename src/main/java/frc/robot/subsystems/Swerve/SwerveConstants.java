@@ -17,6 +17,7 @@ public class SwerveConstants {
         public final static double TURNING_GEAR_RATIO = 150d / 7;
         public final static double DRIVE_GEAR_RATIO = 6.75;
         private final static double WHEEL_RADIUS = 0.0508;
+        public final static double WHEEL_CIRCUMFERENCE =  WHEEL_RADIUS * Math.PI;
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
 
@@ -68,7 +69,7 @@ public class SwerveConstants {
 
         //Modules
         public final static SwerveModule frontLeftModule = new SwerveModuleTalonFX(
-        
+        "Front Left",
         PortMap.Swerve.leftFrontDriveID,
         PortMap.Swerve.leftFrontTurningID,
         PortMap.Swerve.leftFrontAbsoluteEncoder,
@@ -79,7 +80,7 @@ public class SwerveConstants {
         PortMap.CanBus.CANivoreBus);
 
         public final static SwerveModule frontRightModule = new SwerveModuleTalonFX(
-  
+        "Front Right",
         PortMap.Swerve.rightFrontDriveID,
         PortMap.Swerve.rightFrontTurningID,
         PortMap.Swerve.rightFrontAbsoluteEncoder,
@@ -90,7 +91,7 @@ public class SwerveConstants {
         PortMap.CanBus.CANivoreBus);
 
         public final static SwerveModule rearLeftModule = new SwerveModuleTalonFX(
-      
+        "Rear Right",
         PortMap.Swerve.leftBackDriveID,
         PortMap.Swerve.leftBackTurningID,
         PortMap.Swerve.leftBackAbsoluteEncoder,
@@ -101,7 +102,7 @@ public class SwerveConstants {
         PortMap.CanBus.CANivoreBus);
 
         public final static SwerveModule rearRightModule = new SwerveModuleTalonFX(
-       
+        "Rear Left",
         PortMap.Swerve.rightBackDriveID,
         PortMap.Swerve.rightBackTurningID,
         PortMap.Swerve.rightBackAbsoluteEncoder,
