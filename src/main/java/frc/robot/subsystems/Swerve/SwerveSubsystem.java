@@ -18,6 +18,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.PortMap;
 //The orde of te modules is a STANDART and it is
@@ -184,13 +185,19 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    
+    // if (DriverStation.isDisabled()) {
+    //   modulesArry[0].driveUsingPID(0);
+    //   modulesArry[0].turningUsingPID(0);
+    // } else {
+    //   modulesArry[0].driveUsingPID(1);
+    //   modulesArry[0].turningUsingPID(180);
+    // }
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].update();
     }
     gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
 
-    //Limits state meachin
+    //Limits state meachinp
     // if (RobotContainer.driveController.R2().getAsBoolean()) {
     //   currentLimits = SwerveConstants.Slow10Precent;
     // } else if (RobotContainer.driveController.L2().getAsBoolean()) {

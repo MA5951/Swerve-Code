@@ -78,7 +78,6 @@ public class SwerveConstants {
 
 
         //IO
-
         public static final SwerveModule[] getModulesArry() {
                 if (Robot.isReal()) {
                         final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
@@ -138,7 +137,7 @@ public class SwerveConstants {
         }
 
         public static final Gyro getGyro() {
-                if ( Robot.isReal()) {
+                if (Robot.isReal()) {
                         return new GyroPiegon2("Piegon 2", PortMap.CanBus.CANivoreBus , PortMap.Swerve.Pigeon2ID);
                 } else {
                         return new GyroSim("Gyro Sim");

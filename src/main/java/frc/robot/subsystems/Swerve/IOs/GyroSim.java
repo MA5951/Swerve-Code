@@ -30,7 +30,6 @@ public class GyroSim extends Gyro{
 
     }
 
-
     public void reset() {
     }
 

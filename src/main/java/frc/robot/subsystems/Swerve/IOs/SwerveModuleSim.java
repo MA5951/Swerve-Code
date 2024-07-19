@@ -20,9 +20,9 @@ public class SwerveModuleSim extends SwerveModule{
     private final DCMotorSim turnSim;
 
     private final PIDController driveFeedback =
-      new PIDController(0, 0.0, 0.0, RobotConstants.KDELTA_TIME);
+      new PIDController(38, 0.0, 0.0, RobotConstants.KDELTA_TIME);
     private final PIDController turnFeedback =
-      new PIDController(1.0, 0.0, 0.0, RobotConstants.KDELTA_TIME);
+      new PIDController(0.08, 0.0, 0.0, RobotConstants.KDELTA_TIME);
 
     private double absoluteEcoderPose;
     private double driveAppliedVolts = 0.0;
