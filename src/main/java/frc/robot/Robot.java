@@ -10,12 +10,13 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Utils.RobotClock;
 import frc.robot.commands.Swerve.DriveController;
 import frc.robot.commands.Swerve.TeleopSwerveController;
+import frc.robot.subsystems.PoseEstimation.SwervePoseCalculator;
 import frc.robot.subsystems.Swerve.SwerveSubsystem;
 
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
-
+  
   private RobotContainer m_robotContainer;
 
  
@@ -24,14 +25,16 @@ public class Robot extends TimedRobot {
     RobotClock.getInstance();
     m_robotContainer = new RobotContainer();
     SwerveSubsystem.getInstance();
+    SwervePoseCalculator.getInstance();
 
   }
 
 
   @Override
   public void robotPeriodic() {
-
+    
     CommandScheduler.getInstance().run();
+    SwervePoseCalculator.getInstance().update();;
   }
 
   @Override

@@ -253,7 +253,7 @@ public class SwerveSetpointGenerator {
         desiredState.vxMetersPerSecond, desiredState.vyMetersPerSecond, desiredState.omegaRadiansPerSecond);
     if (all_modules_should_flip
         && !EqualsUtil.epsilonEquals(new Twist2d() , preSeTwist2d)
-        && !EqualsUtil.epsilonEquals(new Twist2d() , deTwist2d2)) {
+        && !EqualsUtil.epsilonEquals(new Twist2d() , deTwist2d)) {
       // It will (likely) be faster to stop the robot, rotate the modules in place to the complement
       // of the desired
       // angle, and accelerate again.

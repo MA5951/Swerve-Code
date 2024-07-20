@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.subsystems.Swerve.Util.Gyro;
 
 
-public class GyroPiegon2 extends Gyro{
+public class GyroPiegon2 implements Gyro{
 
     private String name;
 

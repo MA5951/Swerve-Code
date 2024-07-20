@@ -10,7 +10,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.Swerve.Util.Gyro;
 
-public class GyroSim extends Gyro{
+public class GyroSim implements Gyro{
 
     private LoggedDouble yaw;
     private LoggedDouble pitch;
@@ -60,7 +60,7 @@ public class GyroSim extends Gyro{
         accelX.update(getAccelX());
         accelY.update(getAccelY());
 
-        yawValue += Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond * 0.02);
+        yawValue += Units.radiansToDegrees(robotSpeeds.omegaRadiansPerSecond) * 0.02;
     }
 
 

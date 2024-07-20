@@ -4,23 +4,17 @@
 
 package frc.robot.subsystems.Swerve;
 
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.hardware.Pigeon2;
-import com.ma5951.utils.DashBoard.MAShuffleboard;
-import com.ma5951.utils.Logger.LoggedDouble;
+import com.ma5951.utils.RobotConstants;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.PortMap;
 //The orde of te modules is a STANDART and it is
 //Front Left
 //Front Right
@@ -37,33 +31,15 @@ public class SwerveSubsystem extends SubsystemBase {
   private static SwerveSubsystem swerveSubsystem;
 
   private SwerveSetpointGenerator setpointGenerator;
-  private MAShuffleboard board;
   private LoggedSwerveStates currenStates;
   private LoggedSwerveStates setPoinStates;
 
-  private final static SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
-  private final static Gyro gyro = SwerveConstants.getGyro();
-  private final static SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
-  private ModuleLimits currentLimits;
-
-
-  private static SwerveModulePosition[] getSwerveModulePositions() {
-    return new SwerveModulePosition[] {
-        modulesArry[0].getPosition(),
-        modulesArry[1].getPosition(),
-        modulesArry[2].getPosition(),
-        modulesArry[3].getPosition()
-      };
-  }
-
-  private static SwerveModuleState[] getSwerveModuleStates() {
-    return new SwerveModuleState[] {
-        modulesArry[0].getState(),
-        modulesArry[1].getState(),
-        modulesArry[2].getState(),
-        modulesArry[3].getState()
-    };
-  }
+  private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
+  private final Gyro gyro = SwerveConstants.getGyro();
+  private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
+  SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
+  private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
+  private double offsetAngle = 0;
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -74,8 +50,6 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModuleState()
   });
 
-  private double offsetAngle = 0;
-
   public SwerveSubsystem() {
 
     setpointGenerator = new SwerveSetpointGenerator(kinematics , new Translation2d[] {
@@ -85,10 +59,27 @@ public class SwerveSubsystem extends SubsystemBase {
       SwerveConstants.rearRightLocation
     });
 
-    board = new MAShuffleboard("Swerve");
     currenStates = new LoggedSwerveStates("/Swerve/Current States");
     setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
 
+  }
+
+  public SwerveModulePosition[] getSwerveModulePositions() {
+    return new SwerveModulePosition[] {
+        modulesArry[0].getPosition(),
+        modulesArry[1].getPosition(),
+        modulesArry[2].getPosition(),
+        modulesArry[3].getPosition()
+      };
+  }
+
+  private SwerveModuleState[] getSwerveModuleStates() {
+    return new SwerveModuleState[] {
+        modulesArry[0].getState(),
+        modulesArry[1].getState(),
+        modulesArry[2].getState(),
+        modulesArry[3].getState()
+    };
   }
 
   public double getOffsetAngle() {
@@ -115,10 +106,8 @@ public class SwerveSubsystem extends SubsystemBase {
     return gyro.getPitch();
   }
 
-  
   public double getVelocity() {
     ChassisSpeeds speeds = getRobotRelativeSpeeds();
-  //cheak 
     return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) +
       Math.pow(speeds.vyMetersPerSecond, 2));
   }
@@ -135,13 +124,12 @@ public class SwerveSubsystem extends SubsystemBase {
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
-          new ModuleLimits(Units.feetToMeters(15.0), Units.feetToMeters(75.0), Units.degreesToRadians(1080)), currentSetpoint, chassiSpeeds, 0.02);
-    SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];//Make peremeent
+          getCurrentLimits(), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
 
     for (int i = 0; i < modulesArry.length; i++) {
-      // Optimize setpoints
       optimizedSetpointStates[i] =
-          SwerveModuleState.optimize(currentSetpoint.moduleStates()[i], new Rotation2d(modulesArry[i].getAbsoluteEncoderPosition()));
+         SwerveModuleState.optimize(currentSetpoint.moduleStates()[i], new Rotation2d(Units.degreesToRadians(modulesArry[i].getTurningPosition())));
+      //optimizedSetpointStates[i] = currentSetpoint.moduleStates()[i];
     }
 
     return optimizedSetpointStates;
@@ -159,9 +147,9 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, false);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, true);
     setPoinStates.update(states);
-    setModules(new SwerveModuleState[] {states[0] , states[1] , states[2] , states[3]});
+    setModules(states);
   }
 
   public OdometryUpdate getOdometryUpdate() {
@@ -185,17 +173,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // if (DriverStation.isDisabled()) {
-    //   modulesArry[0].driveUsingPID(0);
-    //   modulesArry[0].turningUsingPID(0);
-    // } else {
-    //   modulesArry[0].driveUsingPID(1);
-    //   modulesArry[0].turningUsingPID(180);
-    // }
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].update();
     }
     gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
+    currenStates.update(getSwerveModuleStates());
+
 
     //Limits state meachinp
     // if (RobotContainer.driveController.R2().getAsBoolean()) {
@@ -203,9 +186,6 @@ public class SwerveSubsystem extends SubsystemBase {
     // } else if (RobotContainer.driveController.L2().getAsBoolean()) {
     //   currentLimits = SwerveConstants.Slow40Precent;
     // }
-
-    currenStates.update(getSwerveModuleStates());
-
 
   }
 }

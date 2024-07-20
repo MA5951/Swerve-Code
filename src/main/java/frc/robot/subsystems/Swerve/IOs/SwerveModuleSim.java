@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
-public class SwerveModuleSim extends SwerveModule{
+public class SwerveModuleSim implements SwerveModule{
 
     private final DCMotorSim driveSim;
     private final DCMotorSim turnSim;
@@ -27,6 +27,7 @@ public class SwerveModuleSim extends SwerveModule{
     private double absoluteEcoderPose;
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
+    private double drivePose = 0;
 
     private LoggedDouble DrivePosition;
     private LoggedDouble DriveVelocity;
@@ -42,6 +43,8 @@ public class SwerveModuleSim extends SwerveModule{
         turnSim = new DCMotorSim(DCMotor.getFalcon500Foc(1), SwerveConstants.TURNING_GEAR_RATIO, 0.004);
 
         absoluteEcoderPose = offsetEncoder;
+
+        turnFeedback.enableContinuousInput(0, 360);
 
         DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Position");
         DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Drive Velocity");
@@ -76,7 +79,9 @@ public class SwerveModuleSim extends SwerveModule{
 
     public double getDrivePosition() {
         //Return distance in meters
-        return driveSim.getAngularPositionRotations() * SwerveConstants.WHEEL_CIRCUMFERENCE;
+        drivePose += driveSim.getAngularPositionRotations() * SwerveConstants.WHEEL_CIRCUMFERENCE * RobotConstants.KDELTA_TIME;
+        return drivePose;
+       
     }
 
     public double getTurningPosition() {
@@ -89,11 +94,11 @@ public class SwerveModuleSim extends SwerveModule{
         return driveSim.getAngularPositionRotations() * SwerveConstants.WHEEL_CIRCUMFERENCE;
     }
 
-    public void setNutralModeDrive(Boolean isBrake) {
+    public void setNeutralModeDrive(Boolean isBrake) {
         
     }
 
-    public void setNutralModeTurn(Boolean isBrake) {
+    public void setNeutralModeTurn(Boolean isBrake) {
         
     }
 
@@ -117,7 +122,7 @@ public class SwerveModuleSim extends SwerveModule{
 
     public void turningUsingPID(double setPointDEGREES) {
         //Degrees
-        turnSim.setInputVoltage(turnFeedback.calculate(turnSim.getAngularPositionRotations() * 360, setPointDEGREES));
+        turnSim.setInputVoltage(turnFeedback.calculate(getTurningPosition(), setPointDEGREES));
     }
 
     public void driveUsingPID(double setPointMPS) {
@@ -140,8 +145,5 @@ public class SwerveModuleSim extends SwerveModule{
         turnSim.update(RobotConstants.KDELTA_TIME);
 
     }
-
-
-
 
 }

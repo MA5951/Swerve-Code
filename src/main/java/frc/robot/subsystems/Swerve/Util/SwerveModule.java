@@ -4,58 +4,56 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-public abstract class SwerveModule {
-    
+public interface SwerveModule {
+
     //Return degrees
-    public abstract double getAbsoluteEncoderPosition();
+    double getAbsoluteEncoderPosition();
 
     //Returns distance in meters
-    public abstract double getDrivePosition();
+    double getDrivePosition();
 
     //Return position in degrees
-    public abstract double getTurningPosition();
+    double getTurningPosition();
 
-    //Return meters per secound
-    public abstract double getDriveVelocity();
-
-    //Between 1 to -1
-    public abstract void turningMotorSetPower(double power);
+    //Return meters per second
+    double getDriveVelocity();
 
     //Between 1 to -1
-    public abstract void driveMotorSetPower(double power);
+    void turningMotorSetPower(double power);
+
+    //Between 1 to -1
+    void driveMotorSetPower(double power);
 
     //Between 0 to 12
-    public abstract void turningMotorSetVoltage(double volt);
+    void turningMotorSetVoltage(double volt);
 
     //Between 0 to 12
-    public abstract void driveMotorSetVoltage(double volt);
+    void driveMotorSetVoltage(double volt);
 
     //Turns in degrees
-    public abstract void turningUsingPID(double setPoint);
+    void turningUsingPID(double setPoint);
 
-    //Drives in meter per secound
-    public abstract void driveUsingPID(double setPoint);
+    //Drives in meters per second
+    void driveUsingPID(double setPoint);
 
-    public abstract void setNutralModeDrive(Boolean isBrake);
+    void setNeutralModeDrive(Boolean isBrake);
 
-    public abstract void setNutralModeTurn(Boolean isBrake);
+    void setNeutralModeTurn(Boolean isBrake);
 
-    public abstract void update();
+    void update();
 
-    public SwerveModulePosition getPosition() {
+    default SwerveModulePosition getPosition() {
         return new SwerveModulePosition(
                 getDrivePosition(), new Rotation2d(Math.toRadians(getTurningPosition())));
     }
 
-    public SwerveModuleState getState() {
+    default SwerveModuleState getState() {
         return new SwerveModuleState(
                 getDriveVelocity(), new Rotation2d(Math.toRadians(getTurningPosition())));
-    };
+    }
 
-    public void setDesiredState(SwerveModuleState desiredState) {
+    default void setDesiredState(SwerveModuleState desiredState) {
         driveUsingPID(desiredState.speedMetersPerSecond);
         turningUsingPID(desiredState.angle.getDegrees());
-    };
-
-
+    }
 }

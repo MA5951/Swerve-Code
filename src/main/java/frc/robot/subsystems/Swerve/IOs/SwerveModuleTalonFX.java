@@ -16,7 +16,7 @@ import com.ma5951.utils.Logger.LoggedDouble;
 import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
-public class SwerveModuleTalonFX extends SwerveModule {
+public class SwerveModuleTalonFX implements SwerveModule {
 
     private final TalonFX driveMotor;
     private final TalonFX turningMotor;
@@ -104,7 +104,7 @@ public class SwerveModuleTalonFX extends SwerveModule {
         turningConfiguration.Feedback.RotorToSensorRatio = 1;
         turningConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.TURNING_GEAR_RATIO;
 
-        turningConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
+        turningConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
 
         turningConfiguration.MotorOutput.Inverted = 
             isTurningMotorReversed ? InvertedValue.Clockwise_Positive : 
@@ -227,12 +227,12 @@ public class SwerveModuleTalonFX extends SwerveModule {
         return driveVelocity.getValue() * SwerveConstants.WHEEL_CIRCUMFERENCE;
     }
 
-    public void setNutralModeDrive(Boolean isBrake) {
+    public void setNeutralModeDrive(Boolean isBrake) {
         driveConfiguration.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         driveMotor.getConfigurator().apply(driveConfiguration);
     }
 
-    public void setNutralModeTurn(Boolean isBrake) {
+    public void setNeutralModeTurn(Boolean isBrake) {
         turningConfiguration.MotorOutput.NeutralMode = isBrake ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         turningMotor.getConfigurator().apply(turningConfiguration);
     }

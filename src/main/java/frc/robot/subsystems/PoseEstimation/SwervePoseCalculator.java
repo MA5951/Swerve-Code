@@ -6,23 +6,36 @@ package frc.robot.subsystems.PoseEstimation;
 
 import frc.robot.subsystems.Swerve.CollisionDtector;
 import frc.robot.subsystems.Swerve.SkidDetector;
+import frc.robot.subsystems.Swerve.SwerveOdometry;
 import frc.robot.subsystems.Swerve.SwerveSubsystem;
 
 /** Add your docs here. */
 public class SwervePoseCalculator {
 
+    private static SwervePoseCalculator swervePoseCalculator;
+
     private CollisionDtector collisionDtector;
     private SkidDetector skidDetector;
+    private SwerveOdometry odometry;
 
     public SwervePoseCalculator() {
         //collisionDtector = new CollisionDtector(SwerveSubsystem.getInstance().getGyro());
-        skidDetector = new SkidDetector(SwerveSubsystem.getInstance().getOdometryUpdate());
+        //skidDetector = new SkidDetector(SwerveSubsystem.getInstance().getOdometryUpdate());
+        odometry = new SwerveOdometry();
     }
 
     
     public void update() {
-        collisionDtector.update();
+        //collisionDtector.update();
+        odometry.update();
     }
+
+    public static SwervePoseCalculator getInstance() {
+        if (swervePoseCalculator == null) {
+          swervePoseCalculator = new SwervePoseCalculator();
+        }
+        return swervePoseCalculator;
+        }
 
 
 

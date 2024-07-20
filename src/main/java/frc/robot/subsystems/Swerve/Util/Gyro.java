@@ -2,21 +2,21 @@ package frc.robot.subsystems.Swerve.Util;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-public abstract class Gyro {
-    
-    public abstract void reset();
+public interface Gyro {
 
-    public abstract double getPitch();
+    void reset();
 
-    public abstract double getRoll();
+    double getPitch();
 
-    public abstract double getYaw();
+    double getRoll();
 
-    public abstract double getAccelX();
+    double getYaw();
 
-    public abstract double getAccelY();
+    double getAccelX();
 
-    public abstract void update(ChassisSpeeds robotSpeeds);
+    double getAccelY();
 
-    
+    void update(ChassisSpeeds robotSpeeds);
+
 }
+
