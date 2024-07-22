@@ -4,7 +4,9 @@ import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
@@ -13,6 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ma5951.utils.Logger.LoggedDouble;
 
+import edu.wpi.first.units.Units;
 import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
@@ -31,8 +34,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
     private boolean isTurningMotorReversed;
     private boolean isAbsoluteEncoderReversed;
 
-    private MotionMagicTorqueCurrentFOC turnController = new MotionMagicTorqueCurrentFOC(0);
-    private VelocityTorqueCurrentFOC driveController = new VelocityTorqueCurrentFOC(0);
+    private MotionMagicVoltage turnController = new MotionMagicVoltage(0);
+    private VelocityVoltage driveController = new VelocityVoltage(0);
 
 
 
@@ -99,12 +102,14 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     private void configTurningMotor() {
+        //turningConfiguration.TorqueCurrent.PeakForwardTorqueCurrent = 40; //80Deafult
+        //turningConfiguration.TorqueCurrent.PeakReverseTorqueCurrent = -40; //80Deafult
+        
         turningConfiguration.Feedback.FeedbackRemoteSensorID = absoluteEcoder.getDeviceID();
         turningConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.SyncCANcoder;
-        turningConfiguration.Feedback.RotorToSensorRatio = 1;
         turningConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.TURNING_GEAR_RATIO;
 
-        turningConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
+        turningConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
 
         turningConfiguration.MotorOutput.Inverted = 
             isTurningMotorReversed ? InvertedValue.Clockwise_Positive : 
@@ -139,6 +144,9 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     private void configDriveMotor() {
+        //driveConfiguration.TorqueCurrent.PeakForwardTorqueCurrent = 40; //80Deafult
+        //driveConfiguration.TorqueCurrent.PeakReverseTorqueCurrent = -40; //80Deafult
+
         driveConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         driveConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.DRIVE_GEAR_RATIO;
 
@@ -224,7 +232,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
     public double getDriveVelocity() {
         //Meter Per Secound
         driveVelocity.refresh();
-        return driveVelocity.getValue() * SwerveConstants.WHEEL_CIRCUMFERENCE;
+        return (driveVelocity.getValueAsDouble() * 0.159 * SwerveConstants.WHEEL_RADIUS) * (1/0.01666);
     }
 
     public void setNeutralModeDrive(Boolean isBrake) {
@@ -260,7 +268,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     public void driveUsingPID(double setPointMPS) {
         //Meter Per Secound
-        driveMotor.setControl(driveController.withVelocity(setPointMPS / SwerveConstants.WHEEL_CIRCUMFERENCE).withSlot(SwerveConstants.SLOT_CONFIG));
+        driveMotor.setControl(driveController.withVelocity(((setPointMPS / 0.159) / SwerveConstants.WHEEL_RADIUS) / (1/0.01666)).withSlot(SwerveConstants.SLOT_CONFIG));
     }
 
     public void update() {

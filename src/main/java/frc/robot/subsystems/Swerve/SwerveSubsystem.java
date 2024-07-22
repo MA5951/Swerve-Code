@@ -62,6 +62,11 @@ public class SwerveSubsystem extends SubsystemBase {
     currenStates = new LoggedSwerveStates("/Swerve/Current States");
     setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
 
+    for (int i = 0; i < 4 ; i++) {
+      modulesArry[i].setNeutralModeDrive(false);
+      modulesArry[i].setNeutralModeTurn(false);
+    }
+
   }
 
   public SwerveModulePosition[] getSwerveModulePositions() {
@@ -178,6 +183,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
     currenStates.update(getSwerveModuleStates());
+
 
 
     //Limits state meachinp

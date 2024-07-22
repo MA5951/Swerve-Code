@@ -25,7 +25,7 @@ public class Robot extends TimedRobot {
     RobotClock.getInstance();
     m_robotContainer = new RobotContainer();
     SwerveSubsystem.getInstance();
-    SwervePoseCalculator.getInstance();
+    //SwervePoseCalculator.getInstance();
 
   }
 
@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     
     CommandScheduler.getInstance().run();
-    SwervePoseCalculator.getInstance().update();;
+    //SwervePoseCalculator.getInstance().update();;
   }
 
   @Override

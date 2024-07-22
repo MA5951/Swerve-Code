@@ -22,9 +22,9 @@ public class SwerveConstants {
                         Math.pow(WIDTH, 2) + Math.pow(LENGTH, 2)) / 2.0;
 
         // Modules constants
-        public final static double TURNING_GEAR_RATIO = 150d / 7;
+        public final static double TURNING_GEAR_RATIO = 150d / 7;//21.42
         public final static double DRIVE_GEAR_RATIO = 6.75;
-        private final static double WHEEL_RADIUS = 0.0508;
+        public final static double WHEEL_RADIUS = 0.0508;
         public final static double WHEEL_CIRCUMFERENCE =  WHEEL_RADIUS * Math.PI;
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
@@ -102,7 +102,7 @@ public class SwerveConstants {
                                 PortMap.CanBus.CANivoreBus);
 
                         final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
-                                "Rear Right",
+                                "Rear Left",
                                 PortMap.Swerve.leftBackDriveID,
                                 PortMap.Swerve.leftBackTurningID,
                                 PortMap.Swerve.leftBackAbsoluteEncoder,
@@ -113,7 +113,7 @@ public class SwerveConstants {
                                 PortMap.CanBus.CANivoreBus);
 
                         final SwerveModule rearRightModule = new SwerveModuleTalonFX(
-                                "Rear Left",
+                                "Rear Right",
                                 PortMap.Swerve.rightBackDriveID,
                                 PortMap.Swerve.rightBackTurningID,
                                 PortMap.Swerve.rightBackAbsoluteEncoder,
@@ -149,14 +149,13 @@ public class SwerveConstants {
         public final static int SLOT_CONFIG = 0;
         
         // MotionMagic PIDF
-        public final static double TURNING_kP = 3.6;
+        public final static double TURNING_kP = 18;
         public final static double TURNING_kI = 0;
         public final static double TURNING_kD = 0;
         public final static double TURNING_kS = 0;
-        public final static double TURNING_kV = 0;
         public final static double TURNING_kA = 0;
-        public final static double TURNING_CTUISE_VELOCITY = 0;
-        public final static double TURNING_ACCELERATION = 0;
+        public final static double TURNING_CTUISE_VELOCITY = 224 * (1/0.02); //RPS
+        public final static double TURNING_ACCELERATION = 10;
         public final static double TURNING_JERK = 0;
 
         // Ramp
@@ -171,11 +170,11 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_kP = 0.1;
+        public final static double DRIVE_kP = 1.5;
         public final static double DRIVE_kI = 0;
         public final static double DRIVE_kD = 0;
         public final static double DRIVE_kS = 0;
-        public final static double DRIVE_kV = 2.4;
+        public final static double DRIVE_kV = 0.12 * 6;//* 12;
         // Current Limit
         public final static int DRIVE_PEAK_CURRENT_LIMIT_TORQUE_CURRENT = 60;
         public final static int DRIVE_PEAK_CURRENT_LIMIT = 60;
