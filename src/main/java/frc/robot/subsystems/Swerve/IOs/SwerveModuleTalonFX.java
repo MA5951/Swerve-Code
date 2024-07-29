@@ -50,7 +50,9 @@ public class SwerveModuleTalonFX implements SwerveModule {
     private StatusSignal<Double> steerCurrent;
     private StatusSignal<Double> steerVolts;
     private StatusSignal<Double> absAngle;
+    private StatusSignal<Double> steerVelocitt;
     private StatusSignal<Double> error;
+    private StatusSignal<Double> steerRefrance;
     private String moduleName;
 
     private LoggedDouble DrivePosition;
@@ -62,6 +64,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
     private LoggedDouble SteerVolts;
     private LoggedDouble AbsAngle;
     private LoggedDouble errorPrint;
+    private LoggedDouble velociSteer;
+    private LoggedDouble steerRefrancePrint;
 
     
 
@@ -89,7 +93,9 @@ public class SwerveModuleTalonFX implements SwerveModule {
         SteerCurrent = new LoggedDouble("/Swerve/" + moduleName + "/Steer Current");
         SteerVolts = new LoggedDouble("/Swerve/" + moduleName + "/Steer Volts");
         AbsAngle = new LoggedDouble("/Swerve/" + moduleName + "/Absolute Angle");
-        errorPrint = new LoggedDouble("/Swerve/" + moduleName + "/SetPoint");
+        errorPrint = new LoggedDouble("/Swerve/" + moduleName + "/Drive SetPoint");
+        velociSteer = new LoggedDouble("/Swerve/" + moduleName + "/Steer Velocity");
+        steerRefrancePrint = new LoggedDouble("/Swerve/" + moduleName + "/Steer SetPoint");
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
@@ -100,6 +106,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
         steerVolts = turningMotor.getMotorVoltage();
         absAngle = absoluteEcoder.getAbsolutePosition();
         error = driveMotor.getClosedLoopReference();
+        steerVelocitt = turningMotor.getVelocity();
+        
         
 
         configTurningMotor();
@@ -297,6 +305,11 @@ public class SwerveModuleTalonFX implements SwerveModule {
         AbsAngle.update(getAbsoluteEncoderPosition());
         error.refresh();
         errorPrint.update(error.getValueAsDouble());
+        steerVelocitt.refresh();
+        velociSteer.update(steerVelocitt.getValueAsDouble());
+        //steerRefrance.refresh();
+        //steerRefrancePrint.update(steerRefrance.getValueAsDouble());
+        steerRefrancePrint.update(turnController.Position);
 
     }
 
