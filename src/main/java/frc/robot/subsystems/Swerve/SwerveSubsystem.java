@@ -126,14 +126,17 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
+    chassiSpeeds = new ChassisSpeeds(chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY,
+     chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY);
+    
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
-          getCurrentLimits(), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
+        new ModuleLimits(4.5, 20 , Units.degreesToRadians(1080)), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
 
     for (int i = 0; i < modulesArry.length; i++) {
       optimizedSetpointStates[i] =
-         SwerveModuleState.optimize(currentSetpoint.moduleStates()[i], new Rotation2d(Units.degreesToRadians(modulesArry[i].getTurningPosition())));
+         SwerveModuleState.optimize(new SwerveModuleState(currentSetpoint.moduleStates()[i].speedMetersPerSecond, currentSetpoint.moduleStates()[i].angle), new Rotation2d(Units.degreesToRadians(modulesArry[i].getTurningPosition())));
       //optimizedSetpointStates[i] = currentSetpoint.moduleStates()[i];
     }
 
@@ -181,9 +184,11 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].update();
     }
+    modulesArry[0].turningUsingPID(180);
     gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
     currenStates.update(getSwerveModuleStates());
 
+    
 
 
     //Limits state meachinp

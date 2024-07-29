@@ -61,9 +61,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
 
-    CommandScheduler.getInstance().setDefaultCommand(
-      SwerveSubsystem.getInstance(),
-      new TeleopSwerveController(RobotContainer.driveController));
+    // CommandScheduler.getInstance().setDefaultCommand(
+    //   SwerveSubsystem.getInstance(),
+    //   new TeleopSwerveController(RobotContainer.driveController));
   
   }
 

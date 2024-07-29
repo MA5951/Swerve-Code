@@ -34,25 +34,25 @@ public class SwerveConstants {
         public final static double ANGLE_PER_PULSE = 360d / TURNING_GEAR_RATIO;
 
         // front left module
-        public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 9.4;
+        public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 0;//-0.47;
         public final static boolean FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
         public final static boolean FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // front right module
-        public final static double FRONT_RIGHT_MODULE_OFFSET_ENCODER = 162.8;
+        public final static double FRONT_RIGHT_MODULE_OFFSET_ENCODER = -17;
         public final static boolean FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
         public final static boolean FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // rear left module
-        public final static double REAR_LEFT_MODULE_OFFSET_ENCODER = 199.6;
+        public final static double REAR_LEFT_MODULE_OFFSET_ENCODER = 20;
         public final static boolean REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
         public final static boolean REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // rear right module
-        public final static double REAR_RIGHT_MODULE_OFFSET_ENCODER = 214;
+        public final static double REAR_RIGHT_MODULE_OFFSET_ENCODER = 34;
         public final static boolean REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
         public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
@@ -149,7 +149,7 @@ public class SwerveConstants {
         public final static int SLOT_CONFIG = 0;
         
         // MotionMagic PIDF
-        public final static double TURNING_kP = 18;
+        public final static double TURNING_kP = 24;
         public final static double TURNING_kI = 0;
         public final static double TURNING_kD = 0;
         public final static double TURNING_kS = 0;
@@ -170,11 +170,11 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_kP = 1.5;
+        public final static double DRIVE_kP = 0;
         public final static double DRIVE_kI = 0;
         public final static double DRIVE_kD = 0;
         public final static double DRIVE_kS = 0;
-        public final static double DRIVE_kV = 0.12 * 6;//* 12;
+        public final static double DRIVE_kV = 0.857 ;//* 12;
         // Current Limit
         public final static int DRIVE_PEAK_CURRENT_LIMIT_TORQUE_CURRENT = 60;
         public final static int DRIVE_PEAK_CURRENT_LIMIT = 60;
@@ -200,7 +200,7 @@ public class SwerveConstants {
         public final static double THATA_KD = 0.0;
 
         //Module Limits
-        public final static ModuleLimits DEFUALT = new ModuleLimits(5.3, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
+        public final static ModuleLimits DEFUALT = new ModuleLimits(4.5, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
         public final static ModuleLimits Slow40Precent = new ModuleLimits(5.3 * 0.4, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
         public final static ModuleLimits Slow10Precent = new ModuleLimits(5.3 * 0.1, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
         
