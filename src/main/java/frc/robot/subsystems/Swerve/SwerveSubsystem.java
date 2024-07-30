@@ -63,8 +63,8 @@ public class SwerveSubsystem extends SubsystemBase {
     setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
 
     for (int i = 0; i < 4 ; i++) {
-      modulesArry[i].setNeutralModeDrive(false);
-      modulesArry[i].setNeutralModeTurn(false);
+      modulesArry[i].setNeutralModeDrive(true);
+      modulesArry[i].setNeutralModeTurn(true);
     }
 
   }
@@ -156,8 +156,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void drive(ChassisSpeeds chassisSpeeds) {
     SwerveModuleState[] states = generateStates(chassisSpeeds, true);
-    setPoinStates.update(states);
-    setModules(states);
+
+    SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
+    setPoinStates.update(Optistates);
+    setModules(Optistates);
   }
 
   public OdometryUpdate getOdometryUpdate() {
@@ -184,7 +186,7 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].update();
     }
-    //modulesArry[0].turningUsingPID(270);
+    //modulesArry[3].turningUsingPID(270);
     gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
     currenStates.update(getSwerveModuleStates());
 

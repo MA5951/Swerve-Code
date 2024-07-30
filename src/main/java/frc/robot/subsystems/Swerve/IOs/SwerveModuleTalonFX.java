@@ -153,7 +153,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
             SwerveConstants.TURNING_PEAK_CURRENT_DURATION;
         
         turningMotor.getConfigurator().apply(turningConfiguration);
-        //turningMotor.setPosition(((getAbsoluteEncoderPosition() - canCoderOffset)/360 ) * SwerveConstants.TURNING_GEAR_RATIO);
+        turningMotor.setPosition((getAbsoluteEncoderPosition() - canCoderOffset)/360 );
     }
 
     private void configDriveMotor() {
