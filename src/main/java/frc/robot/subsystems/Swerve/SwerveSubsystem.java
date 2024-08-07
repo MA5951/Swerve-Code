@@ -5,6 +5,7 @@
 package frc.robot.subsystems.Swerve;
 
 import com.ma5951.utils.RobotConstants;
+import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,6 +41,7 @@ public class SwerveSubsystem extends SubsystemBase {
   SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private double offsetAngle = 0;
+  private LoggedDouble offsetprint;
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -61,12 +63,14 @@ public class SwerveSubsystem extends SubsystemBase {
 
     currenStates = new LoggedSwerveStates("/Swerve/Current States");
     setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
+    offsetprint = new LoggedDouble("/Swerve/Offset Angle");
 
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].setNeutralModeDrive(true);
       modulesArry[i].setNeutralModeTurn(true);
     }
 
+    gyro.reset();
   }
 
   public SwerveModulePosition[] getSwerveModulePositions() {
@@ -126,8 +130,8 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
-    chassiSpeeds = new ChassisSpeeds(chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY,
-     chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY);
+    chassiSpeeds = new ChassisSpeeds(chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY,
+     chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY);
     
     if (optimize) {
       currentSetpoint =
@@ -189,6 +193,8 @@ public class SwerveSubsystem extends SubsystemBase {
     //modulesArry[3].turningUsingPID(270);
     gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
     currenStates.update(getSwerveModuleStates());
+
+    offsetprint.update(offsetAngle);
 
     
 

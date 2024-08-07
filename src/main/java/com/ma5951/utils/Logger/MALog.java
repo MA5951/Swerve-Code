@@ -13,14 +13,17 @@ public class MALog {
     
 
     public MALog() {
-        DataLogManager.start();
-        DriverStation.startDataLog(DataLogManager.getLog());
         networkTable = NetworkTableInstance.getDefault();
     }
 
     public NetworkTable getMainNT() {
         table = networkTable.getTable("/");
         return table;
+    }
+
+    public void startLog() {
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
     }
 
     public void stopLog() {

@@ -32,8 +32,8 @@ public class DriveController extends Command {
     ySpeed = Controller.getLeftY();
     turningSpeed = Controller.getRightX();
 
-    xSpeed = Math.abs(xSpeed) < 0.1 ? 0 : xSpeed;
-    ySpeed = Math.abs(ySpeed) < 0.1 ? 0 : ySpeed;
+    xSpeed = Math.abs(xSpeed) < 0.1 ? 0 : xSpeed * -1;
+    ySpeed = Math.abs(ySpeed) < 0.1 ? 0 : ySpeed * -1;
     turningSpeed = (Math.abs(turningSpeed) < 0.1 ? 0 : turningSpeed) * -1;
 
     speed = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed,
