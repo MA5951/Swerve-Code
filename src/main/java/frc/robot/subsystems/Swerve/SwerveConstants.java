@@ -86,8 +86,6 @@ public class SwerveConstants {
                                 PortMap.Swerve.leftFrontAbsoluteEncoder,
                                 SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
                                 SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                SwerveConstants.FRONT_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-                                SwerveConstants.FRONT_LEFT_MODULE_OFFSET_ENCODER,
                                 PortMap.CanBus.CANivoreBus);
 
                         final SwerveModule frontRightModule = new SwerveModuleTalonFX(
@@ -97,8 +95,6 @@ public class SwerveConstants {
                                 PortMap.Swerve.rightFrontAbsoluteEncoder,
                                 SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
                                 SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                SwerveConstants.FRONT_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-                                SwerveConstants.FRONT_RIGHT_MODULE_OFFSET_ENCODER,
                                 PortMap.CanBus.CANivoreBus);
 
                         final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
@@ -108,8 +104,6 @@ public class SwerveConstants {
                                 PortMap.Swerve.leftBackAbsoluteEncoder,
                                 SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
                                 SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                SwerveConstants.REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-                                SwerveConstants.REAR_LEFT_MODULE_OFFSET_ENCODER,
                                 PortMap.CanBus.CANivoreBus);
 
                         final SwerveModule rearRightModule = new SwerveModuleTalonFX(
@@ -119,16 +113,14 @@ public class SwerveConstants {
                                 PortMap.Swerve.rightBackAbsoluteEncoder,
                                 SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
                                 SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                SwerveConstants.REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED,
-                                SwerveConstants.REAR_RIGHT_MODULE_OFFSET_ENCODER,
                                 PortMap.CanBus.CANivoreBus);
                         return new SwerveModule[] {
                 frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
                 } else {
-                        final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left", 0);
-                        final SwerveModule frontRightModule = new SwerveModuleSim("Front Right", 0);
-                        final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left", 0);
-                        final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right", 0);
+                        final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left");
+                        final SwerveModule frontRightModule = new SwerveModuleSim("Front Right");
+                        final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left");
+                        final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right");
 
                         return new SwerveModule[] {
                 frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
@@ -145,7 +137,7 @@ public class SwerveConstants {
 
         public final static Translation2d[] modulesLocationArry = new Translation2d[] {frontLeftLocation , frontRightLocation , rearLeftLocation , rearRightLocation};
 
-        // Modules turning config
+        // Modules config
         public final static int SLOT_CONFIG = 0;
         
         // MotionMagic PIDF
@@ -200,9 +192,9 @@ public class SwerveConstants {
         public final static double THATA_KD = 0.0;
 
         //Module Limits
-        public final static ModuleLimits DEFUALT = new ModuleLimits(4.5, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
-        public final static ModuleLimits Slow40Precent = new ModuleLimits(5.3 * 0.4, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
-        public final static ModuleLimits Slow10Precent = new ModuleLimits(5.3 * 0.1, Units.feetToMeters(75.0), Units.degreesToRadians(1080)); 
+        public final static ModuleLimits DEFUALT =  new ModuleLimits(4.5, 20 , Units.degreesToRadians(600)); 
+        public final static ModuleLimits Slow40Precent = new ModuleLimits(4.5 * 0.4, Units.feetToMeters(75.0), Units.degreesToRadians(600)); 
+        public final static ModuleLimits Slow10Precent = new ModuleLimits(4.5 * 0.1, Units.feetToMeters(75.0), Units.degreesToRadians(600)); 
         
         
         //Collision Detector

@@ -14,7 +14,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //The orde of te modules is a STANDART and it is
 //Front Left
@@ -34,14 +33,28 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveSetpointGenerator setpointGenerator;
   private LoggedSwerveStates currenStates;
   private LoggedSwerveStates setPoinStates;
+  private LoggedDouble offsetprint;
+  private LoggedDouble swerevXvelocity;
+  private LoggedDouble swerevYvelocity;
+  private LoggedDouble swerevXaccel;
+  private LoggedDouble swerevYaccel;
+  private LoggedDouble swerevTheatavelocity;
+  private LoggedDouble swerveTheataaccel;
+  
 
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
   private final Gyro gyro = SwerveConstants.getGyro();
   private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
-  SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
+  private SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
+  private SwerveModuleState[] currentStates = new SwerveModuleState[4];
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
+  private ChassisSpeeds currentChassisSpeeds;
   private double offsetAngle = 0;
-  private LoggedDouble offsetprint;
+  private double lastXvelocity;
+  private double lastYvelocity;
+  private double lastTheatavelocity;
+  
+  
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -61,9 +74,15 @@ public class SwerveSubsystem extends SubsystemBase {
       SwerveConstants.rearRightLocation
     });
 
-    currenStates = new LoggedSwerveStates("/Swerve/Current States");
-    setPoinStates = new LoggedSwerveStates("/Swerve/SetPoint States");
-    offsetprint = new LoggedDouble("/Swerve/Offset Angle");
+    currenStates = new LoggedSwerveStates("/Swerve/States/Current States");
+    setPoinStates = new LoggedSwerveStates("/Swerve/States/SetPoint States");
+    swerevXvelocity = new LoggedDouble("/Swerve/Chassis Speed/X Velocity");
+    swerevYvelocity = new LoggedDouble("/Swerve/Chassis Speed/Y Velocity");
+    swerevTheatavelocity = new LoggedDouble("/Swerve/Chassis Speed/Theat Velocity");
+    swerevXaccel = new LoggedDouble("/Swerve/Chassis Speed/X Accel");
+    swerevYaccel = new LoggedDouble("/Swerve/Chassis Speed/Y Accel");
+    swerveTheataaccel = new LoggedDouble("/Swerve/Chassis Speed/Theath Accel");
+    offsetprint = new LoggedDouble("/Swerve/Gyro Offset Angle");
 
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].setNeutralModeDrive(true);
@@ -136,13 +155,10 @@ public class SwerveSubsystem extends SubsystemBase {
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
-        new ModuleLimits(4.5, 20 , Units.degreesToRadians(600)), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
+       getCurrentLimits(), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
 
     for (int i = 0; i < modulesArry.length; i++) {
-      //optimizedSetpointStates[i] =
-      //   SwerveModuleState.optimize(new SwerveModuleState(currentSetpoint.moduleStates()[i].speedMetersPerSecond, currentSetpoint.moduleStates()[i].angle), new Rotation2d(Units.degreesToRadians(modulesArry[i].getTurningPosition())));
       optimizedSetpointStates[i] = currentSetpoint.moduleStates()[i];
-      //optimizedSetpointStates[i] = optimize(optimizedSetpointStates[i],modulesArry[i].getAbsoluteEncoderPosition());
 
     }
 
@@ -152,27 +168,6 @@ public class SwerveSubsystem extends SubsystemBase {
         .toSwerveModuleStates(chassiSpeeds);
     }
   }
-
-  private static SwerveModuleState optimize(SwerveModuleState desiredState,
-            double currentAngle) {
-        double angleDiff = (desiredState.angle.getDegrees() - currentAngle) % 360;
-        double targetAngle = currentAngle + angleDiff;
-        double targetSpeed = desiredState.speedMetersPerSecond;
-
-        if (angleDiff <= -270) {
-            targetAngle += 360;
-        } else if (-90 > angleDiff && angleDiff > -270) {
-            targetAngle += 180;
-            targetSpeed = -targetSpeed;
-        } else if (90 < angleDiff && angleDiff < 270) {
-            targetAngle -= 180;
-            targetSpeed = -targetSpeed;
-        } else if (angleDiff >= 270) {
-            targetAngle -= 360;
-        }
-
-        return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
-    }
 
   public void setModules(SwerveModuleState[] states) {
     modulesArry[0].setDesiredState(states[0]);
@@ -217,21 +212,27 @@ public class SwerveSubsystem extends SubsystemBase {
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].update();
     }
-    //modulesArry[3].turningUsingPID(270);
-    gyro.update(kinematics.toChassisSpeeds(getSwerveModuleStates()));
-    currenStates.update(getSwerveModuleStates());
+    
+    currentStates = getSwerveModuleStates();
+    currentChassisSpeeds = kinematics.toChassisSpeeds(currentStates);
 
+    gyro.update(currentChassisSpeeds);
+    currenStates.update(getSwerveModuleStates());
     offsetprint.update(offsetAngle);
+    
+    swerevXvelocity.update(currentChassisSpeeds.vxMetersPerSecond);
+    swerevYvelocity.update(currentChassisSpeeds.vyMetersPerSecond);
+    swerevTheatavelocity.update(currentChassisSpeeds.omegaRadiansPerSecond);
+    swerevXaccel.update((lastXvelocity - currentChassisSpeeds.vxMetersPerSecond) / 0.2);
+    swerevYaccel.update((lastYvelocity - currentChassisSpeeds.vyMetersPerSecond) / 0.2);
+    swerveTheataaccel.update((lastTheatavelocity - currentChassisSpeeds.omegaRadiansPerSecond) / 0.2);
+
+    lastXvelocity = currentChassisSpeeds.vxMetersPerSecond;
+    lastYvelocity = currentChassisSpeeds.vyMetersPerSecond;
+    lastTheatavelocity = currentChassisSpeeds.omegaRadiansPerSecond;
+
 
     
-
-
-    //Limits state meachinp
-    // if (RobotContainer.driveController.R2().getAsBoolean()) {
-    //   currentLimits = SwerveConstants.Slow10Precent;
-    // } else if (RobotContainer.driveController.L2().getAsBoolean()) {
-    //   currentLimits = SwerveConstants.Slow40Precent;
-    // }
 
   }
 }

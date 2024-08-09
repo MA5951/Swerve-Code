@@ -7,6 +7,7 @@ package frc.robot.subsystems.Swerve;
 import com.ma5951.utils.Logger.LoggedPose2d;
 
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
+import frc.robot.Robot;
 
 /** Add your docs here. */
 public class SwerveOdometry {
@@ -22,5 +23,6 @@ public class SwerveOdometry {
     public void update() {
         odometry.update(SwerveSubsystem.getInstance().getRotation2d(), SwerveSubsystem.getInstance().getSwerveModulePositions());
         robotPose.update(odometry.getPoseMeters());
+        
     }
 }

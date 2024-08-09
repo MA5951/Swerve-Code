@@ -7,10 +7,10 @@ package frc.robot;
 import com.ma5951.utils.Logger.MALog;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Utils.RobotClock;
-import frc.robot.commands.Swerve.DriveController;
 import frc.robot.commands.Swerve.TeleopSwerveController;
 import frc.robot.subsystems.PoseEstimation.SwervePoseCalculator;
 import frc.robot.subsystems.Swerve.SwerveSubsystem;
@@ -27,7 +27,7 @@ public class Robot extends TimedRobot {
     RobotClock.getInstance();
     m_robotContainer = new RobotContainer();
     SwerveSubsystem.getInstance();
-    //SwervePoseCalculator.getInstance();
+    SwervePoseCalculator.getInstance();
     MALog.getInstance();
   }
 
@@ -36,7 +36,11 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     
     CommandScheduler.getInstance().run();
-    //SwervePoseCalculator.getInstance().update();;
+    SwervePoseCalculator.getInstance().update();
+    BatterySim.calculateLoadedBatteryVoltage(kDefaultPeriod, kDefaultPeriod, null)
+    
+    
+    
   }
 
   @Override

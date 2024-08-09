@@ -24,7 +24,6 @@ public class SwerveModuleSim implements SwerveModule{
     private final PIDController turnFeedback =
       new PIDController(0.08, 0.0, 0.0, RobotConstants.KDELTA_TIME);
 
-    private double absoluteEcoderPose;
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
     private double drivePose = 0;
@@ -37,12 +36,13 @@ public class SwerveModuleSim implements SwerveModule{
     private LoggedDouble SteerCurrent;
     private LoggedDouble SteerVolts;
     private LoggedDouble AbsAngle;
+    private LoggedDouble DriveTemp;
+    private LoggedDouble SteerTemp;
 
-    public SwerveModuleSim(String moduleNameN , double offsetEncoder) {
+    public SwerveModuleSim(String moduleNameN) {
         driveSim = new DCMotorSim(DCMotor.getKrakenX60Foc(1), SwerveConstants.DRIVE_GEAR_RATIO, 0.025);
         turnSim = new DCMotorSim(DCMotor.getFalcon500Foc(1), SwerveConstants.TURNING_GEAR_RATIO, 0.004);
 
-        absoluteEcoderPose = offsetEncoder;
 
         turnFeedback.enableContinuousInput(0, 360);
 
@@ -54,12 +54,21 @@ public class SwerveModuleSim implements SwerveModule{
         SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Steer Current");
         SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Steer Volts");
         AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Absolute Angle");
+        DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "/Drive Temp");
+        SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "/Steer Temp");
     }
 
     public void resetSteer() {
         
     }
 
+    public double getDriveTemp() {
+        return 0;
+    }
+
+    public double getSteerTemp() {
+        return 0;
+    }
 
     public double getDriveCurrent() {
         return Math.abs(driveSim.getCurrentDrawAmps());
@@ -78,7 +87,7 @@ public class SwerveModuleSim implements SwerveModule{
     }
 
     public double getAbsoluteEncoderPosition() {
-        return absoluteEcoderPose + turnSim.getAngularPositionRotations() * 360 ;
+        return turnSim.getAngularPositionRotations() * 360 ;
     }
 
     public double getDrivePosition() {
@@ -90,7 +99,7 @@ public class SwerveModuleSim implements SwerveModule{
 
     public double getTurningPosition() {
         //Degrees
-        return absoluteEcoderPose + turnSim.getAngularPositionRotations() * 360 ;
+        return  turnSim.getAngularPositionRotations() * 360 ;
     }
 
     public double getDriveVelocity() {
@@ -144,6 +153,8 @@ public class SwerveModuleSim implements SwerveModule{
         SteerCurrent.update(getSteerCurrent());
         SteerVolts.update(getSteerVolts());
         AbsAngle.update(getAbsoluteEncoderPosition());
+        DriveTemp.update(getDriveTemp());
+        SteerTemp.update(getSteerTemp());
 
         driveSim.update(RobotConstants.KDELTA_TIME);
         turnSim.update(RobotConstants.KDELTA_TIME);
