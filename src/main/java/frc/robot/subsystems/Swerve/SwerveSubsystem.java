@@ -130,18 +130,20 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
-    chassiSpeeds = new ChassisSpeeds(chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY,
-     chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY);
+    chassiSpeeds = new ChassisSpeeds(chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY,
+     chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY);
     
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
-        new ModuleLimits(4.5, 20 , Units.degreesToRadians(1080)), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
+        new ModuleLimits(4.5, 20 , Units.degreesToRadians(600)), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
 
     for (int i = 0; i < modulesArry.length; i++) {
-      optimizedSetpointStates[i] =
-         SwerveModuleState.optimize(new SwerveModuleState(currentSetpoint.moduleStates()[i].speedMetersPerSecond, currentSetpoint.moduleStates()[i].angle), new Rotation2d(Units.degreesToRadians(modulesArry[i].getTurningPosition())));
-      //optimizedSetpointStates[i] = currentSetpoint.moduleStates()[i];
+      //optimizedSetpointStates[i] =
+      //   SwerveModuleState.optimize(new SwerveModuleState(currentSetpoint.moduleStates()[i].speedMetersPerSecond, currentSetpoint.moduleStates()[i].angle), new Rotation2d(Units.degreesToRadians(modulesArry[i].getTurningPosition())));
+      optimizedSetpointStates[i] = currentSetpoint.moduleStates()[i];
+      //optimizedSetpointStates[i] = optimize(optimizedSetpointStates[i],modulesArry[i].getAbsoluteEncoderPosition());
+
     }
 
     return optimizedSetpointStates;
@@ -150,6 +152,27 @@ public class SwerveSubsystem extends SubsystemBase {
         .toSwerveModuleStates(chassiSpeeds);
     }
   }
+
+  private static SwerveModuleState optimize(SwerveModuleState desiredState,
+            double currentAngle) {
+        double angleDiff = (desiredState.angle.getDegrees() - currentAngle) % 360;
+        double targetAngle = currentAngle + angleDiff;
+        double targetSpeed = desiredState.speedMetersPerSecond;
+
+        if (angleDiff <= -270) {
+            targetAngle += 360;
+        } else if (-90 > angleDiff && angleDiff > -270) {
+            targetAngle += 180;
+            targetSpeed = -targetSpeed;
+        } else if (90 < angleDiff && angleDiff < 270) {
+            targetAngle -= 180;
+            targetSpeed = -targetSpeed;
+        } else if (angleDiff >= 270) {
+            targetAngle -= 360;
+        }
+
+        return new SwerveModuleState(targetSpeed, Rotation2d.fromDegrees(targetAngle));
+    }
 
   public void setModules(SwerveModuleState[] states) {
     modulesArry[0].setDesiredState(states[0]);
@@ -176,6 +199,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void setCurrentLimits(ModuleLimits newLimits) {
     currentLimits = newLimits;
+  }
+
+  public SwerveModule[] getModulesArry() {
+    return modulesArry;
   }
 
   public static SwerveSubsystem getInstance() {

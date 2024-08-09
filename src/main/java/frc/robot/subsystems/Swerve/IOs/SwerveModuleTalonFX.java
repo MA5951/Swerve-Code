@@ -18,7 +18,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ma5951.utils.Logger.LoggedDouble;
 
-import edu.wpi.first.units.Units;
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
@@ -85,17 +85,17 @@ public class SwerveModuleTalonFX implements SwerveModule {
         this.canCoderOffset = offsetEncoder;
         this.moduleName = moduleNameN;
 
-        DrivePosition = new LoggedDouble("/Swerve/" + moduleName + "/Drive Position");
-        DriveVelocity = new LoggedDouble("/Swerve/" + moduleName + "/Drive Velocity");
-        DriveCurrent = new LoggedDouble("/Swerve/" + moduleName + "/Drive Current");
-        DriveVolts = new LoggedDouble("/Swerve/" + moduleName + "/Drive Volts");
-        SteerPosition = new LoggedDouble("/Swerve/" + moduleName + "/Steer Position");
-        SteerCurrent = new LoggedDouble("/Swerve/" + moduleName + "/Steer Current");
-        SteerVolts = new LoggedDouble("/Swerve/" + moduleName + "/Steer Volts");
-        AbsAngle = new LoggedDouble("/Swerve/" + moduleName + "/Absolute Angle");
-        errorPrint = new LoggedDouble("/Swerve/" + moduleName + "/Drive SetPoint");
-        velociSteer = new LoggedDouble("/Swerve/" + moduleName + "/Steer Velocity");
-        steerRefrancePrint = new LoggedDouble("/Swerve/" + moduleName + "/Steer SetPoint");
+        DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Position");
+        DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Velocity");
+        DriveCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Current");
+        DriveVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Volts");
+        SteerPosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Position");
+        SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Current");
+        SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Volts");
+        AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Absolute Angle");
+        errorPrint = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive SetPoint");
+        velociSteer = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Velocity");
+        steerRefrancePrint = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer SetPoint Refrance");
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
@@ -113,15 +113,16 @@ public class SwerveModuleTalonFX implements SwerveModule {
         configTurningMotor();
         configDriveMotor();
         //configCANCoder();
+        resetSteer();
     }
 
     private void configTurningMotor() {
         //turningConfiguration.TorqueCurrent.PeakForwardTorqueCurrent = 40; //80Deafult
         //turningConfiguration.TorqueCurrent.PeakReverseTorqueCurrent = -40; //80Deafult
-        driveConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
-        driveConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.TURNING_GEAR_RATIO;
+        turningConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;/////////////Fuvking stupid
+        turningConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.TURNING_GEAR_RATIO;
 
-        turningConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
+        turningConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
 
         turningConfiguration.MotorOutput.Inverted = 
             isTurningMotorReversed ? InvertedValue.Clockwise_Positive : 
@@ -153,7 +154,12 @@ public class SwerveModuleTalonFX implements SwerveModule {
             SwerveConstants.TURNING_PEAK_CURRENT_DURATION;
         
         turningMotor.getConfigurator().apply(turningConfiguration);
-        turningMotor.setPosition((getAbsoluteEncoderPosition() - canCoderOffset)/360 );
+
+        
+    }
+
+    public void resetSteer() {
+        turningMotor.setPosition((getAbsoluteEncoderPosition() / 360 ));// * SwerveConstants.TURNING_GEAR_RATIO
     }
 
     private void configDriveMotor() {
@@ -196,14 +202,14 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     private void configCANCoder() {
-        canCoderConfig.MagnetSensor.MagnetOffset = canCoderOffset; //Convert between angles to rotations
+        //canCoderConfig.MagnetSensor.MagnetOffset = canCoderOffset; //Convert between angles to rotations
         //canCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
 
         // canCoderConfig.MagnetSensor.SensorDirection = 
         //     isAbsoluteEncoderReversed ? SensorDirectionValue.Clockwise_Positive :
         //     SensorDirectionValue.CounterClockwise_Positive;
 
-        absoluteEcoder.getConfigurator().apply(canCoderConfig);
+        //absoluteEcoder.getConfigurator().apply(canCoderConfig);
     }
 
     public double getDriveCurrent() {
@@ -240,7 +246,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
     public double getTurningPosition() {
         //Degrees
         steerPosition.refresh();
-        return (steerPosition.getValueAsDouble() * 360) / SwerveConstants.TURNING_GEAR_RATIO;
+        return (steerPosition.getValueAsDouble() * 360);// / SwerveConstants.TURNING_GEAR_RATIO
     }
 
     public double getDriveVelocity() {
@@ -279,7 +285,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     public void turningUsingPID(double setPointDEGREES) {
         //Degrees
-        turningMotor.setControl(turnController.withPosition((setPointDEGREES / 360) * SwerveConstants.TURNING_GEAR_RATIO).withSlot(SwerveConstants.SLOT_CONFIG));
+        turningMotor.setControl(turnController.withPosition(Units.radiansToRotations(setPointDEGREES)).withSlot(SwerveConstants.SLOT_CONFIG));//* SwerveConstants.TURNING_GEAR_RATIO
     }
 
     public void driveUsingPID(double setPointMPS) {
@@ -288,7 +294,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
         double omega = (setPointMPS / SwerveConstants.WHEEL_RADIUS);
         
         double rps = omega / (2 * Math.PI );
-        System.err.println(rps);
         driveMotor.setControl(driveController.withVelocity(rps).withSlot(SwerveConstants.SLOT_CONFIG));
 
     }

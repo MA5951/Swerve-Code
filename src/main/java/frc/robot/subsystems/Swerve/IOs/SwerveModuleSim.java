@@ -56,6 +56,10 @@ public class SwerveModuleSim implements SwerveModule{
         AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Absolute Angle");
     }
 
+    public void resetSteer() {
+        
+    }
+
 
     public double getDriveCurrent() {
         return Math.abs(driveSim.getCurrentDrawAmps());

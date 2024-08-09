@@ -22,6 +22,12 @@ public class LoggedSwerveStates {
         loggedStates = networkTable.getStructArrayTopic(name , SwerveModuleState.struct).publish();
         loggedStates.set(null);
         lastStates = null;
+        loggedStates.set(new SwerveModuleState[] {
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState(),
+            new SwerveModuleState()
+  });
     }
 
     public void update(SwerveModuleState[] states) {

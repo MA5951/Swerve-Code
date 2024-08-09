@@ -149,7 +149,7 @@ public class SwerveConstants {
         public final static int SLOT_CONFIG = 0;
         
         // MotionMagic PIDF
-        public final static double TURNING_kP = 3;
+        public final static double TURNING_kP = 23;
         public final static double TURNING_kI = 0;
         public final static double TURNING_kD = 0;
         public final static double TURNING_kS = 0;

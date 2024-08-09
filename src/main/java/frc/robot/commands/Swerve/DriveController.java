@@ -28,8 +28,8 @@ public class DriveController extends Command {
   @Override
   public void execute() {
 
-    xSpeed = Controller.getLeftX();
-    ySpeed = Controller.getLeftY();
+    xSpeed = Controller.getLeftY();
+    ySpeed = Controller.getLeftX();
     turningSpeed = Controller.getRightX();
 
     xSpeed = Math.abs(xSpeed) < 0.1 ? 0 : xSpeed * -1;
@@ -40,6 +40,9 @@ public class DriveController extends Command {
                   new Rotation2d(
                     Math.toRadians((SwerveSubsystem.getInstance().getFusedHeading()
                      - SwerveSubsystem.getInstance().getOffsetAngle()))));
+
+    // speed = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed,
+    //               new Rotation2d(0));
   }
 
   public ChassisSpeeds getChassisSpeed() {

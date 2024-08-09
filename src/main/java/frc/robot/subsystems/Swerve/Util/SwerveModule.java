@@ -40,6 +40,8 @@ public interface SwerveModule {
 
     void setNeutralModeTurn(Boolean isBrake);
 
+    void resetSteer();
+
     void update();
 
     default SwerveModulePosition getPosition() {
@@ -54,6 +56,6 @@ public interface SwerveModule {
 
     default void setDesiredState(SwerveModuleState desiredState) {
         driveUsingPID(desiredState.speedMetersPerSecond);
-        turningUsingPID(desiredState.angle.getDegrees());
+        turningUsingPID(desiredState.angle.getRadians());
     }
 }
