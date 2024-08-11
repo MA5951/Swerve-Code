@@ -102,7 +102,7 @@ public class SwerveSubsystem extends SubsystemBase {
       };
   }
 
-  private SwerveModuleState[] getSwerveModuleStates() {
+  public SwerveModuleState[] getSwerveModuleStates() {
     return new SwerveModuleState[] {
         modulesArry[0].getState(),
         modulesArry[1].getState(),
@@ -185,7 +185,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, true);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStates.update(Optistates);

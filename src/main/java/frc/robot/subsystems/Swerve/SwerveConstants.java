@@ -15,6 +15,9 @@ import frc.robot.subsystems.Swerve.Util.Gyro;
 import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
 public class SwerveConstants {
+        public final static boolean optimize = true;
+        
+        
         // swerve constants
         public final static double WIDTH = 0.75;
         public final static double LENGTH = 0.75;
