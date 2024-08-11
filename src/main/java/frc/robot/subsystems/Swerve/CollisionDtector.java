@@ -7,10 +7,12 @@ package frc.robot.subsystems.Swerve;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ma5951.utils.Logger.LoggedDouble;
 
+import frc.robot.subsystems.Swerve.Util.Gyro;
+
 /** Add your docs here. */
 public class CollisionDtector {
 
-    private Pigeon2 gyro;
+    private Gyro gyro;
     private LoggedDouble yaw;
     private LoggedDouble pitch;
     private LoggedDouble roll;
@@ -19,7 +21,7 @@ public class CollisionDtector {
     private LoggedDouble accelZ;
 
 
-    public CollisionDtector(Pigeon2 device) {
+    public CollisionDtector(Gyro device) {
         gyro = device;
         yaw = new LoggedDouble("/Swerve/Collision Detector/Yaw");
         pitch = new LoggedDouble("/Swerve/Collision Detector/Pitch");
@@ -30,12 +32,11 @@ public class CollisionDtector {
     }
 
     public void update() {
-        yaw.update(gyro.getYaw().getValueAsDouble());
-        pitch.update(gyro.getPitch().getValueAsDouble());
-        roll.update(gyro.getRoll().getValueAsDouble());
-        accelX.update(gyro.getAccelerationX().getValueAsDouble());
-        accelY.update(gyro.getAccelerationY().getValueAsDouble());
-        accelZ.update(gyro.getAccelerationZ().getValueAsDouble());
+        yaw.update(gyro.getYaw());
+        pitch.update(gyro.getPitch());
+        roll.update(gyro.getRoll());
+        accelX.update(gyro.getAccelX());
+        accelY.update(gyro.getAccelY());
     }
 
 

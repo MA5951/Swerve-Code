@@ -16,8 +16,8 @@ import frc.robot.subsystems.Swerve.Util.SwerveModule;
 
 public class SwerveConstants {
         // swerve constants
-        public final static double WIDTH = 0.545;
-        public final static double LENGTH = 0.545;
+        public final static double WIDTH = 0.75;
+        public final static double LENGTH = 0.75;
         public final static double RADIUS = Math.sqrt(
                         Math.pow(WIDTH, 2) + Math.pow(LENGTH, 2)) / 2.0;
 
@@ -29,9 +29,9 @@ public class SwerveConstants {
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
 
-        public final static double DISTANCE_PER_PULSE = (((2 * WHEEL_RADIUS * Math.PI)
-                        / DRIVE_GEAR_RATIO)); // * 0.92378753;
-        public final static double ANGLE_PER_PULSE = 360d / TURNING_GEAR_RATIO;
+        // public final static double DISTANCE_PER_PULSE = (((2 * WHEEL_RADIUS * Math.PI)
+        //                 / DRIVE_GEAR_RATIO)); // * 0.92378753;
+        // public final static double ANGLE_PER_PULSE = 360d / TURNING_GEAR_RATIO;
 
         // front left module
         public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 0;//-0.47;
@@ -192,7 +192,7 @@ public class SwerveConstants {
         public final static double THATA_KD = 0.0;
 
         //Module Limits
-        public final static ModuleLimits DEFUALT =  new ModuleLimits(4.5, 20 , Units.degreesToRadians(600)); 
+        public final static ModuleLimits DEFUALT =  new ModuleLimits(4.5, Units.feetToMeters(75.0) , Units.degreesToRadians(600)); 
         public final static ModuleLimits Slow40Precent = new ModuleLimits(4.5 * 0.4, Units.feetToMeters(75.0), Units.degreesToRadians(600)); 
         public final static ModuleLimits Slow10Precent = new ModuleLimits(4.5 * 0.1, Units.feetToMeters(75.0), Units.degreesToRadians(600)); 
         

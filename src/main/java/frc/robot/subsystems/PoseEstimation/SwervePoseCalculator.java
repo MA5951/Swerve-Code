@@ -6,6 +6,7 @@ package frc.robot.subsystems.PoseEstimation;
 
 import frc.robot.subsystems.Swerve.CollisionDtector;
 import frc.robot.subsystems.Swerve.SkidDetector;
+import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.SwerveOdometry;
 import frc.robot.subsystems.Swerve.SwerveSubsystem;
 
@@ -19,14 +20,14 @@ public class SwervePoseCalculator {
     private SwerveOdometry odometry;
 
     public SwervePoseCalculator() {
-        //collisionDtector = new CollisionDtector(SwerveSubsystem.getInstance().getGyro());
+        collisionDtector = new CollisionDtector(SwerveConstants.getGyro());
         //skidDetector = new SkidDetector(SwerveSubsystem.getInstance().getOdometryUpdate());
         odometry = new SwerveOdometry();
     }
 
     
     public void update() {
-        //collisionDtector.update();
+        collisionDtector.update();
         odometry.update();
     }
 

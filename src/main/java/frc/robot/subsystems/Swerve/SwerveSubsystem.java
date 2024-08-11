@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //The orde of te modules is a STANDART and it is
 //Front Left
@@ -149,13 +150,20 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
-    chassiSpeeds = new ChassisSpeeds(chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY,
-     chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY);
+    chassiSpeeds = ChassisSpeeds.fromRobotRelativeSpeeds(chassiSpeeds , new Rotation2d(
+                    Math.toRadians((SwerveSubsystem.getInstance().getFusedHeading()
+                     - SwerveSubsystem.getInstance().getOffsetAngle()))));
+    
+    chassiSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY * 0.7,
+     chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY * 0.7, chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY * 0.7, new Rotation2d(
+                    Math.toRadians((SwerveSubsystem.getInstance().getFusedHeading()
+                     - SwerveSubsystem.getInstance().getOffsetAngle()))));
+    
     
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
-       getCurrentLimits(), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
+       new ModuleLimits(4.3, Units.feetToMeters(75.0) , Units.degreesToRadians(600)), currentSetpoint, chassiSpeeds, RobotConstants.KDELTA_TIME);
 
     for (int i = 0; i < modulesArry.length; i++) {
       optimizedSetpointStates[i] = currentSetpoint.moduleStates()[i];
