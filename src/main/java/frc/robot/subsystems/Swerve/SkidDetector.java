@@ -8,6 +8,7 @@ package frc.robot.subsystems.Swerve;
 
 import java.util.function.Supplier;
 
+import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Utils.VectorUtil;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -20,19 +21,23 @@ public class SkidDetector {
     private SwerveDriveKinematics kinematics;
     private Supplier<SwerveModuleState[]> statesSupplier;
     private SwerveModuleState[] rotationalStates;
-    private double[] statesTranslationMag;
+    private double[] statesTranslationMag =  new double[4];
     private double angularVelocity;
     private double maxTranslationSpeed = 0;
     private double minTranslationSpeed = 0;
+
+    private LoggedDouble skidRatio;
 
     public SkidDetector(SwerveDriveKinematics kinematics,Supplier<SwerveModuleState[]> states) {
         this.kinematics = kinematics;
         statesSupplier = states;
 
+        skidRatio = new LoggedDouble("/Swerve/Skid Detector");
+
     }
 
     public void update() {
-
+        skidRatio.update(getSkidRatio());
     }
 
     public double getSkidRatio() {

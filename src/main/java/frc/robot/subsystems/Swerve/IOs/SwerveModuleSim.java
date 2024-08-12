@@ -10,6 +10,7 @@ import com.ma5951.utils.Logger.LoggedDouble;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.Util.SwerveModule;
@@ -22,7 +23,7 @@ public class SwerveModuleSim implements SwerveModule{
     private final PIDController driveFeedback =
       new PIDController(38, 0.0, 0.0, RobotConstants.KDELTA_TIME);
     private final PIDController turnFeedback =
-      new PIDController(0.08, 0.0, 0.0, RobotConstants.KDELTA_TIME);
+      new PIDController(20, 0.0, 0.0, RobotConstants.KDELTA_TIME);
 
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
@@ -54,8 +55,8 @@ public class SwerveModuleSim implements SwerveModule{
         SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Steer Current");
         SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Steer Volts");
         AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Absolute Angle");
-        DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "/Drive Temp");
-        SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "/Steer Temp");
+        DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Drive Temp");
+        SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Steer Temp");
     }
 
     public void resetSteer() {
@@ -133,9 +134,9 @@ public class SwerveModuleSim implements SwerveModule{
         driveSim.setInputVoltage(driveAppliedVolts);
     }
 
-    public void turningUsingPID(double setPointDEGREES) {
-        //Degrees
-        turnSim.setInputVoltage(turnFeedback.calculate(getTurningPosition(), setPointDEGREES));
+    public void turningUsingPID(double setPointRdians) {
+        
+        turnSim.setInputVoltage(turnFeedback.calculate(Units.degreesToRadians(getTurningPosition()), setPointRdians));
     }
 
     public void driveUsingPID(double setPointMPS) {

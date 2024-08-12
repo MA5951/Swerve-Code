@@ -29,6 +29,7 @@ public class SwervePoseCalculator {
     public void update() {
         collisionDtector.update();
         odometry.update();
+        skidDetector.update();
     }
 
     public static SwervePoseCalculator getInstance() {

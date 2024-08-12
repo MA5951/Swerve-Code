@@ -13,15 +13,12 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 public class LoggedSwerveStates {
 
     private StructArrayPublisher<SwerveModuleState> loggedStates;
-    private SwerveModuleState[] lastStates;
     private NetworkTable networkTable;
 
 
     public LoggedSwerveStates(String name) {
         networkTable = NetworkTableInstance.getDefault().getTable("/");
         loggedStates = networkTable.getStructArrayTopic(name , SwerveModuleState.struct).publish();
-        loggedStates.set(null);
-        lastStates = null;
         loggedStates.set(new SwerveModuleState[] {
             new SwerveModuleState(),
             new SwerveModuleState(),
@@ -32,10 +29,5 @@ public class LoggedSwerveStates {
 
     public void update(SwerveModuleState[] states) {
         loggedStates.set(states);
-        // if (lastStates != states) {
-        //     loggedStates.set(states);
-        //     lastStates = states;
-        // }   
-
     }
 }
