@@ -28,13 +28,10 @@ public class SwerveConstants {
         public final static double TURNING_GEAR_RATIO = 150d / 7;//21.42
         public final static double DRIVE_GEAR_RATIO = 6.75;
         public final static double WHEEL_RADIUS = 0.0508;
-        public final static double WHEEL_CIRCUMFERENCE =  WHEEL_RADIUS * Math.PI;
+        public final static double WHEEL_CIRCUMFERENCE = 2 * WHEEL_RADIUS * Math.PI;
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
 
-        // public final static double DISTANCE_PER_PULSE = (((2 * WHEEL_RADIUS * Math.PI)
-        //                 / DRIVE_GEAR_RATIO)); // * 0.92378753;
-        // public final static double ANGLE_PER_PULSE = 360d / TURNING_GEAR_RATIO;
 
         // front left module
         public final static double FRONT_LEFT_MODULE_OFFSET_ENCODER = 0;//-0.47;
@@ -201,5 +198,8 @@ public class SwerveConstants {
         
         
         //Collision Detector
-        public final static double COLLISION_THRESHOLD = 2d;
+        public final static double COLLISION_THRESHOLD = 1.8;
+
+        //Odometry
+        public static final double ODOMETRY_UPDATE_RATE = 200;
 }

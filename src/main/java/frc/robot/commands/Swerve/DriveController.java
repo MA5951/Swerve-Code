@@ -36,7 +36,7 @@ public class DriveController extends Command {
     ySpeed = Math.abs(ySpeed) < 0.1 ? 0 : ySpeed * -1;
     turningSpeed = (Math.abs(turningSpeed) < 0.1 ? 0 : turningSpeed) * -1;
 
-    speed = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed,
+    speed = ChassisSpeeds.fromFieldRelativeSpeeds(ySpeed, xSpeed, turningSpeed,
                   new Rotation2d(
                     Math.toRadians((SwerveSubsystem.getInstance().getFusedHeading()
                      - SwerveSubsystem.getInstance().getOffsetAngle()))));

@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Swerve.IOs;
 
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -107,6 +108,9 @@ public class SwerveModuleTalonFX implements SwerveModule {
         configDriveMotor();
         //configCANCoder();
         resetSteer();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(SwerveConstants.ODOMETRY_UPDATE_RATE, 
+        drivePosition , driveVelocity , steerPosition);
     }
 
     private void configTurningMotor() {

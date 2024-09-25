@@ -4,10 +4,12 @@
 
 package frc.robot.subsystems.Swerve.IOs;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ma5951.utils.Logger.LoggedDouble;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.subsystems.Swerve.SwerveConstants;
 import frc.robot.subsystems.Swerve.Util.Gyro;
 
 
@@ -46,6 +48,8 @@ public class GyroPiegon2 implements Gyro{
         accelX = new LoggedDouble("/Swerve/" + name + "/Accel X");
         accelY = new LoggedDouble("/Swerve/" + name + "/Accel Y");
         
+        BaseStatusSignal.setUpdateFrequencyForAll(SwerveConstants.ODOMETRY_UPDATE_RATE, 
+        gyroYaw);
     }
 
     public void reset() {
