@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import com.ma5951.utils.Utils.DriverStationUtil;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
+import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -43,14 +46,16 @@ public class AutoSelector {
     private static final HashMap<Command, AutoOption> autoOptionByCommand = new HashMap<>();
     private boolean preVizualizAuto;
     private PathPlannerPath[] pathsArry;
+    private Supplier<Pose2d> poseSupplier;
 
     
 
 
-    public AutoSelector() {
+    public AutoSelector(Supplier<Pose2d> robotPoseSupplier) {
         commandChooser = new SendableChooser<>();
         Shuffleboard.getTab("Auto").add("AutoSelector", commandChooser);
         SmartDashboard.putData(field);
+        poseSupplier = robotPoseSupplier;
 
     }
 
@@ -112,6 +117,7 @@ public class AutoSelector {
     }
 
     public void updateViz() {
+        field.setRobotPose(poseSupplier.get());
         if (preVizualizAuto) {
             if (!DriverStation.isTeleopEnabled()) {
                 if (getSelectedAuto().isPathPlannerAuto()) {
@@ -119,11 +125,14 @@ public class AutoSelector {
                     clearCurrentPath();
                     String auto = "";
                     auto = getSelectedAuto().getPathPlannerAutoName();
-                    pathsArry = PathPlannerAuto.getPathGroupFromAutoFile(auto).toArray(new PathPlannerPath[0]);
+                    //pathsArry = PathPlannerAuto.getPathGroupFromAutoFile(auto).toArray(new PathPlannerPath[0]);
                     for (PathPlannerPath path : pathsArry) {
-                        
+                        if (DriverStationUtil.getAlliance() == Alliance.Red) {
+                            path.flipPath();
+                        }
                         setCurrentPath(path);
                     }
+                    
                     lastPublishedAuto = getSelectedAuto().getPathPlannerAutoName();
                     for (int i = 0; i < lastarr.length; i += 3) {
                         double x = lastarr[i];

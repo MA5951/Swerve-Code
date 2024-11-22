@@ -18,7 +18,7 @@ public class VelocityControlledTalonFX extends PowerControlledTalonFX{
     private Double convertionFactor = 1d ;
     private Double tolorance = 50d;
     private Double setPoint = 0d;
-    private boolean isFalcon = false;
+    //private boolean isFalcon = false;
     private int maxSpeed = 6000;
 
     public VelocityControlledTalonFX(int ID , boolean isFalcon) {

@@ -77,9 +77,9 @@ public class PowerControlledTalonFX {
     }
 
     public void setPeakCurrentLimit(double peakCurrent , double peakTime) {
-        configuration.CurrentLimits.SupplyCurrentThreshold = peakCurrent;
-        configuration.CurrentLimits.SupplyTimeThreshold = peakTime;
-        configuration.CurrentLimits.SupplyCurrentLimitEnable = true;
+        // configuration.CurrentLimits.SupplyCurrentThreshold = peakCurrent;
+        // configuration.CurrentLimits.SupplyTimeThreshold = peakTime;
+        // configuration.CurrentLimits.SupplyCurrentLimitEnable = true; //TODO
 
         applyConfiguration();
     }

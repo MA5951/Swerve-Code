@@ -1,50 +1,68 @@
 // Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
+// Open Sostatic urce Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands.Swerve;
 
+import com.ma5951.utils.Logger.LoggedString;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.PS5Controller;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import frc.robot.subsystems.Swerve.SwerveSubsystem;
+import frc.robot.Subsystem.PoseEstimation.Vision;
+import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
 public class TeleopSwerveController extends Command {
   
-  private DriveController driveCommand;
+  private FieldCentricDriveController driveController;
+  private AngleAdjustController angleAdjustController;
+  private RelativAngleAdjustController relativAngleAdjustController;
   private ChassisSpeeds driveControllerSpeeds;
+  private ChassisSpeeds angleAdjustControllerSpeeds;
+  private ChassisSpeeds relativAngleAdjustControllerSpeeds;
+  
+  public static boolean atPoint;
+  
 
   private SwerveSubsystem swerve;
   private ChassisSpeeds robotSpeeds;
+  private LoggedString xyControllerLog;
+  private LoggedString theathControllerLog;
   
-  public TeleopSwerveController(CommandPS5Controller controller) {
+  public TeleopSwerveController(PS5Controller controller) {
     swerve = SwerveSubsystem.getInstance();
     
-    driveCommand = new DriveController(controller);
+    driveController = new FieldCentricDriveController(controller , () -> controller.getR2Button() , 
+    0.4 , () -> SwerveSubsystem.getInstance().getFusedHeading());
+    angleAdjustController = new AngleAdjustController( () -> SwerveSubsystem.getInstance().getFusedHeading());
+    relativAngleAdjustController = new RelativAngleAdjustController(0 , () -> Vision.getInstance().getTx());
+
+    xyControllerLog = new LoggedString("/Swerve/Controllers/XY Controller");
+    theathControllerLog = new LoggedString("/Swerve/Controllers/Theath Controller");
+
+
     addRequirements(swerve);
   }
 
   @Override
   public void initialize() {
-    driveCommand.initialize();
   }
 
   @Override
   public void execute() {
-    driveCommand.execute();
-    driveControllerSpeeds = driveCommand.getChassisSpeed();
 
-    //State meachin to switch aulter the final chassis speed
-    if (true) {
-      robotSpeeds = driveControllerSpeeds;
-    }
+    driveControllerSpeeds = driveController.update();
+    xyControllerLog.update("Drive Controller");
+    theathControllerLog.update("Drive Controller");
+    robotSpeeds = driveControllerSpeeds;
 
-    swerve.drive(robotSpeeds);
+    swerve.drive(robotSpeeds , false);
   }
 
   @Override
   public void end(boolean interrupted) {
-    driveCommand.end(interrupted);
+
   }
 
   @Override
