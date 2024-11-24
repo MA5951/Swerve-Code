@@ -63,12 +63,7 @@ SwerveSubsystem extends SubsystemBase {
   private SwerveModuleState[] currentStates = new SwerveModuleState[4];
   private SwerveModulePosition[] currentPositions = new  SwerveModulePosition[4];
   private SwerveModulePosition[] wheelPositions = new  SwerveModulePosition[4];
-  private SwerveModulePosition[] lastPositions = new  SwerveModulePosition[] {
-    new SwerveModulePosition(),
-    new SwerveModulePosition(),
-    new SwerveModulePosition(),
-    new SwerveModulePosition()
-};
+  private SwerveModulePosition[] lastPositions = null;
   private SwerveModuleData[] modulesData = new SwerveModuleData[4];
   private GyroData gyroData = new GyroData();
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
@@ -188,14 +183,7 @@ SwerveSubsystem extends SubsystemBase {
     return new Rotation2d(Math.toRadians(getFusedHeading()));
   }
 
-  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize , boolean scale) {
-    if (scale) { // move to controler
-      chassiSpeeds.omegaRadiansPerSecond = chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY;
-      chassiSpeeds.vxMetersPerSecond = chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY;
-      chassiSpeeds.vyMetersPerSecond = chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY;
-    }
-
-
+  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
@@ -220,8 +208,8 @@ SwerveSubsystem extends SubsystemBase {
     modulesArry[3].setDesiredState(states[3]);
   }
 
-  public void drive(ChassisSpeeds chassisSpeeds , boolean isAuto) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize , !isAuto);
+  public void drive(ChassisSpeeds chassisSpeeds) {
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -229,7 +217,7 @@ SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize , true);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -304,27 +292,26 @@ SwerveSubsystem extends SubsystemBase {
       }
       // Filtering based on delta wheel positions
       boolean includeMeasurement = true;
-      // if (lastPositions != null) {
-      //   double dt = timestamps[i] - lastTime;
-      //   for (int j = 0; j < modulesArry.length; j++) {
-      //     double velocity =
-      //         (wheelPositions[j].distanceMeters
-      //                 - lastPositions[j].distanceMeters)
-      //             / dt;
-      //     double omega =
-      //         wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
-      //             / dt;
-      //     // Check if delta is too large
-      //     if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
-      //         || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
-      //       includeMeasurement = false;
-      //       break;
-      //     }
-      //   }
-      // }
+      if (lastPositions != null) {
+        double dt = timestamps[i] - lastTime;
+        for (int j = 0; j < modulesArry.length; j++) {
+          double velocity =
+              (wheelPositions[j].distanceMeters
+                      - lastPositions[j].distanceMeters)
+                  / dt;
+          double omega =
+              wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
+                  / dt;
+          // Check if delta is too large
+          if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
+              || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
+            includeMeasurement = false;
+            break;
+          }
+        }
+      }
 
       if (includeMeasurement) {
-        //System.out.println("updated");
         lastPositions = wheelPositions;
         PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
         lastTime = timestamps[i];
@@ -335,25 +322,14 @@ SwerveSubsystem extends SubsystemBase {
 
     
 
-
-
-
    
     currentChassisSpeeds = kinematics.toChassisSpeeds(getSwerveModuleStates());
     currenStatesLog.update(getSwerveModuleStates());
-    offsetprintLog.update(offsetAngle);
     
     swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
     swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
     swerveTheataaccelLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
-    swerevXaccelLog.update((lastXvelocity - currentChassisSpeeds.vxMetersPerSecond) / 0.2);
-    swerevYaccelLog.update((lastYvelocity - currentChassisSpeeds.vyMetersPerSecond) / 0.2);
-    swerevTheatavelocityLog.update((lastTheatavelocity - currentChassisSpeeds.omegaRadiansPerSecond) / 0.2);
-
-    lastXvelocity = currentChassisSpeeds.vxMetersPerSecond;
-    lastYvelocity = currentChassisSpeeds.vyMetersPerSecond;
-    lastTheatavelocity = currentChassisSpeeds.omegaRadiansPerSecond;
-
+    
     
   }
 }

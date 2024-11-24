@@ -5,27 +5,19 @@
 package frc.robot;
 
 
-import com.ctre.phoenix6.swerve.SwerveRequest.FieldCentric;
 import com.ma5951.utils.DashBoard.AutoOption;
 import com.ma5951.utils.DashBoard.AutoSelector;
 import com.ma5951.utils.StateControl.StatesTypes.State;
-import com.ma5951.utils.StateControl.StatesTypes.StatesConstants;
-import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.auto.NamedCommands;
 
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS5Controller;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.PoseEstimation.Vision;
 import frc.robot.Subsystem.Swerve.SwerveAutoFollower;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
-import frc.robot.Utils.ShootingParameters;
-import frc.robot.commands.Swerve.AngleAdjustController;
 import frc.robot.commands.Swerve.FieldCentricDriveController;
 import frc.robot.commands.Swerve.TeleopSwerveController;
 
@@ -67,7 +59,7 @@ public class RobotContainer {
     autoSelector.updateViz();
   }
 
-  public static void setIDLE() {
+  public void setIDLE() {
       lastRobotState = currentRobotState;
       currentRobotState = RobotConstants.IDLE;
   }

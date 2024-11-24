@@ -57,7 +57,7 @@ public class TeleopSwerveController extends Command {
     theathControllerLog.update("Drive Controller");
     robotSpeeds = driveControllerSpeeds;
 
-    swerve.drive(robotSpeeds , false);
+    swerve.drive(robotSpeeds);
   }
 
   @Override

@@ -37,7 +37,7 @@ public class RelativAngleAdjustController implements SwerveController{
 
     public ChassisSpeeds update() {
         omega = pid.calculate(measurment.get());
-        chassisSpeeds.omegaRadiansPerSecond = omega;
+        chassisSpeeds.omegaRadiansPerSecond = omega * SwerveConstants.DRIVER_THATA_SCALER;
 
         omegaLog.update(omega);
         atPointLog.update(getAtPoint());
