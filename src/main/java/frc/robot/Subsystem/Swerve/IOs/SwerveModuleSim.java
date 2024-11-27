@@ -4,32 +4,39 @@
 
 package frc.robot.Subsystem.Swerve.IOs;
 
-import com.ma5951.utils.RobotConstantsMAUtil;
-import com.ma5951.utils.Logger.LoggedDouble;
 
-import edu.wpi.first.math.MathUtil;
+import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ma5951.utils.RobotConstantsMAUtil;
+import com.ma5951.utils.ControlledMotors.TalonFXSim;
+import com.ma5951.utils.Logger.LoggedDouble;
+import com.ma5951.utils.Utils.ConvUtil;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
 
 public class SwerveModuleSim implements SwerveModule{
 
-    private final DCMotorSim driveSim;
-    private final DCMotorSim turnSim;
+    private final TalonFXSim driveSim;
+    private final TalonFXSim turnSim;
 
     private final PIDController driveFeedback =
-      new PIDController(38, 0.0, 0.0, RobotConstantsMAUtil.KDELTA_TIME);
+      new PIDController(3, 0.0, 0.0, RobotConstantsMAUtil.KDELTA_TIME);
     private final PIDController turnFeedback =
-      new PIDController(20, 0.0, 0.0, RobotConstantsMAUtil.KDELTA_TIME);
+      new PIDController(12, 0.0, 0.0, RobotConstantsMAUtil.KDELTA_TIME);
 
-    private double driveAppliedVolts = 0.0;
-    private double turnAppliedVolts = 0.0;
-    private double drivePose = 0;
+    private PositionVoltage pidTurnController = new PositionVoltage(0);
+    private VelocityVoltage driveController = new VelocityVoltage(0);
+    private double rpsDriveSetPoint;
+
 
     private SwerveModuleData moduleData = new SwerveModuleData();
 
@@ -45,11 +52,17 @@ public class SwerveModuleSim implements SwerveModule{
     private LoggedDouble SteerTemp;
 
     public SwerveModuleSim(String moduleNameN) {
-        driveSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(SwerveConstants.DRIVE_kV, SwerveConstants.DRIVE_kA), DCMotor.getKrakenX60Foc(1) , new double[] {});
-        turnSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(SwerveConstants.TURNING_kV, SwerveConstants.TURNING_kA), DCMotor.getFalcon500(1), null);
+        driveSim = new TalonFXSim(DCMotor.getKrakenX60(1), SwerveConstants.DRIVE_GEAR_RATIO, 
+        0.025,  SwerveConstants.DRIVE_GEAR_RATIO);
 
+        turnSim = new TalonFXSim(DCMotor.getFalcon500(1), SwerveConstants.TURNING_GEAR_RATIO, 
+        0.004,  SwerveConstants.TURNING_GEAR_RATIO);
 
-        turnFeedback.enableContinuousInput(0, 360);
+        turnFeedback.enableContinuousInput(-Math.PI, -Math.PI);
+        
+
+        driveSim.setController(driveFeedback);
+        turnSim.setController(turnFeedback);
 
         DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Position");
         DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" +"/Drive Velocity");
@@ -76,40 +89,38 @@ public class SwerveModuleSim implements SwerveModule{
     }
 
     public double getDriveCurrent() {
-        return Math.abs(driveSim.getCurrentDrawAmps());
+        return driveSim.getAppliedCurrent();
     }
 
     public double getSteerCurrent() {
-        return Math.abs(turnSim.getCurrentDrawAmps());
+        return turnSim.getAppliedCurrent();
     }
 
     public double getDriveVolts() {
-        return driveAppliedVolts;
+        return driveSim.getAppliedVoltage();
     }
 
     public double getSteerVolts() {
-        return turnAppliedVolts;
+        return turnSim.getAppliedVoltage();
     }
 
     public double getAbsolutePosition() {
-        return turnSim.getAngularPositionRotations() * 360 ;
+        return turnSim.getPosition() * 360 ;
     }
 
     public double getDrivePosition() {
         //Return distance in meters
-        drivePose += driveSim.getAngularPositionRotations() * SwerveConstants.WHEEL_CIRCUMFERENCE * RobotConstantsMAUtil.KDELTA_TIME;
-        return drivePose;
-       
+        return driveSim.getPosition() * SwerveConstants.WHEEL_CIRCUMFERENCE;
     }
 
     public double getSteerPosition() {
-        //Degrees
-        return  turnSim.getAngularPositionRotations() * 360 ;
+        //Radians
+        return ConvUtil.RotationsToRadians(turnSim.getPosition()) ;
     }
 
     public double getDriveVelocity() {
         //Meter Per Secound
-        return driveSim.getAngularPositionRotations() * SwerveConstants.WHEEL_CIRCUMFERENCE;
+        return (driveSim.getVelocity() * 60) * Math.PI * (SwerveConstants.WHEEL_RADIUS * 2) / 60;
     }
 
     public void setNeutralModeDrive(Boolean isBrake) {
@@ -121,35 +132,52 @@ public class SwerveModuleSim implements SwerveModule{
     }
 
     public void turningMotorSetPower(double power) {
-        turnSim.setInputVoltage(12 * power);
+        turnSim.setControl(new DutyCycleOut(power));
     }
 
     public void driveMotorSetPower(double power) {
-        driveSim.setInputVoltage(12 * power);
+        driveSim.setControl(new DutyCycleOut(power));
     }
 
     public void turningMotorSetVoltage(double volt) {
-        turnAppliedVolts = MathUtil.clamp(volt, -12.0, 12.0);
-        turnSim.setInputVoltage(turnAppliedVolts);
+        turnSim.setControl(new VoltageOut(volt));
     }
 
     public void driveMotorSetVoltage(double volt) {
-        driveAppliedVolts = MathUtil.clamp(volt, -12.0, 12.0);
-        driveSim.setInputVoltage(driveAppliedVolts);
+        driveSim.setControl(new VoltageOut(volt));
     }
 
     public void turningUsingPID(double setPointRdians) {
-        
-        turnSim.setInputVoltage(turnFeedback.calculate(Units.degreesToRadians(getSteerPosition()), setPointRdians));
+        turnSim.setControl(pidTurnController.withPosition(Units.radiansToRotations(setPointRdians)));
     }
 
-    public void driveUsingPID(double setPointMPS , double feedforward) {
+    public void driveUsingPID(double setPointMPS , double feedForward) {
         //Meter Per Secound setPointMPS / SwerveConstants.WHEEL_CIRCUMFERENCE
-        driveSim.setInputVoltage(driveFeedback.calculate(getDriveVelocity(), setPointMPS));
+        rpsDriveSetPoint = (setPointMPS / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI );
+        driveSim.setControl(driveController.withVelocity(rpsDriveSetPoint)
+        .withFeedForward(feedForward)
+        .withSlot(SwerveConstants.SLOT_CONFIG));
     }
 
     public SwerveModuleData update() {
         
+        driveSim.update(Timer.getFPGATimestamp());
+        turnSim.update(Timer.getFPGATimestamp());
+        moduleData.updateData(
+            getDrivePosition(),
+            getDriveVelocity(),
+            getDriveCurrent(),
+            getDriveVolts(),
+            getDriveTemp(),
+            getSteerTemp(),
+            getSteerPosition(),
+            getSteerCurrent(),
+            getSteerVolts(),
+            getAbsolutePosition(),
+            0d, 
+            new double[1], 
+            new Rotation2d[1]);
+
         DrivePosition.update(getDrivePosition());
         DriveVelocity.update(getDriveVelocity());
         DriveCurrent.update(getDriveCurrent());
@@ -160,9 +188,6 @@ public class SwerveModuleSim implements SwerveModule{
         AbsAngle.update(getAbsolutePosition());
         DriveTemp.update(getDriveTemp());
         SteerTemp.update(getSteerTemp());
-
-        driveSim.update(RobotConstantsMAUtil.KDELTA_TIME);
-        turnSim.update(RobotConstantsMAUtil.KDELTA_TIME);
 
         return moduleData;
 

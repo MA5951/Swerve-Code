@@ -1,5 +1,6 @@
 package frc.robot.Subsystem.Swerve.Util;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public interface Gyro {
 
@@ -17,7 +18,7 @@ public interface Gyro {
 
     double getAccelY();
 
-    GyroData update();
+    GyroData update(ChassisSpeeds robotSpeeds);
 
 }
 

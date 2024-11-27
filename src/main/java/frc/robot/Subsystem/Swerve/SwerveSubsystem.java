@@ -136,45 +136,32 @@ SwerveSubsystem extends SubsystemBase {
     return currentStates;
   }
 
-  public double getOffsetAngle() {
-    return offsetAngle;
-  }
-
-  public void updateOffset(double offset) {
-    offsetAngle = offset;
-  }
-
-  public void updateOffset() {
-    offsetAngle = getFusedHeading();
-  }
-
   public void resetGyro() {
     gyro.reset();
   }
 
   public double getFusedHeading() {
-    return gyro.getYaw();
+    return gyroData.getYaw();
   }
 
   public double getRoll() {
-    return gyro.getRoll();
+    return gyroData.getRoll();
   }
 
   public double getPitch() {
-    return gyro.getPitch();
+    return gyroData.getPitch();
   }
 
   public double getAbsYaw() {
-    return gyro.getAbsYaw();
+    return gyroData.getAbsoluteYaw();
   }
 
-  public double getVelocityVector(){
+  public double getVelocityVector(){ 
     ChassisSpeeds speeds = getRobotRelativeSpeeds();
     return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) +
       Math.pow(speeds.vyMetersPerSecond, 2));
   }
 
-  //TODO: Critical fix nedded
   public ChassisSpeeds getRobotRelativeSpeeds() {
     return kinematics.toChassisSpeeds(getSwerveModuleStates());
   }
@@ -183,7 +170,14 @@ SwerveSubsystem extends SubsystemBase {
     return new Rotation2d(Math.toRadians(getFusedHeading()));
   }
 
-  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
+  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize , boolean scale) {
+    if (scale) { // move to controler
+      chassiSpeeds.omegaRadiansPerSecond = chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY;
+      chassiSpeeds.vxMetersPerSecond = chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY;
+      chassiSpeeds.vyMetersPerSecond = chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY;
+    }
+
+
     if (optimize) {
       currentSetpoint =
       setpointGenerator.generateSetpoint(
@@ -208,8 +202,8 @@ SwerveSubsystem extends SubsystemBase {
     modulesArry[3].setDesiredState(states[3]);
   }
 
-  public void drive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
+  public void drive(ChassisSpeeds chassisSpeeds , boolean isAuto) {
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize , !isAuto);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -217,7 +211,7 @@ SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize , true);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -248,6 +242,14 @@ SwerveSubsystem extends SubsystemBase {
       return new SwerveModuleState(wheelTorque, desiState.angle);
   }
 
+  public void updateHardwereData() {
+    for (int i = 0; i < 4 ; i++) {
+      modulesData[i] = modulesArry[i].update();
+    }
+    currentChassisSpeeds = kinematics.toChassisSpeeds(getSwerveModuleStates());
+    gyroData = gyro.update(currentChassisSpeeds);
+  }
+
   public static SwerveSubsystem getInstance() {
   if (swerveSubsystem == null) {
     swerveSubsystem = new SwerveSubsystem();
@@ -257,79 +259,72 @@ SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    odometryLock.lock();
+    // odometryLock.lock();
 
-    timestamps =
-        timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
-    if (timestamps.length == 0) {
-      timestamps = new double[] {Timer.getFPGATimestamp()};
-    }
-    timestampQueue.clear();
+    // timestamps =
+    //     timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+    // if (timestamps.length == 0) {
+    //   timestamps = new double[] {Timer.getFPGATimestamp()};
+    // }
+    // timestampQueue.clear();
 
-    gyroData = gyro.update();
-    for (int i = 0; i < 4 ; i++) {
-      modulesData[i] = modulesArry[i].update();
-    }
-
-    odometryLock.unlock();
+    updateHardwereData();
     
-    int minOdometryUpdates =
-        IntStream.of(
-                timestamps.length,
-                Arrays.stream(modulesData)
-                    .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length) //TODO: Cheack
-                    .min()
-                    .orElse(0))
-            .min()
-            .orElse(0);
-    minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
+    // odometryLock.unlock();
+    
+    // int minOdometryUpdates =
+    //     IntStream.of(
+    //             timestamps.length,
+    //             Arrays.stream(modulesData)
+    //                 .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length) //TODO: Cheack
+    //                 .min()
+    //                 .orElse(0))
+    //         .min()
+    //         .orElse(0);
+    // minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
   
-    for (int i = 0; i < minOdometryUpdates; i++) {
-      int odometryIndex = i;
-      Rotation2d yaw = gyroData.getYawPositionQueue()[i];
-      for (int a = 0; a < modulesArry.length ; a++) {
-        wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
-      }
-      // Filtering based on delta wheel positions
-      boolean includeMeasurement = true;
-      if (lastPositions != null) {
-        double dt = timestamps[i] - lastTime;
-        for (int j = 0; j < modulesArry.length; j++) {
-          double velocity =
-              (wheelPositions[j].distanceMeters
-                      - lastPositions[j].distanceMeters)
-                  / dt;
-          double omega =
-              wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
-                  / dt;
-          // Check if delta is too large
-          if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
-              || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
-            includeMeasurement = false;
-            break;
-          }
-        }
-      }
+    // for (int i = 0; i < minOdometryUpdates; i++) {
+    //   int odometryIndex = i;
+    //   Rotation2d yaw = gyroData.getYawPositionQueue()[i];
+    //   for (int a = 0; a < modulesArry.length ; a++) {
+    //     wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
+    //   }
+    //   // Filtering based on delta wheel positions
+    //   boolean includeMeasurement = true;
+    //   if (lastPositions != null) {
+    //     double dt = timestamps[i] - lastTime;
+    //     for (int j = 0; j < modulesArry.length; j++) {
+    //       double velocity =
+    //           (wheelPositions[j].distanceMeters
+    //                   - lastPositions[j].distanceMeters)
+    //               / dt;
+    //       double omega =
+    //           wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
+    //               / dt;
+    //       // Check if delta is too large
+    //       if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
+    //           || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
+    //         includeMeasurement = false;
+    //         break;
+    //       }
+    //     }
+    //   }
 
-      if (includeMeasurement) {
-        lastPositions = wheelPositions;
-        PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
-        lastTime = timestamps[i];
-      }
-    }
+    //   if (includeMeasurement) {
+    //     lastPositions = wheelPositions;
+    //     PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
+    //     lastTime = timestamps[i];
+    //   }
+    // }
 
 
-
-    
-
-   
-    currentChassisSpeeds = kinematics.toChassisSpeeds(getSwerveModuleStates());
-    currenStatesLog.update(getSwerveModuleStates());
+    currenStatesLog.update(currentStates);
     
     swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
     swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
-    swerveTheataaccelLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
-    
+    swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
+   
+
     
   }
 }

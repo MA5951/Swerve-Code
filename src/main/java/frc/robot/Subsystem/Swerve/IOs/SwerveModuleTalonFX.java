@@ -7,9 +7,7 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-//import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityTorqueCurrentFOC;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -286,7 +284,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
         //turningMotor.setControl(turnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
         turningMotor.setControl(pidTurnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
     }
-
     //In Ammperes
     public void driveUsingPID(double setPointMPS , double feedForward) {
         rpsDriveSetPoint = (setPointMPS / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI );
@@ -296,7 +293,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     }
 
-    
     public void logData(SwerveModuleData swerveModuleData) {
         DrivePosition.update(swerveModuleData.getDrivePosition());
         DriveVelocity.update(swerveModuleData.getDriveVelocity());

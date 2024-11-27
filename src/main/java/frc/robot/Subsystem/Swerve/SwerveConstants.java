@@ -2,6 +2,7 @@ package frc.robot.Subsystem.Swerve;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
 import frc.robot.Robot;
@@ -193,41 +194,39 @@ public class SwerveConstants {
         public final static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.frontLeftLocation, SwerveConstants.frontRightLocation,
         SwerveConstants.rearLeftLocation, SwerveConstants.rearRightLocation);
 
-        //Swerve controllers
-
-        //Swerve theta PID_CONTROLLER radians
-        public final static double THATA_KP = 0.45;
-        public final static double THATA_KI = 0;
-        public final static double THATA_KD = 0.0;
-        public final static double ANGLE_PID_TOLORANCE = Math.toRadians(3);
-
-        //Swerve theta PID_CONTROLLER degrees
-        public final static double RELATIV_THATA_KP = 0.00615;
-        public final static double RELATIV_THATA_KI = 0;
-        public final static double RELATIV_THATA_KD = 0.0016;
-        public final static double RELATIV_ANGLE_PID_TOLORANCE = 3;
-
-        public final static double TIME_AT_SET_POINT = 0.1;
-
-        //Swerve theta PID_CONTROLLER lock
-        public final static double THATA_LOCK_KP = 0.01;
-        public final static double THATA_LOCK_KI = 0;
-        public final static double THATA_LOCK_KD = 0.00015;
-        public final static double THATA_LOCK_PID_TOLORANCE = 2;
-        public final static double THATA_LOCK_THRESHOLD= 0.0;
-
-        //Swerve DRIVE CONTROLLER 
-        public final static double DRIVER_XY_SCALER = 1;
-        public final static double DRIVER_THATA_SCALER = 0.7;
-
         //Module Limits //75 Accl //700/800
         public final static ModuleLimits DEFUALT =  new ModuleLimits(5.2, Units.feetToMeters(65) , Units.degreesToRadians(700)); 
-        
+                
         //Collision Detector
         public final static double COLLISION_THRESHOLD = 1.85;
 
         //Oגometry
         public static final double ODOMETRY_UPDATE_RATE = 200;
 
-        //TODO: REFRASH ALL STATUS SIGNAL FUNCTION
+
+        //Swerve controllers
+
+        //Swerve AngleAdjust
+        public final static double THATA_KP = 0.45;
+        public final static double THATA_KI = 0;
+        public final static double THATA_KD = 0.0;
+        public final static double ANGLE_PID_TOLORANCE = Math.toRadians(3);
+
+        //Swerve AutoAdjustXY
+        public final static double XY_KP = 0.45;
+        public final static double XY_KI = 0;
+        public final static double XY_KD = 0.0;
+        public final static Constraints XY_CONSTRAINTS = new Constraints(3.5, 3);
+        public final static double XY_TOLORANCE = 0.05;
+
+        //Swerve RelativAngleAdjust
+        public final static double RELATIV_THATA_KP = 0.00615;
+        public final static double RELATIV_THATA_KI = 0;
+        public final static double RELATIV_THATA_KD = 0.0016;
+        public final static double RELATIV_ANGLE_PID_TOLORANCE = 3;
+
+        //Swerve DRIVE CONTROLLER 
+        public final static double DRIVER_XY_SCALER = 1;
+        public final static double DRIVER_THATA_SCALER = 0.7;
+
 }

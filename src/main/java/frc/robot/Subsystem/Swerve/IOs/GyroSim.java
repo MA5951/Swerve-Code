@@ -4,10 +4,13 @@
 
 package frc.robot.Subsystem.Swerve.IOs;
 
+import org.opencv.core.RotatedRect;
+
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Utils.ConvUtil;
 import com.ma5951.utils.Utils.DriverStationUtil;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
@@ -21,6 +24,8 @@ public class GyroSim implements Gyro{
     private LoggedDouble accelX;
     private LoggedDouble accelY;
 
+    private GyroData gyroData;
+
     private double yawValue;
 
     public GyroSim(String type) {
@@ -30,6 +35,8 @@ public class GyroSim implements Gyro{
         roll = new LoggedDouble("/Swerve/" + type + "/Roll");
         accelX = new LoggedDouble("/Swerve/" + type + "/Accel X");
         accelY = new LoggedDouble("/Swerve/" + type + "/Accel Y");
+
+        gyroData = new GyroData();
 
     }
 
@@ -41,11 +48,7 @@ public class GyroSim implements Gyro{
     }
 
     public double getAbsYaw() {
-        if (DriverStationUtil.getAlliance() == Alliance.Blue) {
-            return getYaw() + 180;
-        } else {
-            return getYaw();
-        }
+        return getYaw();
     }
 
     public double getPitch() {
@@ -64,21 +67,26 @@ public class GyroSim implements Gyro{
         return 0;
     }
 
-    public void update(ChassisSpeeds robotSpeeds) {
-        yaw.update(getYaw());
-        pitch.update(getPitch());
-        roll.update(getRoll());
-        accelX.update(getAccelX());
-        accelY.update(getAccelY());
+    public GyroData update(ChassisSpeeds robotSpeeds) {
+        gyroData.updateData(
+            0d,
+            0d,
+            0d,
+            yawValue += ConvUtil.RadiansToDegrees(robotSpeeds.omegaRadiansPerSecond) * 0.02,
+            0d,
+            0d,
+            0d,
+            0d,
+            yawValue,
+            new Rotation2d[1]
+        );
+        
+        yaw.update(yawValue);
 
-        yawValue = yawValue + ConvUtil.RadiansToDegrees(robotSpeeds.omegaRadiansPerSecond) * 0.02;
+        return gyroData;
     }
 
-    @Override
-    public GyroData update() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
+    
 
 
 

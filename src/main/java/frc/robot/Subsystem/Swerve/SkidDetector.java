@@ -20,12 +20,12 @@ public class SkidDetector {
     private Supplier<SwerveModuleState[]> statesSupplier;
     private ChassisSpeeds measurSpeeds;
     private SwerveModuleState[] swerveStatesRotationalPart;
-    private double[] swerveStatesTranslationalPartMagnitudes = new double[kinematics.getModules().length];
+    private double[] swerveStatesTranslationalPartMagnitudes = new double[4];
     private Translation2d swerveStateMeasuredAsVector;
     private Translation2d swerveStatesRotationalPartAsVector;
     private Translation2d swerveStatesTranslationalPartAsVector;
     private double maximumTranslationalSpeed = 0;
-    private double minimumTranslationalSpeed = Double.POSITIVE_INFINITY;
+    private double minimumTranslationalSpeed = 0;
 
     private LoggedDouble skidRatio;
 
@@ -38,15 +38,13 @@ public class SkidDetector {
     }
 
     public void update() {
-        skidRatio.update(getSkiddingRatio(statesSupplier.get() , kinematics));
+        skidRatio.update(getSkiddingRatio(statesSupplier.get()));
     }
 
     public double getSkiddingRatio(
-            SwerveModuleState[] swerveStatesMeasured, SwerveDriveKinematics swerveDriveKinematics) {
-        measurSpeeds = swerveDriveKinematics.toChassisSpeeds(swerveStatesMeasured);
-        measurSpeeds.vxMetersPerSecond = 0;
-        measurSpeeds.vyMetersPerSecond = 0;
-        swerveStatesRotationalPart = swerveDriveKinematics.toSwerveModuleStates( measurSpeeds );
+            SwerveModuleState[] swerveStatesMeasured) {
+        measurSpeeds = kinematics.toChassisSpeeds(swerveStatesMeasured);
+        swerveStatesRotationalPart = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, measurSpeeds.omegaRadiansPerSecond));
         
         for (int i = 0; i < swerveStatesMeasured.length; i++) {
             swerveStateMeasuredAsVector = VectorUtil.getVectorFromSwerveState(swerveStatesMeasured[i]);
@@ -60,6 +58,7 @@ public class SkidDetector {
             maximumTranslationalSpeed = Math.max(maximumTranslationalSpeed, translationalSpeed);
             minimumTranslationalSpeed = Math.min(minimumTranslationalSpeed, translationalSpeed);
         }
+        //System.out.println(maximumTranslationalSpeed);
 
         return maximumTranslationalSpeed / minimumTranslationalSpeed;
     }

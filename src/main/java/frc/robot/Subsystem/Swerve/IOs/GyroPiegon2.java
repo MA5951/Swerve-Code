@@ -14,6 +14,7 @@ import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Utils.DriverStationUtil;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -144,7 +145,7 @@ public class GyroPiegon2 implements Gyro{
         veloYaw.update(data.getVeloYaw());
     }
 
-    public GyroData update() {
+    public GyroData update(ChassisSpeeds robotSpeeds) {
         gyroData.updateData(
             getPitch(), 
             getYaw(), 
@@ -163,6 +164,5 @@ public class GyroPiegon2 implements Gyro{
         
         return gyroData;
     }
-
 
 }
