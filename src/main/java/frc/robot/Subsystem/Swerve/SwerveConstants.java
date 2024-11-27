@@ -7,13 +7,17 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
 import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
+import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
+import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 //import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
+import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
+import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 
 public class SwerveConstants {
         public final static boolean optimize = true;
@@ -53,6 +57,7 @@ public class SwerveConstants {
         public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
         public final static boolean REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
+        //Module locations
         public static final Translation2d frontLeftLocation = new Translation2d(
                 -WIDTH / 2,
                 LENGTH / 2); 
@@ -69,22 +74,10 @@ public class SwerveConstants {
                 WIDTH / 2,
                 -LENGTH / 2);
 
-        // public static final Translation2d frontLeftLocation = new Translation2d(
-        //         LENGTH / 2,
-        //         WIDTH / 2);
+        public final static Translation2d[] modulesLocationArry = new Translation2d[] {frontLeftLocation , frontRightLocation , rearLeftLocation , rearRightLocation};
 
-        // public static final Translation2d frontRightLocation = new Translation2d(
-        //         LENGTH / 2,
-        //         -WIDTH / 2);
 
-        // public static final Translation2d rearLeftLocation = new Translation2d(
-        //         -LENGTH / 2,
-        //         WIDTH / 2);
 
-        // public static final Translation2d rearRightLocation = new Translation2d(
-        //         -LENGTH / 2,
-        //         -WIDTH / 2);
-        
 
         //IOs
         public static final SwerveModule[] getModulesArry() {
@@ -126,27 +119,34 @@ public class SwerveConstants {
                                 PortMap.CanBus.CANivoreBus);
                         return new SwerveModule[] {
                 frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
-                } else {
-                        final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left");
+                }
+
+                final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left");
                         final SwerveModule frontRightModule = new SwerveModuleSim("Front Right");
                         final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left");
                         final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right");
 
                         return new SwerveModule[] {
                 frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
-                }
 
         }
 
         public static final Gyro getGyro() {
                 if (Robot.isReal()) {
                         return new GyroPiegon2("Piegon 2", PortMap.CanBus.CANivoreBus , PortMap.Swerve.Pigeon2ID);
-                } else {
-                        return new GyroSim("Gyro Sim");
-                }
+                } 
+
+                return new GyroSim("Gyro Sim");
         }
 
-        public final static Translation2d[] modulesLocationArry = new Translation2d[] {frontLeftLocation , frontRightLocation , rearLeftLocation , rearRightLocation};
+        public static final SwerveOdometry getOdometry() {
+                if (Robot.isReal()) {
+                        return new Swerve50HzOdometry(ODOMETRY_CONFIG);
+                }
+
+                return new Swerve50HzOdometry(ODOMETRY_CONFIG);
+        }
+
 
         // Modules config
         public final static int SLOT_CONFIG = 0;
@@ -188,21 +188,22 @@ public class SwerveConstants {
 
         //Swerve physics
         public final static double MAX_VELOCITY =  5.2;
-        //public final static double MAX_ACCELERATION = (10.91 / 1.15) * 1.3; 
         public final static double MAX_ANGULAR_VELOCITY = MAX_VELOCITY / RADIUS;// Radians
 
         public final static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.frontLeftLocation, SwerveConstants.frontRightLocation,
         SwerveConstants.rearLeftLocation, SwerveConstants.rearRightLocation);
 
-        //Module Limits //75 Accl //700/800
-        public final static ModuleLimits DEFUALT =  new ModuleLimits(5.2, Units.feetToMeters(65) , Units.degreesToRadians(700)); 
-                
-        //Collision Detector
-        public final static double COLLISION_THRESHOLD = 1.85;
+        //Module Limits 
+        public final static ModuleLimits DEFUALT =  new ModuleLimits(5.2, Units.feetToMeters(65) , Units.degreesToRadians(700));
 
-        //Oגometry
+        //Odometry
         public static final double ODOMETRY_UPDATE_RATE = 200;
-
+        public static final OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
+                SwerveSubsystem.getInstance(),
+                PoseEstimator.getInstance(),
+                new SkidDetector(kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates()), 
+                new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData()), 
+                false, false, 0.15 , 1.85);
 
         //Swerve controllers
 

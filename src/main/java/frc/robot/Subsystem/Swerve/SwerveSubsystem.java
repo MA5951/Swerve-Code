@@ -47,13 +47,9 @@ SwerveSubsystem extends SubsystemBase {
   private SwerveSetpointGenerator setpointGenerator;
   private LoggedSwerveStates currenStatesLog;
   private LoggedSwerveStates setPoinStatesLog;
-  private LoggedDouble offsetprintLog;
   private LoggedDouble swerevXvelocityLog;
   private LoggedDouble swerevYvelocityLog;
-  private LoggedDouble swerevXaccelLog;
-  private LoggedDouble swerevYaccelLog;
   private LoggedDouble swerevTheatavelocityLog;
-  private LoggedDouble swerveTheataaccelLog;
   
 
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
@@ -68,10 +64,6 @@ SwerveSubsystem extends SubsystemBase {
   private GyroData gyroData = new GyroData();
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private ChassisSpeeds currentChassisSpeeds;
-  private double offsetAngle = 0;
-  private double lastXvelocity;
-  private double lastYvelocity;
-  private double lastTheatavelocity;
   private double lastTime;
 
   public double[] timestamps = new double[] {};
@@ -105,10 +97,6 @@ SwerveSubsystem extends SubsystemBase {
     swerevXvelocityLog = new LoggedDouble("/Swerve/Chassis Speed/X Velocity");
     swerevYvelocityLog = new LoggedDouble("/Swerve/Chassis Speed/Y Velocity");
     swerevTheatavelocityLog = new LoggedDouble("/Swerve/Chassis Speed/Theat Velocity");
-    swerevXaccelLog = new LoggedDouble("/Swerve/Chassis Speed/X Accel");
-    swerevYaccelLog = new LoggedDouble("/Swerve/Chassis Speed/Y Accel");
-    swerveTheataaccelLog = new LoggedDouble("/Swerve/Chassis Speed/Theath Accel");
-    offsetprintLog = new LoggedDouble("/Swerve/Gyro Offset Angle");
 
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].setNeutralModeDrive(true);
@@ -157,9 +145,8 @@ SwerveSubsystem extends SubsystemBase {
   }
 
   public double getVelocityVector(){ 
-    ChassisSpeeds speeds = getRobotRelativeSpeeds();
-    return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) +
-      Math.pow(speeds.vyMetersPerSecond, 2));
+    return Math.sqrt(Math.pow(currentChassisSpeeds.vxMetersPerSecond, 2) +
+      Math.pow(currentChassisSpeeds.vyMetersPerSecond, 2));
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -171,12 +158,6 @@ SwerveSubsystem extends SubsystemBase {
   }
 
   public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize , boolean scale) {
-    if (scale) { // move to controler
-      chassiSpeeds.omegaRadiansPerSecond = chassiSpeeds.omegaRadiansPerSecond * SwerveConstants.MAX_ANGULAR_VELOCITY;
-      chassiSpeeds.vxMetersPerSecond = chassiSpeeds.vxMetersPerSecond * SwerveConstants.MAX_VELOCITY;
-      chassiSpeeds.vyMetersPerSecond = chassiSpeeds.vyMetersPerSecond * SwerveConstants.MAX_VELOCITY;
-    }
-
 
     if (optimize) {
       currentSetpoint =
@@ -230,24 +211,20 @@ SwerveSubsystem extends SubsystemBase {
     return modulesArry;
   }
 
-  public SwerveModuleState calculateFFTorque(SwerveModuleState desiState) {
-     Vector<N2> wheelDirection =
-              VecBuilder.fill(
-                  desiState.angle.getCos(),
-                  desiState.angle.getSin());
-          //wheelForces is junk
-          Vector<N2> wheelForces = new Vector<>(wheelDirection);//rajectoryController.getModuleForces().get(i);
-          double wheelTorque =
-              wheelForces.dot(wheelDirection) * SwerveConstants.WHEEL_RADIUS;
-      return new SwerveModuleState(wheelTorque, desiState.angle);
-  }
-
   public void updateHardwereData() {
     for (int i = 0; i < 4 ; i++) {
       modulesData[i] = modulesArry[i].update();
     }
     currentChassisSpeeds = kinematics.toChassisSpeeds(getSwerveModuleStates());
     gyroData = gyro.update(currentChassisSpeeds);
+  }
+
+  public GyroData getGyroData() {
+    return gyroData;
+  }
+
+  public SwerveModuleData[] getModulesData() {
+    return modulesData;
   }
 
   public static SwerveSubsystem getInstance() {
@@ -259,63 +236,63 @@ SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // odometryLock.lock();
+    odometryLock.lock();
 
-    // timestamps =
-    //     timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
-    // if (timestamps.length == 0) {
-    //   timestamps = new double[] {Timer.getFPGATimestamp()};
-    // }
-    // timestampQueue.clear();
+    timestamps =
+        timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+    if (timestamps.length == 0) {
+      timestamps = new double[] {Timer.getFPGATimestamp()};
+    }
+    timestampQueue.clear();
 
     updateHardwereData();
     
-    // odometryLock.unlock();
+    odometryLock.unlock();
     
-    // int minOdometryUpdates =
-    //     IntStream.of(
-    //             timestamps.length,
-    //             Arrays.stream(modulesData)
-    //                 .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length) //TODO: Cheack
-    //                 .min()
-    //                 .orElse(0))
-    //         .min()
-    //         .orElse(0);
-    // minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
+    int minOdometryUpdates =
+        IntStream.of(
+                timestamps.length,
+                Arrays.stream(modulesData)
+                    .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length)
+                    .min()
+                    .orElse(0))
+            .min()
+            .orElse(0);
+    minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
   
-    // for (int i = 0; i < minOdometryUpdates; i++) {
-    //   int odometryIndex = i;
-    //   Rotation2d yaw = gyroData.getYawPositionQueue()[i];
-    //   for (int a = 0; a < modulesArry.length ; a++) {
-    //     wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
-    //   }
-    //   // Filtering based on delta wheel positions
-    //   boolean includeMeasurement = true;
-    //   if (lastPositions != null) {
-    //     double dt = timestamps[i] - lastTime;
-    //     for (int j = 0; j < modulesArry.length; j++) {
-    //       double velocity =
-    //           (wheelPositions[j].distanceMeters
-    //                   - lastPositions[j].distanceMeters)
-    //               / dt;
-    //       double omega =
-    //           wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
-    //               / dt;
-    //       // Check if delta is too large
-    //       if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
-    //           || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
-    //         includeMeasurement = false;
-    //         break;
-    //       }
-    //     }
-    //   }
+    for (int i = 0; i < minOdometryUpdates; i++) {
+      int odometryIndex = i;
+      Rotation2d yaw = gyroData.getYawPositionQueue()[i];
+      for (int a = 0; a < modulesArry.length ; a++) {
+        wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
+      }
+      // Filtering based on delta wheel positions
+      boolean includeMeasurement = true;
+      if (lastPositions != null) {
+        double dt = timestamps[i] - lastTime;
+        for (int j = 0; j < modulesArry.length; j++) {
+          double velocity =
+              (wheelPositions[j].distanceMeters
+                      - lastPositions[j].distanceMeters)
+                  / dt;
+          double omega =
+              wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
+                  / dt;
+          // Check if delta is too large
+          if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
+              || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
+            includeMeasurement = false;
+            break;
+          }
+        }
+      }
 
-    //   if (includeMeasurement) {
-    //     lastPositions = wheelPositions;
-    //     PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
-    //     lastTime = timestamps[i];
-    //   }
-    // }
+      if (includeMeasurement) {
+        lastPositions = wheelPositions;
+        PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
+        lastTime = timestamps[i];
+      }
+    }
 
 
     currenStatesLog.update(currentStates);

@@ -6,7 +6,6 @@ package frc.robot.Subsystem.Swerve;
 
 import java.util.function.Supplier;
 
-import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Utils.VectorUtil;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -27,27 +26,19 @@ public class SkidDetector {
     private double maximumTranslationalSpeed = 0;
     private double minimumTranslationalSpeed = 0;
 
-    private LoggedDouble skidRatio;
-
     public SkidDetector(SwerveDriveKinematics kinematics,Supplier<SwerveModuleState[]> states) {
         this.kinematics = kinematics;
         statesSupplier = states;
 
-        skidRatio = new LoggedDouble("/Swerve/Skid Detector/Skid Ration");
 
     }
 
-    public void update() {
-        skidRatio.update(getSkiddingRatio(statesSupplier.get()));
-    }
-
-    public double getSkiddingRatio(
-            SwerveModuleState[] swerveStatesMeasured) {
-        measurSpeeds = kinematics.toChassisSpeeds(swerveStatesMeasured);
+    public double getSkiddingRatio() {
+        measurSpeeds = kinematics.toChassisSpeeds(statesSupplier.get());
         swerveStatesRotationalPart = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, measurSpeeds.omegaRadiansPerSecond));
         
-        for (int i = 0; i < swerveStatesMeasured.length; i++) {
-            swerveStateMeasuredAsVector = VectorUtil.getVectorFromSwerveState(swerveStatesMeasured[i]);
+        for (int i = 0; i < statesSupplier.get().length; i++) {
+            swerveStateMeasuredAsVector = VectorUtil.getVectorFromSwerveState(statesSupplier.get()[i]);
             swerveStatesRotationalPartAsVector = VectorUtil.getVectorFromSwerveState(swerveStatesRotationalPart[i]);
             swerveStatesTranslationalPartAsVector = swerveStateMeasuredAsVector.minus(swerveStatesRotationalPartAsVector);
             swerveStatesTranslationalPartMagnitudes[i] = swerveStatesTranslationalPartAsVector.getNorm();
@@ -62,35 +53,5 @@ public class SkidDetector {
 
         return maximumTranslationalSpeed / minimumTranslationalSpeed;
     }
-
-//     public double getSkiddingStandardDeviation(
-//             SwerveModuleState[] measuredSwerveStates, SwerveDriveKinematics swerveDriveKinematics) {
-//         final ChassisSpeeds measuredChassisSpeed =
-//                 swerveDriveKinematics.toChassisSpeeds(measuredSwerveStates);
-                
-//         final SwerveModuleState[] idealSwerveStatesGivenNoSkidding =
-//                 swerveDriveKinematics.toSwerveModuleStates(measuredChassisSpeed); //what????
-
-//         double totalSquaredDeviation = 0;
-//         for (int i = 0; i < 4; i++)
-//             totalSquaredDeviation +=
-//                     getSquaredDifferenceBetweenTwoSwerveStates(
-//                             measuredSwerveStates[i], idealSwerveStatesGivenNoSkidding[i]);
-
-//         final double variance = totalSquaredDeviation / 4;
-//         return Math.sqrt(variance);
-//     }
-
-//     //(meters/seconds)^2 //why???
-//     private double getSquaredDifferenceBetweenTwoSwerveStates(
-//             SwerveModuleState swerveModuleState1, SwerveModuleState swerveModuleState2) {
-//         final Translation2d
-//                 swerveState1VelocityVector =
-//                 new Translation2d(swerveModuleState1.speedMetersPerSecond, swerveModuleState1.angle),
-//                 swerveState2VelocityVector =
-//                         new Translation2d(swerveModuleState2.speedMetersPerSecond, swerveModuleState2.angle);
-
-//         return Math.pow(swerveState1VelocityVector.getDistance(swerveState2VelocityVector), 2);
-//     }
 
 }

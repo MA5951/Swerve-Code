@@ -1,41 +1,23 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.Subsystem.Swerve;
 
-import com.ma5951.utils.Logger.LoggedDouble;
 
-import frc.robot.Subsystem.Swerve.Util.Gyro;
+import java.util.function.Supplier;
 
-/** Add your docs here. */
+import frc.robot.Subsystem.Swerve.Util.GyroData;
+
 public class CollisionDtector {
 
-    private Gyro gyro;
-    private LoggedDouble yaw;
-    private LoggedDouble pitch;
-    private LoggedDouble roll;
-    private LoggedDouble accelX;
-    private LoggedDouble accelY;
+    private Supplier<GyroData> gyroData;
 
 
-    public CollisionDtector(Gyro device) {
-        gyro = device;
-        yaw = new LoggedDouble("/Swerve/Collision Detector/Yaw");
-        pitch = new LoggedDouble("/Swerve/Collision Detector/Pitch");
-        roll = new LoggedDouble("/Swerve/Collision Detector/Roll");
-        accelX = new LoggedDouble("/Swerve/Collision Detector/Accel X");
-        accelY = new LoggedDouble("/Swerve/Collision Detector/Accel Y");
+    public CollisionDtector(Supplier<GyroData> GyroData) {
+        gyroData = GyroData;
     }
 
-    public void update() {
-        yaw.update(gyro.getYaw());
-        pitch.update(gyro.getPitch());
-        roll.update(gyro.getRoll());
-        accelX.update(gyro.getAccelX());
-        accelY.update(gyro.getAccelY());
+    public double getForce() {
+        return Math.sqrt(Math.pow(gyroData.get().getAccelX(), 2) +
+        Math.pow(gyroData.get().getAccelY(), 2));
     }
-
-
 
 }

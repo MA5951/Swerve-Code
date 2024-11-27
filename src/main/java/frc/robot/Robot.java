@@ -47,8 +47,6 @@ public class Robot extends TimedRobot {
 
     MALog.getInstance().startLog();
 
-    SwerveSubsystem.getInstance().updateOffset(180);
-
     
 
     currentRobotStateLog = new LoggedString("/RobotControl/Current Robot State");
