@@ -49,7 +49,6 @@ public class SkidDetector {
             maximumTranslationalSpeed = Math.max(maximumTranslationalSpeed, translationalSpeed);
             minimumTranslationalSpeed = Math.min(minimumTranslationalSpeed, translationalSpeed);
         }
-        //System.out.println(maximumTranslationalSpeed);
 
         return maximumTranslationalSpeed / minimumTranslationalSpeed;
     }

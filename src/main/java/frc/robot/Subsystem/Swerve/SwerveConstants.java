@@ -12,7 +12,6 @@ import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
 import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
-//import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
