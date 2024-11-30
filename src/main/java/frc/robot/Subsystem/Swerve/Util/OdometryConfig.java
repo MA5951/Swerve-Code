@@ -2,6 +2,8 @@
 package frc.robot.Subsystem.Swerve.Util;
 
 
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.CollisionDtector;
 import frc.robot.Subsystem.Swerve.SkidDetector;
@@ -19,10 +21,7 @@ public class OdometryConfig {
     public double collisionForce;
 
 
-    // public OdometryConfig() {
-    //     this(null, null, null, null, false, false, 1, 0);
-    // }
-
+ 
     public OdometryConfig(
         SwerveSubsystem SwerveSubsystem , 
         PoseEstimator PoseEstimator , 
@@ -39,6 +38,18 @@ public class OdometryConfig {
         skidDetector = SkidDetector;
         collisionForce = CollisionForce;
         skidRatio = SkidRatio;
+    }
+
+    public void updateHardwereData() {
+        swerveSubsystem.updateHardwereData();
+    }
+
+    public SwerveModulePosition[] getCurrentPositions() {
+        return swerveSubsystem.getSwerveModulePositions();
+    }
+
+    public Rotation2d getRotation() {
+        return new Rotation2d(swerveSubsystem.getFusedHeading());
     }
 
 

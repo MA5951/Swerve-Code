@@ -16,15 +16,12 @@ import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //The orde of te modules is a STANDART and it is
@@ -36,6 +33,7 @@ import frc.robot.Utils.ModuleLimits;
 import frc.robot.Utils.SwerveSetpoint;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
+import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
@@ -54,17 +52,15 @@ SwerveSubsystem extends SubsystemBase {
 
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
   private final Gyro gyro = SwerveConstants.getGyro();
+  private final SwerveOdometry odometry = SwerveConstants.getOdometry();
   private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
   private SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
   private SwerveModuleState[] currentStates = new SwerveModuleState[4];
   private SwerveModulePosition[] currentPositions = new  SwerveModulePosition[4];
-  private SwerveModulePosition[] wheelPositions = new  SwerveModulePosition[4];
-  private SwerveModulePosition[] lastPositions = null;
   private SwerveModuleData[] modulesData = new SwerveModuleData[4];
   private GyroData gyroData = new GyroData();
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private ChassisSpeeds currentChassisSpeeds;
-  private double lastTime;
 
   public double[] timestamps = new double[] {};
 
@@ -236,65 +232,9 @@ SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    odometryLock.lock();
-
-    timestamps =
-        timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
-    if (timestamps.length == 0) {
-      timestamps = new double[] {Timer.getFPGATimestamp()};
-    }
-    timestampQueue.clear();
-
-    updateHardwereData();
+    odometry.updateOdometry();
     
-    odometryLock.unlock();
     
-    int minOdometryUpdates =
-        IntStream.of(
-                timestamps.length,
-                Arrays.stream(modulesData)
-                    .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length)
-                    .min()
-                    .orElse(0))
-            .min()
-            .orElse(0);
-    minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
-  
-    for (int i = 0; i < minOdometryUpdates; i++) {
-      int odometryIndex = i;
-      Rotation2d yaw = gyroData.getYawPositionQueue()[i];
-      for (int a = 0; a < modulesArry.length ; a++) {
-        wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
-      }
-      // Filtering based on delta wheel positions
-      boolean includeMeasurement = true;
-      if (lastPositions != null) {
-        double dt = timestamps[i] - lastTime;
-        for (int j = 0; j < modulesArry.length; j++) {
-          double velocity =
-              (wheelPositions[j].distanceMeters
-                      - lastPositions[j].distanceMeters)
-                  / dt;
-          double omega =
-              wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
-                  / dt;
-          // Check if delta is too large
-          if (Math.abs(omega) > currentLimits.maxSteeringVelocity() * 5.0
-              || Math.abs(velocity) > currentLimits.maxDriveVelocity() * 5.0) {
-            includeMeasurement = false;
-            break;
-          }
-        }
-      }
-
-      if (includeMeasurement) {
-        lastPositions = wheelPositions;
-        PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
-        lastTime = timestamps[i];
-      }
-    }
-
-
     currenStatesLog.update(currentStates);
     
     swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);

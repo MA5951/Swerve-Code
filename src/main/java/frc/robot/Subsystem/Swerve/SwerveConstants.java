@@ -13,6 +13,7 @@ import frc.robot.Subsystem.Swerve.IOs.GyroSim;
 import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
+import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
@@ -140,7 +141,7 @@ public class SwerveConstants {
 
         public static final SwerveOdometry getOdometry() {
                 if (Robot.isReal()) {
-                        return new Swerve50HzOdometry(ODOMETRY_CONFIG);
+                        return new SwerveThreadOdometry(ODOMETRY_CONFIG);
                 }
 
                 return new Swerve50HzOdometry(ODOMETRY_CONFIG);
@@ -202,7 +203,7 @@ public class SwerveConstants {
                 PoseEstimator.getInstance(),
                 new SkidDetector(kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates()), 
                 new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData()), 
-                false, false, 0.15 , 1.85);
+                true, true, 0.15 , 1.85);
 
         //Swerve controllers
 
