@@ -15,6 +15,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.PortMap;
 import frc.robot.RobotConstants;
+import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -55,7 +56,7 @@ public class PhoenixOdometryThread extends Thread {
   public Queue<Double> registerSignal(ParentDevice device, StatusSignal<Angle> signal) {
     Queue<Double> queue = new ArrayBlockingQueue<>(20);
     signalsLock.lock();
-    SwerveSubsystem.odometryLock.lock();
+    SwerveThreadOdometry.odometryLock.lock();
     try {
       isCANFD = PortMap.CanBus.CANivoreBus.isNetworkFD();
       BaseStatusSignal[] newSignals = new BaseStatusSignal[signals.length + 1];
@@ -65,7 +66,7 @@ public class PhoenixOdometryThread extends Thread {
       queues.add(queue);
     } finally {
       signalsLock.unlock();
-      SwerveSubsystem.odometryLock.unlock();
+      SwerveThreadOdometry.odometryLock.unlock();
     }
     return queue;
   }
@@ -90,14 +91,14 @@ public class PhoenixOdometryThread extends Thread {
       double fpgaTimestamp = Timer.getFPGATimestamp() / 1.0e6;
 
       // Save new data to queues
-      SwerveSubsystem.odometryLock.lock();
+      SwerveThreadOdometry.odometryLock.lock();
       try {
         for (int i = 0; i < signals.length; i++) {
           queues.get(i).offer(signals[i].getValueAsDouble());
         }
-        SwerveSubsystem.timestampQueue.offer(fpgaTimestamp);
+        SwerveThreadOdometry.timestampQueue.offer(fpgaTimestamp);
       } finally {
-        SwerveSubsystem.odometryLock.unlock();
+        SwerveThreadOdometry.odometryLock.unlock();
       }
     }
   }

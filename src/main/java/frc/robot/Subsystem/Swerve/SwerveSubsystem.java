@@ -4,17 +4,16 @@
 
 package frc.robot.Subsystem.Swerve;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.IntStream;
 
 import com.ma5951.utils.RobotConstantsMAUtil;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.PPLibTelemetry;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -22,7 +21,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //The orde of te modules is a STANDART and it is
 //Front Left
@@ -34,7 +32,6 @@ import frc.robot.Utils.SwerveSetpoint;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
 import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
-import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
 
@@ -52,22 +49,18 @@ SwerveSubsystem extends SubsystemBase {
 
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
   private final Gyro gyro = SwerveConstants.getGyro();
-  private final SwerveOdometry odometry = SwerveConstants.getOdometry();
+  private SwerveOdometry odometry;
   private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
   private SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
   private SwerveModuleState[] currentStates = new SwerveModuleState[4];
   private SwerveModulePosition[] currentPositions = new  SwerveModulePosition[4];
-  private SwerveModuleData[] modulesData = new SwerveModuleData[4];
+  private SwerveModuleData[] modulesData = new SwerveModuleData[] {modulesArry[0].update() , modulesArry[1].update() , modulesArry[2].update() , modulesArry[3].update()};
   private GyroData gyroData = new GyroData();
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private ChassisSpeeds currentChassisSpeeds;
 
-  public double[] timestamps = new double[] {};
+  private boolean init = false;
 
-  public static final Lock odometryLock = new ReentrantLock();
-  public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(20);
-  
-  
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -232,14 +225,19 @@ SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (!init) {
+      odometry = SwerveConstants.getOdometry();
+      init = true;
+    }
     odometry.updateOdometry();
+
     
     
     currenStatesLog.update(currentStates);
     
-    swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
-    swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
-    swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
+    // swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
+    // swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
+    // swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
    
 
     

@@ -74,8 +74,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
     private LoggedDouble DriveTemp;
     private LoggedDouble SteerTemp;
 
-    private final Queue<Double> drivePositionQueue;
-    private final Queue<Double> turnPositionQueue;
+    private Queue<Double> drivePositionQueue;
+    private Queue<Double> turnPositionQueue;
 
     
 

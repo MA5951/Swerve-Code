@@ -122,9 +122,9 @@ public class SwerveConstants {
                 }
 
                 final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left");
-                        final SwerveModule frontRightModule = new SwerveModuleSim("Front Right");
-                        final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left");
-                        final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right");
+                final SwerveModule frontRightModule = new SwerveModuleSim("Front Right");
+                final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left");
+                final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right");
 
                         return new SwerveModule[] {
                 frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
@@ -189,9 +189,10 @@ public class SwerveConstants {
         //Swerve physics
         public final static double MAX_VELOCITY =  5.2;
         public final static double MAX_ANGULAR_VELOCITY = MAX_VELOCITY / RADIUS;// Radians
-
         public final static SwerveDriveKinematics kinematics = new SwerveDriveKinematics(SwerveConstants.frontLeftLocation, SwerveConstants.frontRightLocation,
         SwerveConstants.rearLeftLocation, SwerveConstants.rearRightLocation);
+
+        
 
         //Module Limits 
         public final static ModuleLimits DEFUALT =  new ModuleLimits(5.2, Units.feetToMeters(65) , Units.degreesToRadians(700));

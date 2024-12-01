@@ -36,6 +36,7 @@ public class OdometryConfig {
         swerveSubsystem = SwerveSubsystem;
         poseEstimator = PoseEstimator;
         skidDetector = SkidDetector;
+        collisionDetector = CollisionDetector;
         collisionForce = CollisionForce;
         skidRatio = SkidRatio;
     }

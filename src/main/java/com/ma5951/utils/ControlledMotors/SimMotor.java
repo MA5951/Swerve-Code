@@ -51,6 +51,8 @@ public class SimMotor {
         motorSim.setInputVoltage(voltageRequest.getAsDouble());
         motorSim.update(timestampSeconds - lastTimestampSeconds);
         lastTimestampSeconds = timestampSeconds;
+
+        System.out.println(motorSim.getInputVoltage());
     }
 
     protected interface MotorSetpoint extends DoubleSupplier {

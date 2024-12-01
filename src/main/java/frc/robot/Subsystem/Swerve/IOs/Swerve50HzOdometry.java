@@ -10,7 +10,7 @@ import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 
 public class Swerve50HzOdometry implements SwerveOdometry{
 
-    private OdometryConfig config;
+    private OdometryConfig odometryConfig;
 
     private LoggedBool skidDetectedLog;
     private LoggedBool collisionDetectedLog;
@@ -24,7 +24,7 @@ public class Swerve50HzOdometry implements SwerveOdometry{
     private double lastCollid;
 
     public Swerve50HzOdometry(OdometryConfig Config) {
-        config = Config;
+        odometryConfig = Config;
         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
         lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
@@ -33,10 +33,10 @@ public class Swerve50HzOdometry implements SwerveOdometry{
 
 
     public void updateOdometry() {
-        config.updateHardwereData();
+        odometryConfig.updateHardwereData();
 
-        skidDetected = Math.abs(config.skidDetector.getSkiddingRatio()) > config.skidRatio;
-        collisionDetected = config.collisionDetector.getForce() > config.collisionForce;
+        skidDetected = Math.abs(odometryConfig.skidDetector.getSkiddingRatio()) > odometryConfig.skidRatio;
+        collisionDetected = odometryConfig.collisionDetector.getForce() > odometryConfig.collisionForce;
 
         skidDetectedLog.update(skidDetected);
         collisionDetectedLog.update(collisionDetected);
@@ -51,8 +51,8 @@ public class Swerve50HzOdometry implements SwerveOdometry{
             lastCollisionLog.update(lastCollid);
         }
         
-        if (((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected)) {
-            config.poseEstimator.updateOdometry(config.getCurrentPositions(), config.getRotation() , Timer.getFPGATimestamp());
+        if (((skidDetected && odometryConfig.updateInSkid) || !skidDetected) && ((collisionDetected && odometryConfig.updateInCollision) || !collisionDetected)) {
+            odometryConfig.poseEstimator.updateOdometry(odometryConfig.getCurrentPositions(), odometryConfig.getRotation() , Timer.getFPGATimestamp());
         }
     }
 
