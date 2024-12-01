@@ -24,6 +24,7 @@ public class Swerve50HzOdometry implements SwerveOdometry{
     private double lastCollid;
 
     public Swerve50HzOdometry(OdometryConfig Config) {
+        config = Config;
         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
         lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");

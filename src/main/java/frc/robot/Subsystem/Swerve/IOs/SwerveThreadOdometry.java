@@ -49,6 +49,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
     private ModuleLimits swerveLimits;
 
     public SwerveThreadOdometry(OdometryConfig Config) {
+        config = Config;
         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
         lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
