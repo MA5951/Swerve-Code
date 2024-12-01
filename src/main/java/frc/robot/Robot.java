@@ -47,7 +47,6 @@ public class Robot extends TimedRobot {
 
     MALog.getInstance().startLog();
 
-    SwerveSubsystem.getInstance().updateOffset(180);
 
     
 
