@@ -4,16 +4,10 @@
 
 package frc.robot.Subsystem.Swerve;
 
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.ma5951.utils.RobotConstantsMAUtil;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
 import com.pathplanner.lib.util.DriveFeedforwards;
-import com.pathplanner.lib.util.PPLibTelemetry;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -54,13 +48,12 @@ SwerveSubsystem extends SubsystemBase {
   private SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
   private SwerveModuleState[] currentStates = new SwerveModuleState[4];
   private SwerveModulePosition[] currentPositions = new  SwerveModulePosition[4];
-  private SwerveModuleData[] modulesData = new SwerveModuleData[] {modulesArry[0].update() , modulesArry[1].update() , modulesArry[2].update() , modulesArry[3].update()};
+  private SwerveModuleData[] modulesData = new SwerveModuleData[4];
   private GyroData gyroData = new GyroData();
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private ChassisSpeeds currentChassisSpeeds;
 
   private boolean init = false;
-
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -134,8 +127,9 @@ SwerveSubsystem extends SubsystemBase {
   }
 
   public double getVelocityVector(){ 
-    return Math.sqrt(Math.pow(currentChassisSpeeds.vxMetersPerSecond, 2) +
-      Math.pow(currentChassisSpeeds.vyMetersPerSecond, 2));
+    ChassisSpeeds speeds = getRobotRelativeSpeeds();
+    return Math.sqrt(Math.pow(speeds.vxMetersPerSecond, 2) +
+      Math.pow(speeds.vyMetersPerSecond, 2));
   }
 
   public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -146,7 +140,7 @@ SwerveSubsystem extends SubsystemBase {
     return new Rotation2d(Math.toRadians(getFusedHeading()));
   }
 
-  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize , boolean scale) {
+  public SwerveModuleState[] generateStates(ChassisSpeeds chassiSpeeds , boolean optimize) {
 
     if (optimize) {
       currentSetpoint =
@@ -172,8 +166,8 @@ SwerveSubsystem extends SubsystemBase {
     modulesArry[3].setDesiredState(states[3]);
   }
 
-  public void drive(ChassisSpeeds chassisSpeeds , boolean isAuto) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize , !isAuto);
+  public void drive(ChassisSpeeds chassisSpeeds) {
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -181,7 +175,7 @@ SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize , true);
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -200,14 +194,6 @@ SwerveSubsystem extends SubsystemBase {
     return modulesArry;
   }
 
-  public void updateHardwereData() {
-    for (int i = 0; i < 4 ; i++) {
-      modulesData[i] = modulesArry[i].update();
-    }
-    currentChassisSpeeds = kinematics.toChassisSpeeds(getSwerveModuleStates());
-    gyroData = gyro.update(currentChassisSpeeds);
-  }
-
   public GyroData getGyroData() {
     return gyroData;
   }
@@ -216,28 +202,37 @@ SwerveSubsystem extends SubsystemBase {
     return modulesData;
   }
 
+  public void updateHardwereData() {
+    for (int i = 0; i < 4 ; i++) {
+      modulesData[i] = modulesArry[i].update();
+    }
+    currentChassisSpeeds = kinematics.toChassisSpeeds(getSwerveModuleStates());
+    gyroData = gyro.update(currentChassisSpeeds);
+  }
+
   public static SwerveSubsystem getInstance() {
-  if (swerveSubsystem == null) {
-    swerveSubsystem = new SwerveSubsystem();
-  }
-  return swerveSubsystem;
-  }
+    if (swerveSubsystem == null) {
+      swerveSubsystem = new SwerveSubsystem();
+    }
+    return swerveSubsystem;
+    }
 
   @Override
   public void periodic() {
-    // if (!init) {
-    //   odometry = SwerveConstants.getOdometry();
-    //   init = true;
-    // }
-    // odometry.updateOdometry();
+
+    if (!init) {
+      odometry = SwerveConstants.getOdometry();
+      init = true;
+    }
+    odometry.updateOdometry();
 
     updateHardwereData();
-    
+
     currenStatesLog.update(currentStates);
     
-    // swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
-    // swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
-    // swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
+    swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
+    swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
+    swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
    
 
     

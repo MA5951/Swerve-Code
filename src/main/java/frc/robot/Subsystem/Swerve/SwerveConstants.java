@@ -11,9 +11,11 @@ import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
 import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
+//import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
-import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
+// import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
+//import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
@@ -141,7 +143,8 @@ public class SwerveConstants {
 
         public static final SwerveOdometry getOdometry() {
                 if (Robot.isReal()) {
-                        return new SwerveThreadOdometry(ODOMETRY_CONFIG);
+                        //return new SwerveThreadOdometry(ODOMETRY_CONFIG);
+                        return null;
                 }
 
                 return new Swerve50HzOdometry(ODOMETRY_CONFIG);
@@ -198,12 +201,8 @@ public class SwerveConstants {
         public final static ModuleLimits DEFUALT =  new ModuleLimits(5.2, Units.feetToMeters(65) , Units.degreesToRadians(700));
 
         //Odometry
-        public static final double ODOMETRY_UPDATE_RATE = 200;
-        public static final OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
-                SwerveSubsystem.getInstance(),
-                PoseEstimator.getInstance(),
-                new SkidDetector(kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates()), 
-                new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData()), 
+        public final static double ODOMETRY_UPDATE_RATE = 200;
+        public final static OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
                 true, true, 0.15 , 1.85);
 
         //Swerve controllers

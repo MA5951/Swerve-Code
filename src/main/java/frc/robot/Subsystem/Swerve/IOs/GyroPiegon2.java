@@ -19,7 +19,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
+//import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
@@ -40,7 +40,7 @@ public class GyroPiegon2 implements Gyro{
     private StatusSignal<LinearAcceleration> gyroAccelX;
     private StatusSignal<LinearAcceleration> gyroAccelY;
 
-    private final Queue<Double> yawPositionQueue;
+    //private final Queue<Double> yawPositionQueue;
     private GyroData gyroData = new GyroData();
     private double gyroOffset = 0;
 
@@ -80,7 +80,7 @@ public class GyroPiegon2 implements Gyro{
 
         gyro.getConfigurator().setYaw(0);
 
-        yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(gyro, gyro.getYaw());
+        //yawPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(gyro, gyro.getYaw());
         BaseStatusSignal.setUpdateFrequencyForAll(SwerveConstants.ODOMETRY_UPDATE_RATE, gyroYaw);
         
     }
@@ -156,11 +156,11 @@ public class GyroPiegon2 implements Gyro{
             getAccelX(), 
             getAccelY(), 
             getAbsYaw(), 
-            yawPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new));
+            null); //yawPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new)
 
         logData(gyroData);
 
-        yawPositionQueue.clear();
+        //yawPositionQueue.clear();
         
         return gyroData;
     }

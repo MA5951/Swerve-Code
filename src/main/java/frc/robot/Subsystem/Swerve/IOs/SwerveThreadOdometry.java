@@ -1,159 +1,162 @@
 
-package frc.robot.Subsystem.Swerve.IOs;
+// package frc.robot.Subsystem.Swerve.IOs;
 
-import java.util.Arrays;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.IntStream;
+// import java.util.Arrays;
+// import java.util.Queue;
+// import java.util.concurrent.ArrayBlockingQueue;
+// import java.util.concurrent.locks.Lock;
+// import java.util.concurrent.locks.ReentrantLock;
+// import java.util.stream.IntStream;
 
-import com.ma5951.utils.Logger.LoggedBool;
-import com.ma5951.utils.Logger.LoggedDouble;
+// import com.ma5951.utils.Logger.LoggedBool;
+// import com.ma5951.utils.Logger.LoggedDouble;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
-import frc.robot.Subsystem.Swerve.Util.GyroData;
-import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
-import frc.robot.Subsystem.Swerve.Util.SwerveModule;
-import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
-import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
-import frc.robot.Utils.ModuleLimits;
+// import edu.wpi.first.math.geometry.Rotation2d;
+// import edu.wpi.first.math.kinematics.SwerveModulePosition;
+// import edu.wpi.first.wpilibj.Timer;
+// import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
+// import frc.robot.Subsystem.Swerve.Util.GyroData;
+// import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
+// import frc.robot.Subsystem.Swerve.Util.SwerveModule;
+// import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
+// import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
+// import frc.robot.Utils.ModuleLimits;
 
-public class SwerveThreadOdometry implements SwerveOdometry{
+// public class SwerveThreadOdometry implements SwerveOdometry{
 
-    private OdometryConfig config;
+//     private OdometryConfig config;
 
-    private LoggedBool skidDetectedLog;
-    private LoggedBool collisionDetectedLog;
-    private LoggedDouble lastSkidLog;
-    private LoggedDouble lastCollisionLog;
-
-
-    private boolean skidDetected;
-    private boolean collisionDetected;
-    private double lastSkid;
-    private double lastCollid;
-
-    private SwerveModulePosition[] wheelPositions = new  SwerveModulePosition[4];
-    private SwerveModulePosition[] lastPositions = null;
-    private double lastTime;
-    public double[] timestamps = new double[] {};
-    public static final Lock odometryLock = new ReentrantLock();
-    public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(20);
-    private SwerveModuleData[] modulesData;
-    private GyroData gyroData;
-    private SwerveModule[] modulesArry;
-    private ModuleLimits swerveLimits;
-
-    public SwerveThreadOdometry(OdometryConfig Config) {
-        config = Config;
-        skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
-        collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
-        lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
-        lastCollisionLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Collision");
-
-        modulesData = config.swerveSubsystem.getModulesData();
-        gyroData = config.swerveSubsystem.getGyroData();
-        modulesArry = config.swerveSubsystem.getModulesArry();
-        swerveLimits = config.swerveSubsystem.getCurrentLimits();
-    }
+//     private LoggedBool skidDetectedLog;
+//     private LoggedBool collisionDetectedLog;
+//     private LoggedDouble lastSkidLog;
+//     private LoggedDouble lastCollisionLog;
 
 
-    public void updateOdometry() {
-        odometryLock.lock();
+//     private boolean skidDetected;
+//     private boolean collisionDetected;
+//     private double lastSkid;
+//     private double lastCollid;
 
-        timestamps =
-            timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
-        if (timestamps.length == 0) {
-        timestamps = new double[] {Timer.getFPGATimestamp()};
-        }
-        timestampQueue.clear();
+//     private SwerveModulePosition[] wheelPositions = new  SwerveModulePosition[4];
+//     private SwerveModulePosition[] lastPositions = null;
+//     private double lastTime;
+//     public double[] timestamps = new double[] {};
+//     public static final Lock odometryLock = new ReentrantLock();
+//     public static final Queue<Double> timestampQueue = new ArrayBlockingQueue<>(20);
+//     private SwerveModuleData[] modulesData;
+//     private GyroData gyroData;
+//     private SwerveModule[] modulesArry;
+//     private ModuleLimits swerveLimits;
 
-        config.updateHardwereData();
+//     public SwerveThreadOdometry(OdometryConfig Config) {
+//         config = Config;
+//         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
+//         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
+//         lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
+//         lastCollisionLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Collision");
+
+//         //modulesData = config.swerveSubsystem.getModulesData();
+//         //gyroData = config.swerveSubsystem.getGyroData();
+//         modulesArry = config.swerveSubsystem.getModulesArry();
+//         swerveLimits = config.swerveSubsystem.getCurrentLimits();
+
+//         modulesData = null;
+//         gyroData = null;
+//     }
+
+
+//     public void updateOdometry() {
+//         odometryLock.lock();
+
+//         timestamps =
+//             timestampQueue.stream().mapToDouble(Double::valueOf).toArray();
+//         if (timestamps.length == 0) {
+//         timestamps = new double[] {Timer.getFPGATimestamp()};
+//         }
+//         timestampQueue.clear();
+
+//         config.updateHardwereData();
         
-        odometryLock.unlock();
+//         odometryLock.unlock();
 
-        boolean includeMeasurement = true;
+//         boolean includeMeasurement = true;
 
-        skidDetected = Math.abs(config.skidDetector.getSkiddingRatio()) > config.skidRatio;
-        collisionDetected = config.collisionDetector.getForce() > config.collisionForce;
+//         skidDetected = Math.abs(config.skidDetector.getSkiddingRatio()) > config.skidRatio;
+//         collisionDetected = config.collisionDetector.getForce() > config.collisionForce;
 
-        skidDetectedLog.update(skidDetected);
-        collisionDetectedLog.update(collisionDetected);
+//         skidDetectedLog.update(skidDetected);
+//         collisionDetectedLog.update(collisionDetected);
 
-        if (skidDetected) {
-            lastSkid = Timer.getFPGATimestamp();
-            lastSkidLog.update(lastSkid);
-        }
+//         if (skidDetected) {
+//             lastSkid = Timer.getFPGATimestamp();
+//             lastSkidLog.update(lastSkid);
+//         }
 
-        if (collisionDetected) {
-            lastCollid = Timer.getFPGATimestamp();
-            lastCollisionLog.update(lastCollid);
-        }
+//         if (collisionDetected) {
+//             lastCollid = Timer.getFPGATimestamp();
+//             lastCollisionLog.update(lastCollid);
+//         }
         
-        if (!((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected)) {
-            includeMeasurement = false; //Should inclus every stamp from that cycle or just one?
-        }
+//         if (!((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected)) {
+//             includeMeasurement = false; //Should inclus every stamp from that cycle or just one?
+//         }
         
-        if (includeMeasurement) {
-            int minOdometryUpdates =
-            IntStream.of(
-                    timestamps.length,
-                    Arrays.stream(modulesData)
-                        .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length)
-                        .min()
-                        .orElse(0))
-                .min()
-                .orElse(0);
-        minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
+//         if (includeMeasurement) {
+//             int minOdometryUpdates =
+//             IntStream.of(
+//                     timestamps.length,
+//                     Arrays.stream(modulesData)
+//                         .mapToInt(modulesData -> modulesData.getSteerPositionQueue().length)
+//                         .min()
+//                         .orElse(0))
+//                 .min()
+//                 .orElse(0);
+//         minOdometryUpdates = Math.min(gyroData.getYawPositionQueue().length, minOdometryUpdates);
     
-        for (int i = 0; i < minOdometryUpdates; i++) {
-        int odometryIndex = i;
-        Rotation2d yaw = gyroData.getYawPositionQueue()[i];
-        for (int a = 0; a < modulesArry.length ; a++) {
-            wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
-        }
-        // Filtering based on delta wheel positions
-        if (lastPositions != null) {
-            double dt = timestamps[i] - lastTime;
-            for (int j = 0; j < modulesArry.length; j++) {
-            double velocity =
-                (wheelPositions[j].distanceMeters
-                        - lastPositions[j].distanceMeters)
-                    / dt;
-            double omega =
-                wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
-                    / dt;
-            // Check if delta is too large
-            if (Math.abs(omega) > swerveLimits.maxSteeringVelocity() * 5.0
-                || Math.abs(velocity) > swerveLimits.maxDriveVelocity() * 5.0) {
-                includeMeasurement = false;
-                break;
-            }
-            }
-        }
+//         for (int i = 0; i < minOdometryUpdates; i++) {
+//         int odometryIndex = i;
+//         Rotation2d yaw = gyroData.getYawPositionQueue()[i];
+//         for (int a = 0; a < modulesArry.length ; a++) {
+//             wheelPositions[a] = modulesArry[a].getModulePositions(modulesData[a])[odometryIndex];
+//         }
+//         // Filtering based on delta wheel positions
+//         if (lastPositions != null) {
+//             double dt = timestamps[i] - lastTime;
+//             for (int j = 0; j < modulesArry.length; j++) {
+//             double velocity =
+//                 (wheelPositions[j].distanceMeters
+//                         - lastPositions[j].distanceMeters)
+//                     / dt;
+//             double omega =
+//                 wheelPositions[j].angle.minus(lastPositions[j].angle).getRadians()
+//                     / dt;
+//             // Check if delta is too large
+//             if (Math.abs(omega) > swerveLimits.maxSteeringVelocity() * 5.0
+//                 || Math.abs(velocity) > swerveLimits.maxDriveVelocity() * 5.0) {
+//                 includeMeasurement = false;
+//                 break;
+//             }
+//             }
+//         }
 
-        if (includeMeasurement) {
-            lastPositions = wheelPositions;
-            PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
-            lastTime = timestamps[i];
-        }
-        }
-        }
+//         if (includeMeasurement) {
+//             lastPositions = wheelPositions;
+//             PoseEstimator.getInstance().updateOdometry(wheelPositions, yaw, timestamps[i]);
+//             lastTime = timestamps[i];
+//         }
+//         }
+//         }
         
-    }
+//     }
 
-    public double getLastSkid() {
-        return lastSkid;
-    }
+//     public double getLastSkid() {
+//         return lastSkid;
+//     }
 
-    public double getLastCollision() {
-        return lastCollid;
-    }
+//     public double getLastCollision() {
+//         return lastCollid;
+//     }
 
 
-}
+// }
    

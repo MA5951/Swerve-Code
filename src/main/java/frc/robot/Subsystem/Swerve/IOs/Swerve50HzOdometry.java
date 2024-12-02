@@ -5,12 +5,20 @@ import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
+import frc.robot.Subsystem.Swerve.CollisionDtector;
+import frc.robot.Subsystem.Swerve.SkidDetector;
+import frc.robot.Subsystem.Swerve.SwerveConstants;
+import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
 import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 
 public class Swerve50HzOdometry implements SwerveOdometry{
 
     private OdometryConfig odometryConfig;
+    private SwerveSubsystem swerveSubsystem;
+    private SkidDetector skidDetector;
+    private CollisionDtector collisionDtector;
 
     private LoggedBool skidDetectedLog;
     private LoggedBool collisionDetectedLog;
@@ -24,19 +32,22 @@ public class Swerve50HzOdometry implements SwerveOdometry{
     private double lastCollid;
 
     public Swerve50HzOdometry(OdometryConfig Config) {
+        swerveSubsystem = SwerveSubsystem.getInstance();
         odometryConfig = Config;
         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
         lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
         lastCollisionLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Collision");
+        skidDetector = new SkidDetector(SwerveConstants.kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates());
+        collisionDtector = new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData());
     }
 
 
     public void updateOdometry() {
-        odometryConfig.updateHardwereData();
+        swerveSubsystem.updateHardwereData();
 
-        skidDetected = Math.abs(odometryConfig.skidDetector.getSkiddingRatio()) > odometryConfig.skidRatio;
-        collisionDetected = odometryConfig.collisionDetector.getForce() > odometryConfig.collisionForce;
+        skidDetected = Math.abs(skidDetector.getSkiddingRatio()) > odometryConfig.skidRatio;
+        collisionDetected = collisionDtector.getForce() > odometryConfig.collisionForce;
 
         skidDetectedLog.update(skidDetected);
         collisionDetectedLog.update(collisionDetected);
@@ -52,7 +63,7 @@ public class Swerve50HzOdometry implements SwerveOdometry{
         }
         
         if (((skidDetected && odometryConfig.updateInSkid) || !skidDetected) && ((collisionDetected && odometryConfig.updateInCollision) || !collisionDetected)) {
-            odometryConfig.poseEstimator.updateOdometry(odometryConfig.getCurrentPositions(), odometryConfig.getRotation() , Timer.getFPGATimestamp());
+            PoseEstimator.getInstance().updateOdometry(swerveSubsystem.getSwerveModulePositions(), swerveSubsystem.getRotation2d() , Timer.getFPGATimestamp());
         }
     }
 
