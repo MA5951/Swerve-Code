@@ -152,15 +152,17 @@ public class SwerveModuleSim implements SwerveModule{
     }
 
     public void driveUsingPID(double setPointMPS , double feedForward) {
+        //Meter Per Secound setPointMPS / SwerveConstants.WHEEL_CIRCUMFERENCE
         rpsDriveSetPoint = (setPointMPS / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI );
-        driveSim.setControl(driveController.withVelocity(rpsDriveSetPoint));
+        driveSim.setControl(driveController.withVelocity(rpsDriveSetPoint)
+        .withFeedForward(feedForward)
+        .withSlot(SwerveConstants.SLOT_CONFIG));
     }
 
     public SwerveModuleData update() {
+        
         driveSim.update(Timer.getFPGATimestamp());
         turnSim.update(Timer.getFPGATimestamp());
-
-
         moduleData.updateData(
             getDrivePosition(),
             getDriveVelocity(),
@@ -186,7 +188,6 @@ public class SwerveModuleSim implements SwerveModule{
         AbsAngle.update(getAbsolutePosition());
         DriveTemp.update(getDriveTemp());
         SteerTemp.update(getSteerTemp());
-
 
         return moduleData;
 
