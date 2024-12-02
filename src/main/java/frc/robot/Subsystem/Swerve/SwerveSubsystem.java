@@ -29,8 +29,7 @@ import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
 
-public class 
-SwerveSubsystem extends SubsystemBase {
+public class SwerveSubsystem extends SubsystemBase {
   private static SwerveSubsystem swerveSubsystem;
 
   private SwerveSetpointGenerator setpointGenerator;
