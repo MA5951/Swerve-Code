@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
-/** Add your docs here. */
 public class PoseEstimator {
     private static PoseEstimator poseEstimator;
 
@@ -68,8 +67,6 @@ public class PoseEstimator {
 
 
     public void update() {
-        //updateOdometry();
-        updateVision();
         estimatedRobotPose.update(getEstimatedRobotPose());
         odometryUpdateConstrains.update(PoseEstimatorConstants.ODOMETRY_UPDATE_CONSTRAINS.get());
         visionUpdateConstrains.update(PoseEstimatorConstants.VISION_UPDATE_CONSTRAINS.get());

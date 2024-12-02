@@ -225,10 +225,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     odometry.updateOdometry();
 
-    updateHardwereData();
-
     currenStatesLog.update(currentStates);
-    // 
+    
     swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
     swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
     swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);

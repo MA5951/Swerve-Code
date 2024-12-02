@@ -13,6 +13,7 @@ import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 //import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
+import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 // import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 //import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
@@ -142,8 +143,7 @@ public class SwerveConstants {
 
         public static final SwerveOdometry getOdometry() {
                 if (Robot.isReal()) {
-                        //return new SwerveThreadOdometry(ODOMETRY_CONFIG);
-                        return null;
+                        return new SwerveThreadOdometry(ODOMETRY_CONFIG);
                 }
 
                 return new Swerve50HzOdometry(ODOMETRY_CONFIG);
