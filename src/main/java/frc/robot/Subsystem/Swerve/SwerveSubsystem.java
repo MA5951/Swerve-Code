@@ -218,17 +218,17 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     if (!init) {
       odometry = SwerveConstants.getOdometry();
       init = true;
     }
+
     odometry.updateOdometry();
 
     updateHardwereData();
 
     currenStatesLog.update(currentStates);
-    
+    // 
     swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
     swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
     swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);

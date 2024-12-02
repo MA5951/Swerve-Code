@@ -7,7 +7,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
 import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
-import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
 import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
