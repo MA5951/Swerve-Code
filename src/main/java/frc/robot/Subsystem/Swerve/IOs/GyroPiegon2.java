@@ -14,13 +14,13 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Utils.DriverStationUtil;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
-// import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
@@ -157,11 +157,11 @@ public class GyroPiegon2 implements Gyro{
             getAccelX(), 
             getAccelY(), 
             getAbsYaw(), 
-            null); //yawPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new)
+            yawPositionQueue.stream().map(Rotation2d::fromDegrees).toArray(Rotation2d[]::new));
 
         logData(gyroData);
 
-        //yawPositionQueue.clear();
+        yawPositionQueue.clear();
         
         return gyroData;
     }

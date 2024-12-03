@@ -42,7 +42,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
   private final Gyro gyro = SwerveConstants.getGyro();
-  private SwerveOdometry odometry;
+  private static SwerveOdometry odometry;
   private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
   private SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
   private SwerveModuleState[] currentStates = new SwerveModuleState[4];
@@ -51,8 +51,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private GyroData gyroData = new GyroData();
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private ChassisSpeeds currentChassisSpeeds;
-
-  private boolean init = false;
+  private SwerveModuleState[] states;
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -166,7 +165,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void drive(ChassisSpeeds chassisSpeeds) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
+    states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
     setPoinStatesLog.update(Optistates);
@@ -212,17 +211,13 @@ public class SwerveSubsystem extends SubsystemBase {
   public static SwerveSubsystem getInstance() {
     if (swerveSubsystem == null) {
       swerveSubsystem = new SwerveSubsystem();
+      odometry = SwerveConstants.getOdometry();
     }
     return swerveSubsystem;
     }
 
   @Override
   public void periodic() {
-    if (!init) {
-      odometry = SwerveConstants.getOdometry();
-      init = true;
-    }
-
     odometry.updateOdometry();
 
     currenStatesLog.update(currentStates);

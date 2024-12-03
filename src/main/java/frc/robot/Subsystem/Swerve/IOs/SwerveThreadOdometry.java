@@ -163,10 +163,9 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         return lastSkid;
     }
 
-    public double getLastCollision() {
+    public double getLatCollision() {
         return lastCollid;
     }
-
 
 }
    

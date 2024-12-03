@@ -4,19 +4,19 @@
 
 package com.ma5951.utils.Vision.Filters;
 
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+
 /** Add your docs here. */
 public class LimelightFiltersConfig {
 
-    private double ROBOT_LINEAR_SPEED_FOR_UPDATE;
+    private ChassisSpeeds robotUpdatSpeeds;
     private double ROBOT_ANGULAR_SPEED_FOR_UPDATE;
     private boolean UPDATE_IN_AUTO;
     private double ODOMETRY_TO_VISION_DISTANCE;
-    private double STUDERING_DISTANCE;
 
     public LimelightFiltersConfig(
         boolean UPDATE_IN_AUTO,
-        double ROBOT_LINEAR_SPEED_FOR_UPDATE,
-        double ROBOT_ANGULAR_SPEED_FOR_UPDATE,
+        ChassisSpeeds ROBOT_LINEAR_SPEED_FOR_UPDATE,
         double ODOMETRY_TO_VISION_DISTANCE,
         double STUDERING_DISTANCE
     ) {

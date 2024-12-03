@@ -18,4 +18,5 @@ public class StatesConstants {
     public final static State CANT_MOVE = new State("CANT_MOVE");
     public final static State IDLE = new State("IDLE");
 
+    
 }

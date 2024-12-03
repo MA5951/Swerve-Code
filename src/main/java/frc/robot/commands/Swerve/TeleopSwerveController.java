@@ -8,7 +8,6 @@ import com.ma5951.utils.Logger.LoggedString;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PS5Controller;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystem.PoseEstimation.Vision;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
@@ -57,6 +56,8 @@ public class TeleopSwerveController extends Command {
     theathControllerLog.update("Drive Controller");
     robotSpeeds = driveControllerSpeeds;
 
+
+    
     swerve.drive(robotSpeeds);
   }
 

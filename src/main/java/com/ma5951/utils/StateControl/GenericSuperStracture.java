@@ -41,10 +41,12 @@ public class GenericSuperStracture {
     }
 
     public boolean isRobotMoving() {
-        return robotVelocitySupplier.get() > 0.05;
+        return robotVelocitySupplier.get() > 0.05; //lower value
     }
+    
+    //has gamepiece
 
-    public boolean isInArea(Translation2d boundingBoxMin, Translation2d boundingBoxMax) {
+    public boolean isInArea(Translation2d boundingBoxMin, Translation2d boundingBoxMax) { //Rectangle2d rec = new Rectangle2d(boundingBoxMin, boundingBoxMax)
         return currentPoseSupplier.get().getX() >= boundingBoxMin.getX()
               && currentPoseSupplier.get().getY() >= boundingBoxMin.getY()
               && currentPoseSupplier.get().getX() <= boundingBoxMax.getX()

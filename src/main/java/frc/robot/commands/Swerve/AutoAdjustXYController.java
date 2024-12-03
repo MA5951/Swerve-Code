@@ -1,7 +1,6 @@
 
 package frc.robot.commands.Swerve;
 
-import java.util.PrimitiveIterator;
 import java.util.function.Supplier;
 
 import com.ma5951.utils.Logger.LoggedBool;

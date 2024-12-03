@@ -64,7 +64,6 @@ public class Swerve50HzOdometry implements SwerveOdometry{
         
         if (((skidDetected && odometryConfig.updateInSkid) || !skidDetected) && ((collisionDetected && odometryConfig.updateInCollision) || !collisionDetected)) {
             PoseEstimator.getInstance().updateOdometry(swerveSubsystem.getSwerveModulePositions(), swerveSubsystem.getRotation2d() , Timer.getFPGATimestamp());
-            System.out.println("Update");
         }
     }
 
@@ -72,7 +71,7 @@ public class Swerve50HzOdometry implements SwerveOdometry{
         return lastSkid;
     }
 
-    public double getLastCollision() {
+    public double getLatCollision() {
         return lastCollid;
     }
 
