@@ -4,56 +4,134 @@
 
 package frc.robot;
 
-import com.ma5951.utils.Limelight;
 
-import edu.wpi.first.math.geometry.Transform3d;
+import com.ma5951.utils.DashBoard.AutoOption;
+import com.ma5951.utils.DashBoard.AutoSelector;
+import com.ma5951.utils.StateControl.StatesTypes.State;
+
+import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
+import frc.robot.Subsystem.PoseEstimation.Vision;
+// import frc.robot.Subsystem.Swerve.SwerveAutoFollower;
+import frc.robot.Subsystem.Swerve.SwerveSubsystem;
+import frc.robot.commands.Swerve.FieldCentricDriveController;
+import frc.robot.commands.Swerve.TeleopSwerveController;
 
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
 public class RobotContainer {
+  public static State currentRobotState = RobotConstants.IDLE;
+  public static State lastRobotState = currentRobotState;
 
-  public static final CommandPS4Controller ps4 = 
-    new CommandPS4Controller(PortMap.Controllers.driverJostick);
+  public static PS5Controller driverController = new PS5Controller(PortMap.Controllers.driveID);
+  public static PS5Controller oporatorController = new PS5Controller(PortMap.Controllers.operatorID);
+  public static PS5Controller driverControllerRumble = new PS5Controller(2);
 
-  public static final Limelight LIMELIGHT = new Limelight(
-    "limelight", new Transform3d());
+  public static boolean alignForAmp = true;
 
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
+  private static AutoSelector autoSelector;
+
   public RobotContainer() {
-    // Configure the trigger bindings
+    SwerveSubsystem.getInstance();
+    Vision.getInstance();
     configureBindings();
+    //new SwerveAutoFollower();
+    
+    autoSelector = new AutoSelector(() -> PoseEstimator.getInstance().getEstimatedRobotPose());
+    CommandScheduler.getInstance().setDefaultCommand(SwerveSubsystem.getInstance(), new TeleopSwerveController(RobotContainer.driverController));
+  }
+
+  public void setUpAutoCommands() {
+
+  }
+
+  public void toggleAmpAlign() {
+    if (alignForAmp) {
+      alignForAmp = false;
+    } else {
+      alignForAmp = true;
+    }
+  }
+
+  public static void update() {
+    autoSelector.updateViz();
+  }
+
+  public void setIDLE() {
+      lastRobotState = currentRobotState;
+      currentRobotState = RobotConstants.IDLE;
+  }
+
+  public void setIDLE_AFTER_INTAKE() {
+      lastRobotState = currentRobotState;
+      currentRobotState = RobotConstants.IDLE;
+  }
+
+  public void setINTAKE() {
+      lastRobotState = currentRobotState;  
+      currentRobotState = RobotConstants.INTAKE;
+  }
+
+  public void setEJECT() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.EJECT;
+  }
+
+  public void setWARMING() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.WARMING;
+  }
+
+  public void setAMP() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.AMP;
+  }
+
+  public void setFEEDING() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.FEEDING;
+  }
+
+  public void setSOURCE_INTAKE() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.SOURCE_INTAKE;
+  }
+
+  public void setSTATIONARY_SHOOTING() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.STATIONARY_SHOOTING;
+    
+  }
+
+  public void setPRESET_SHOOTING() {
+    lastRobotState = currentRobotState;
+    currentRobotState = RobotConstants.PRESET_SHOOTING;
   }
 
 
   private void configureBindings() {
-    ps4.triangle().whileTrue(
-      new InstantCommand(SwerveDrivetrainSubsystem.getInstance()::updateOffset));
 
-    ps4.R2().whileTrue(
-      new InstantCommand(
-        () -> SwerveDrivetrainSubsystem.getInstance().FactorVelocityTo(0.4))
-    ).whileFalse(new InstantCommand(
-      () -> SwerveDrivetrainSubsystem.getInstance().FactorVelocityTo(1)));
+    //Update Offset
+    new Trigger(() -> driverController.getTriangleButton()).onTrue(new InstantCommand(() -> FieldCentricDriveController.updateDriveHeading()));
+
+
+
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
+  public String getAutonomousName() {
+    return autoSelector.getSelectedAuto().getName();
+  }
+
+  public boolean getIsPathPLannerAuto() {
+    return autoSelector.getSelectedAuto().isPathPlannerAuto();
+  }
+
+  public AutoOption getCurrentSelectedAutoOption() {
+    return autoSelector.getSelectedAuto();
+  }
+  
   public Command getAutonomousCommand() {
     return null;
   }

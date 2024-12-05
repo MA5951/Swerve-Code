@@ -4,132 +4,168 @@
 
 package frc.robot;
 
+import com.ma5951.utils.Logger.LoggedBool;
+import com.ma5951.utils.Logger.LoggedDouble;
+import com.ma5951.utils.Logger.LoggedInt;
+import com.ma5951.utils.Logger.LoggedPose2d;
+import com.ma5951.utils.Logger.LoggedString;
+import com.ma5951.utils.Logger.MALog;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.DriveSwerveCommand;
-import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
+import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
+import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to
- * each mode, as described in the TimedRobot documentation. If you change the
- * name of this class or
- * the package after creating this project, you must also update the
- * build.gradle file in the
- * project.
- */
+
+
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  private RobotContainer m_robotContainer;
+  
 
-  /**
-   * This function is run when the robot is first started up and should be used
-   * for any
-   * initialization code.
-   */
+  private RobotContainer m_robotContainer;
+  private LoggedString currentRobotStateLog;
+  private LoggedString lastRobotStateLog;
+  private LoggedInt currentRobotStateNumberLog;
+  private LoggedBool isStartingPoseLog;
+  private LoggedString currentSelectedAuto;
+  private LoggedPose2d startingPoseLog;
+  private LoggedDouble batteryVoltageLog;
+  private LoggedDouble matchTimeLog;
+  private boolean isTeleop = false;
+  public static boolean isStartingPose = false;
+
   @Override
   public void robotInit() {
-    // Instantiate our RobotContainer. This will perform all our button bindings,
-    // and put our
-    // autonomous chooser on the dashboard.
+    MALog.getInstance();
     m_robotContainer = new RobotContainer();
-    SwerveDrivetrainSubsystem.getInstance();
+    m_robotContainer.setIDLE();
+    PoseEstimator.getInstance();
+
+    MALog.getInstance().startLog();
+
+    
+
+    currentRobotStateLog = new LoggedString("/RobotControl/Current Robot State");
+    lastRobotStateLog = new LoggedString("/RobotControl/Last Robot State");
+    currentRobotStateNumberLog = new LoggedInt("/RobotControl/Current Robot State Num");
+    isStartingPoseLog = new LoggedBool("/Auto/Is Starting Pose");
+    startingPoseLog = new LoggedPose2d("/Auto/Starting Pose");
+    batteryVoltageLog = new LoggedDouble("/Dash/Battery Vlotage");
+    matchTimeLog = new LoggedDouble("/Dash/Match Time");
   }
 
-  /**
-   * This function is called every 20 ms, no matter the mode. Use this for items
-   * like diagnostics
-   * that you want ran during disabled, autonomous, teleoperated and test.
-   *
-   * <p>
-   * This runs after the mode specific periodic functions, but before LiveWindow
-   * and
-   * SmartDashboard integrated updating.
-   */
   @Override
   public void robotPeriodic() {
-    // Runs the Scheduler. This is responsible for polling buttons, adding
-    // newly-scheduled
-    // commands, running already-scheduled commands, removing finished or
-    // interrupted commands,
-    // and running subsystem periodic() methods. This must be called from the
-    // robot's periodic
-    // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    RobotContainer.LIMELIGHT.periodic();
+    PoseEstimator.getInstance().update();
+    RobotConstants.SUPER_STRUCTURE.update();
+    currentRobotStateLog.update(RobotContainer.currentRobotState.getName());
+    lastRobotStateLog.update(RobotContainer.lastRobotState.getName());
+    currentRobotStateNumberLog.update(getStateAsNum());
+    RobotContainer.update();
+
+    batteryVoltageLog.update(RobotController.getBatteryVoltage());
+    matchTimeLog.update(DriverStation.getMatchTime());
+    
   }
 
-  /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
+    m_robotContainer.setIDLE();
+
+    if (isTeleop) {
+      MALog.getInstance().stopLog();
+    }
   }
 
   @Override
   public void disabledPeriodic() {
+    
+  //   if (m_robotContainer.getCurrentSelectedAutoOption() != null && m_robotContainer.getAutonomousName() != null) {
+  //     //currentSelectedAuto.update(m_robotContainer.getAutonomousName());
+  //     if (m_robotContainer.getIsPathPLannerAuto()) {
+  //       startingPoseLog.update(PathPlannerAuto.getStaringPoseFromAutoFile(m_robotContainer.getAutonomousName()
+  //     ));
+  //       isStartingPose = 
+  //         PathPlannerAuto.getStaringPoseFromAutoFile(m_robotContainer.getAutonomousName()
+  //       ).getTranslation().getDistance(PoseEstimator.getInstance().getEstimatedRobotPose().getTranslation())
+  //       < RobotConstants.DISTANCE_TO_START_AUTO;
+  //       isStartingPoseLog.update(isStartingPose);
+      
+  //     }
+  // }
   }
 
-  /**
-   * This autonomous runs the autonomous command selected by your
-   * {@link RobotContainer} class.
-   */
   @Override
   public void autonomousInit() {
+    // if (m_robotContainer.getIsPathPLannerAuto()) {
+    //   PoseEstimator.getInstance().resetPose(
+    //   PathPlannerAuto.getStaringPoseFromAutoFile(m_robotContainer.getAutonomousName()
+    // ));
+
+    // }
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-    // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
   }
 
-  /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-    }
+      }
 
-    CommandScheduler.getInstance().setDefaultCommand(
-        SwerveDrivetrainSubsystem.getInstance(),
-        new DriveSwerveCommand(
-            RobotContainer.ps4::getLeftX,
-            RobotContainer.ps4::getLeftY,
-            RobotContainer.ps4::getRightX));
+    isTeleop = true;
   }
 
-  /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
   }
 
   @Override
   public void testInit() {
-    // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
   }
 
-  /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {
-  }
+  public void testPeriodic() {}
 
-  /** This function is called once when the robot is first started up. */
   @Override
-  public void simulationInit() {
-  }
+  public void simulationInit() {}
 
-  /** This function is called periodically whilst in simulation. */
   @Override
-  public void simulationPeriodic() {
+  public void simulationPeriodic() {}
+
+  public int getStateAsNum() {
+    if (RobotContainer.currentRobotState == RobotConstants.IDLE) {
+      return 0;
+    } else if (RobotContainer.currentRobotState == RobotConstants.INTAKE) {
+      return 2;
+    } else if (RobotContainer.currentRobotState == RobotConstants.EJECT) {
+      return 4;
+    } else if (RobotContainer.currentRobotState == RobotConstants.WARMING) {
+      return 6;
+    } else if (RobotContainer.currentRobotState == RobotConstants.AMP) {
+      return 8;
+    } else if (RobotContainer.currentRobotState == RobotConstants.FEEDING) {
+      return 10;
+    } else if (RobotContainer.currentRobotState == RobotConstants.SOURCE_INTAKE) {
+      return 12;
+    } else if (RobotContainer.currentRobotState == RobotConstants.STATIONARY_SHOOTING) {
+      return 14;
+    } else if (RobotContainer.currentRobotState == RobotConstants.PRESET_SHOOTING) {
+      return 16;
+    } else {
+      return 0;
+    } 
   }
 }

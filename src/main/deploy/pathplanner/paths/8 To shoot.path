@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 8.19682812889776,
+        "y": 0.5580559282764374
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.285700831713588,
+        "y": 0.5874231808137599
+      },
+      "isLocked": false,
+      "linkedName": "Intake8"
+    },
+    {
+      "anchor": {
+        "x": 3.5296769185087666,
+        "y": 3.020674210362506
+      },
+      "prevControl": {
+        "x": 4.0831740762073085,
+        "y": 1.9662035152239332
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Shoot8"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 140.0
+  },
+  "reversed": false,
+  "folder": "Midline 3",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}
