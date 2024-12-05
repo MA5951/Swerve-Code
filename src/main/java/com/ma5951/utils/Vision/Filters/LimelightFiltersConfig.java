@@ -9,14 +9,23 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 /** Add your docs here. */
 public class LimelightFiltersConfig {
 
+    private boolean updateInAuto; 
     private ChassisSpeeds robotUpdatSpeeds;
     private double ROBOT_ANGULAR_SPEED_FOR_UPDATE;
     private boolean UPDATE_IN_AUTO;
     private double ODOMETRY_TO_VISION_DISTANCE;
 
+    /**
+     * 
+     * @param UPDATE_IN_AUTO
+     * @param RobotUpdateSpeed
+     * @param ODOMETRY_TO_VISION_DISTANCE
+     * @param STUDERING_DISTANCE
+     * 
+     */
     public LimelightFiltersConfig(
         boolean UPDATE_IN_AUTO,
-        ChassisSpeeds ROBOT_LINEAR_SPEED_FOR_UPDATE,
+        ChassisSpeeds RobotUpdateSpeed,
         double ODOMETRY_TO_VISION_DISTANCE,
         double STUDERING_DISTANCE
     ) {
