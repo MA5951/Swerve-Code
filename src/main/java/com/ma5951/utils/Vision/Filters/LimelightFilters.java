@@ -27,6 +27,7 @@ public class LimelightFilters {
     private Supplier<ChassisSpeeds> robotSpeedsSupplier;
     private Translation2d robotPose;
     private ChassisSpeeds robotSpeeds;
+    private Pose2d deafultPose = new Pose2d();
 
     public LimelightFilters(Limelight3G camera , LimelightFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds) {
         limelight = camera;
@@ -40,7 +41,7 @@ public class LimelightFilters {
     }
 
     public boolean isValidForUpdate() {
-        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange() && ;
+        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange() && shouldUpdateByRobotState() && notDeafultPose();
     }
 
     private boolean inVelocityFilter() {
@@ -75,11 +76,16 @@ public class LimelightFilters {
         return true; 
     }
     
-    private boolean shouldUpdateInAuto() {
-        if ((config.updateInAuto && DriverStation.isAutonomous()) || DriverStation.) {
+    private boolean shouldUpdateByRobotState() {
+        if ((config.updateInAuto && DriverStation.isAutonomous()) || !DriverStation.isAutonomous()) {
             return true;
         }
 
         return false;
     }
+
+    private boolean notDeafultPose() {
+        return limelight.getEstimatedPose().pose !=deafultPose;
+    }
+
 }
