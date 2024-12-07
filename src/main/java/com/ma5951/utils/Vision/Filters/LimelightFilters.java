@@ -1,6 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 //Linear Velocity
 //Angular Velocity
@@ -18,14 +15,18 @@ import java.util.function.Supplier;
 import com.ma5951.utils.Vision.Limelights.Limelight3G;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DriverStation;
 
-/** Add your docs here. */
 public class LimelightFilters {
     private Limelight3G limelight;
     private LimelightFiltersConfig config;
     private Supplier<Pose2d> robotPoSupplier;
     private Supplier<ChassisSpeeds> robotSpeedsSupplier;
+    private Translation2d robotPose;
+    private ChassisSpeeds robotSpeeds;
 
     public LimelightFilters(Limelight3G camera , LimelightFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds) {
         limelight = camera;
@@ -39,18 +40,46 @@ public class LimelightFilters {
     }
 
     public boolean isValidForUpdate() {
-        return linearVelocityFilter() &&;
+        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange() && ;
     }
 
-    public boolean linearVelocityFilter() {
-        return robotSpeedsSupplier.get().vxMetersPerSecond <= config.robotUpdateSpeed.vxMetersPerSecond &&
-        robotSpeedsSupplier.get().vyMetersPerSecond <= config.robotUpdateSpeed.vyMetersPerSecond &&
-        robotSpeedsSupplier.get().omegaRadiansPerSecond <= config.robotUpdateSpeed.omegaRadiansPerSecond;
+    private boolean inVelocityFilter() {
+        robotSpeeds = robotSpeedsSupplier.get();
+        return robotSpeeds.vxMetersPerSecond <= config.robotUpdateSpeed.vxMetersPerSecond &&
+        robotSpeeds.vyMetersPerSecond <= config.robotUpdateSpeed.vyMetersPerSecond &&
+        robotSpeeds.omegaRadiansPerSecond <= config.robotUpdateSpeed.omegaRadiansPerSecond;
     }
 
-    public boolean inField() {
-        return config.fieldRectangle.
+    private boolean inField() {
+        return config.fieldRectangle.contains(robotPoSupplier.get().getTranslation());
     }
 
+    private boolean notInFieldObstacles() {
+        if (config.fieldObstaclesRectangles != null) {
+            robotPose = robotPoSupplier.get().getTranslation();
+            for (Rectangle2d obstacles: config.fieldObstaclesRectangles) {
+                if (obstacles.contains(robotPose)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    private boolean inOdometryRange() {
+        if ((config.visionToOdometryInTeleop && DriverStation.isTeleop()) || DriverStation.isAutonomous()) {
+            robotPose = robotPoSupplier.get().getTranslation();
+            return robotPose.getDistance(limelight.getEstimatedPose().pose.getTranslation()) < config.visionToOdometry;
+        }
+        return true; 
+    }
     
+    private boolean shouldUpdateInAuto() {
+        if ((config.updateInAuto && DriverStation.isAutonomous()) || DriverStation.) {
+            return true;
+        }
+
+        return false;
+    }
 }
