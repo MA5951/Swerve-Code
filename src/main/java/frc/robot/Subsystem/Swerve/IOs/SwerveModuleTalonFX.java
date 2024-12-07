@@ -237,7 +237,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     public double getDrivePosition() {
-        //Return distance in meters
         return drivePosition.getValueAsDouble() * SwerveConstants.WHEEL_CIRCUMFERENCE;
     }
 
@@ -280,7 +279,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     public void turningUsingPID(double setPointRdians) {
-        //Degrees
         //turningMotor.setControl(turnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
         turningMotor.setControl(pidTurnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
     }

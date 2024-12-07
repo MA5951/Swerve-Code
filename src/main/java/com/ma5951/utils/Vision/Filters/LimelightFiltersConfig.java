@@ -1,60 +1,41 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package com.ma5951.utils.Vision.Filters;
 
+import edu.wpi.first.math.geometry.Rectangle2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-/** Add your docs here. */
 public class LimelightFiltersConfig {
 
-    private boolean updateInAuto; 
-    private ChassisSpeeds robotUpdatSpeeds;
-    private double ROBOT_ANGULAR_SPEED_FOR_UPDATE;
-    private boolean UPDATE_IN_AUTO;
-    private double ODOMETRY_TO_VISION_DISTANCE;
+    public boolean updateInAuto;
+    public ChassisSpeeds robotUpdateSpeed;
+    public Rectangle2d fieldRectangle;
+    public Rectangle2d[] fieldObstaclesRectangles;
+    public double visionToOdometry;
+    public boolean visionToOdometryInTeleop;
 
-    /**
-     * 
-     * @param UPDATE_IN_AUTO
-     * @param RobotUpdateSpeed
-     * @param ODOMETRY_TO_VISION_DISTANCE
-     * @param STUDERING_DISTANCE
-     * 
-     */
+
     public LimelightFiltersConfig(
-        boolean UPDATE_IN_AUTO,
+        boolean UpdateInAuto,
         ChassisSpeeds RobotUpdateSpeed,
-        double ODOMETRY_TO_VISION_DISTANCE,
-        double STUDERING_DISTANCE
+        Rectangle2d FieldRectangle,
+        Rectangle2d[] FieldObstaclesRectangles,
+        double VisionToOdometry,
+        boolean VisionToOdometryInTeleop
     ) {
-        this.UPDATE_IN_AUTO = UPDATE_IN_AUTO;
-        this.ROBOT_LINEAR_SPEED_FOR_UPDATE = ROBOT_LINEAR_SPEED_FOR_UPDATE;
-        this.ROBOT_ANGULAR_SPEED_FOR_UPDATE = ROBOT_ANGULAR_SPEED_FOR_UPDATE;
-        this.ODOMETRY_TO_VISION_DISTANCE = ODOMETRY_TO_VISION_DISTANCE;
-        this.STUDERING_DISTANCE = STUDERING_DISTANCE;
+        updateInAuto = UpdateInAuto;
+        robotUpdateSpeed = RobotUpdateSpeed;
+        fieldRectangle = new Rectangle2d(new Translation2d(), new Translation2d());
+        fieldObstaclesRectangles = FieldObstaclesRectangles;
+        visionToOdometry = VisionToOdometry;
+        visionToOdometryInTeleop = VisionToOdometryInTeleop;
     }
 
-    public boolean getUpdateInAuto() {
-        return UPDATE_IN_AUTO;
+    public LimelightFiltersConfig() {
+        this(false, new ChassisSpeeds(), new Rectangle2d(null, null), new Rectangle2d[1], 0d, false);
     }
 
-    public double getRobotLinearSpeedForUpdate() {
-        return ROBOT_LINEAR_SPEED_FOR_UPDATE;
-    }
-
-    public double getRobotAngularSpeedForUpdate() {
-        return ROBOT_ANGULAR_SPEED_FOR_UPDATE;
-    }
-
-    public double getOdometryToVisionDistance() {
-        return ODOMETRY_TO_VISION_DISTANCE;
-    }
-
-    public double getStuderingDistance() {
-        return STUDERING_DISTANCE;
-    }
+    
 
 
 }
