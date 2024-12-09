@@ -9,19 +9,10 @@ package com.ma5951.utils.Vision.Limelights;
 
 import java.util.function.Supplier;
 
-import com.ma5951.utils.Utils.DriverStationUtil;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.PoseEstimate;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.RawDetection;
+import com.ma5951.utils.Vision.Limelights.LimelightHelpers.RawFiducial;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public class Limelight3G {
   private String name;
@@ -54,8 +45,20 @@ public class Limelight3G {
     return LimelightHelpers.getTV(name);
   }
 
+  public LimelightHelpers.RawDetection getRawDetection(int detectionIndex) {
+    return isTarget() ? LimelightHelpers.getRawDetections(name)[detectionIndex] : new RawDetection(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  }
+
   public LimelightHelpers.RawDetection getRawDetection() {
-    return isTarget() ? LimelightHelpers.getRawDetections(name)[0] : new RawDetection(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    return getRawDetection(0);
+  }
+
+  public LimelightHelpers.RawFiducial getRawFiducial(int detectionIndex) {
+    return isTarget() ? LimelightHelpers.getRawFiducials(name)[detectionIndex] : new RawFiducial(0,0,0,0,0,0,0);
+  }
+
+  public LimelightHelpers.RawFiducial getRawFiducial() {
+    return getRawFiducial(0);
   }
 
   public void filterTags(int[] tagsArry) {
@@ -70,8 +73,43 @@ public class Limelight3G {
     return isTarget() ? LimelightHelpers.getTY(name) : 0;
   }
 
+  public double getTa() {
+    return isTarget() ? LimelightHelpers.getTA(name) : 0;
+  }
+
+  public int getTargetCount() {
+    return  isTarget() ? LimelightHelpers.getTargetCount(name) : 0;
+  }
+
   public int getTagID() {
     return ((int)LimelightHelpers.getFiducialID(name));
+  }
+
+  public void ledsOn() {
+    LimelightHelpers.setLEDMode_ForceOn(name);
+  }
+
+  public void ledsOff() {
+    LimelightHelpers.setLEDMode_ForceOff(name);
+  }
+
+  public void ledsBlink() {
+    LimelightHelpers.setLEDMode_ForceBlink(name);
+  }
+
+  public void ledsPipelineControl() {
+    LimelightHelpers.setLEDMode_PipelineControl(name);
+  }
+
+  public void setCameraPose(double Forward , double Side , double Height , double Roll , double Pitch , double Yaw) {
+    LimelightHelpers.setCameraPose_RobotSpace(name, 
+    Forward,    // Forward offset (meters)
+    Side,    // Side offset (meters)
+    Height,    // Height offset (meters)
+    Roll,    // Roll (degrees)
+    Pitch,   // Pitch (degrees)
+    Yaw     // Yaw (degrees)
+    );
   }
 
   public void update() {
