@@ -50,7 +50,7 @@ public class AngleAdjustController  implements SwerveController {
   public ChassisSpeeds update() {
 
     omega = pid.calculate(ConvUtil.DegreesToRadians(measurment.get()));
-    chassisSpeeds.omegaRadiansPerSecond = omega * SwerveConstants.DRIVER_THATA_SCALER;
+    chassisSpeeds.omegaRadiansPerSecond = omega;
 
     atPointLog.update(getAtPoint());
     omegaLog.update(omega);

@@ -26,14 +26,7 @@ public class PoseEstimatorConstants {
     public final static double VISION_TO_ODOMETRY_DIFRANCE = 1;
     //public final static double VISION_TO_ODOMETRY_DIFRANCE = 1;
     
-    public static Supplier<Boolean> VISION_UPDATE_CONSTRAINS =() -> (DriverStation.isTeleop() && Math.abs(SwerveSubsystem.getInstance().getRobotRelativeSpeeds().vxMetersPerSecond) < MAX_LINEAR_VELOCITY_FOR_UPDATE 
-    && Math.abs(SwerveSubsystem.getInstance().getRobotRelativeSpeeds().vyMetersPerSecond) < MAX_LINEAR_VELOCITY_FOR_UPDATE
-    && Math.abs(SwerveSubsystem.getInstance().getRobotRelativeSpeeds().omegaRadiansPerSecond) < MAX_ANGULAR_VELOCITY_FOR_UPDATE 
-    && Vision.getInstance().isTag()) ||  
-    (DriverStation.isAutonomous() && Math.abs(SwerveSubsystem.getInstance().getRobotRelativeSpeeds().vxMetersPerSecond) < 0.5
-    && Math.abs(SwerveSubsystem.getInstance().getRobotRelativeSpeeds().vyMetersPerSecond) < 0.5
-    && Math.abs(SwerveSubsystem.getInstance().getRobotRelativeSpeeds().omegaRadiansPerSecond) < MAX_ANGULAR_VELOCITY_FOR_UPDATE 
-    && Vision.getInstance().isTag());
+
 
     public static Supplier<Boolean> ODOMETRY_UPDATE_CONSTRAINS = () -> DriverStation.isEnabled() && !DriverStation.isTest();
 
