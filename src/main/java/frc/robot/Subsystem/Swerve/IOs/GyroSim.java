@@ -5,16 +5,19 @@
 package frc.robot.Subsystem.Swerve.IOs;
 
 
+import org.ironmaple.simulation.drivesims.GyroSimulation;
+
 import com.ma5951.utils.Logger.LoggedDouble;
-import com.ma5951.utils.Utils.ConvUtil;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
 
 public class GyroSim implements Gyro{
 
+    private GyroSimulation gyroSimulation = SwerveConstants.SWERVE_DRIVE_SIMULATION.getGyroSimulation();
     private LoggedDouble yaw;
 
     private GyroData gyroData;
@@ -61,16 +64,16 @@ public class GyroSim implements Gyro{
             0d,
             0d,
             0d,
-            yawValue += ConvUtil.RadiansToDegrees(robotSpeeds.omegaRadiansPerSecond) * 0.02,
+            gyroSimulation.getGyroReading().getDegrees(),
             0d,
             0d,
             0d,
             0d,
-            yawValue,
-            new Rotation2d[1]
+            gyroSimulation.getGyroReading().getDegrees(),
+            gyroSimulation.getCachedGyroReadings() 
         );
         
-        yaw.update(yawValue);
+        yaw.update(gyroSimulation.getGyroReading().getDegrees());
 
         return gyroData;
     }

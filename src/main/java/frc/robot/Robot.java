@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import org.ironmaple.simulation.SimulatedArena;
+
 import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedInt;
@@ -56,6 +58,8 @@ public class Robot extends TimedRobot {
     startingPoseLog = new LoggedPose2d("/Auto/Starting Pose");
     batteryVoltageLog = new LoggedDouble("/Dash/Battery Vlotage");
     matchTimeLog = new LoggedDouble("/Dash/Match Time");
+
+    SimulatedArena.getInstance();
   }
 
   @Override
@@ -143,7 +147,9 @@ public class Robot extends TimedRobot {
   public void simulationInit() {}
 
   @Override
-  public void simulationPeriodic() {}
+  public void simulationPeriodic() {
+    SimulatedArena.getInstance().simulationPeriodic();
+  }
 
   public int getStateAsNum() {
     if (RobotContainer.currentRobotState == RobotConstants.IDLE) {

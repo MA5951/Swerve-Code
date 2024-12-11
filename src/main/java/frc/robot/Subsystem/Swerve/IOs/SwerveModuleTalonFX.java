@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 // import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
@@ -31,16 +32,16 @@ import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
 
 public class SwerveModuleTalonFX implements SwerveModule {
 
-    private final TalonFX driveMotor;
-    private final TalonFX turningMotor;
-    private final CANcoder absoluteEcoder;
+    protected final TalonFX driveMotor;
+    protected final TalonFX turningMotor;
+    protected final CANcoder absoluteEcoder;
 
     private TalonFXConfiguration driveConfiguration = new TalonFXConfiguration();
     private TalonFXConfiguration turningConfiguration = new TalonFXConfiguration();
     private SwerveModuleData moduleData = new SwerveModuleData();
 
-    private boolean isDriveMotorReversed;
-    private boolean isTurningMotorReversed;
+    protected boolean isDriveMotorReversed;
+    protected boolean isTurningMotorReversed;
     private double rpsDriveSetPoint;
 
     //private MotionMagicVoltage turnController = new MotionMagicVoltage(0);
@@ -119,8 +120,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
         driveMotor.setPosition(0);
 
-        // drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
-        // turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
+        drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
+        turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
         
         
 
