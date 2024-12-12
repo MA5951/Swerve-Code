@@ -5,6 +5,8 @@
 package frc.robot.Subsystem.Swerve.IOs;
 
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
+import org.ironmaple.simulation.motorsims.SimulatedMotorController;
+
 import static edu.wpi.first.units.Units.*;
 
 import java.util.Arrays;
@@ -32,16 +34,20 @@ import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
 import frc.robot.Utils.PhoenixUtil;
 
-public class SwerveModuleSim extends SwerveModuleTalonFX {
+public class SwerveModuleSim implements SwerveModule {
 
-    private final TalonFXSim driveSim;
-    private final TalonFXSim turnSim;
 
-    private final PIDController driveFeedback = new PIDController(3, 0.0, 0.0, RobotConstantsMAUtil.KDELTA_TIME);
-    private final PIDController turnFeedback = new PIDController(12, 0.0, 0.0, RobotConstantsMAUtil.KDELTA_TIME);
+    private final SimulatedMotorController.GenericMotorController driveMotor;
+    private final SimulatedMotorController.GenericMotorController turnMotor;
 
-    private PositionVoltage pidTurnController = new PositionVoltage(0);
-    private VelocityVoltage driveController = new VelocityVoltage(0);
+    private boolean driveClosedLoop = false;
+    private boolean turnClosedLoop = false;
+    private final PIDController driveController;
+    private final PIDController turnController;
+    private double driveFFVolts = 0.0;
+    private double driveAppliedVolts = 0.0;
+    private double turnAppliedVolts = 0.0;
+
     private double rpsDriveSetPoint;
 
     private SwerveModuleData moduleData = new SwerveModuleData();
@@ -59,17 +65,18 @@ public class SwerveModuleSim extends SwerveModuleTalonFX {
     private LoggedDouble SteerTemp;
 
     public SwerveModuleSim(String moduleNameN, SwerveModuleSimulation  moduleSimulation , boolean isDriveMotorReversed, boolean isTurningMotorReversed) {
-        super(moduleNameN, 0, 0, 0, isDriveMotorReversed, isTurningMotorReversed, PortMap.CanBus.RioBus);
-        driveSim = new TalonFXSim(DCMotor.getKrakenX60(1), SwerveConstants.DRIVE_GEAR_RATIO,
-                0.025, SwerveConstants.DRIVE_GEAR_RATIO);
+        this.driveMotor = moduleSimulation
+                .useGenericMotorControllerForDrive()
+                .withCurrentLimit(Amps.of(TunerConstants.FrontLeft.SlipCurrent));
+        this.turnMotor = moduleSimulation
+                .useGenericControllerForSteer()
+                .withCurrentLimit(Amps.of(20));
 
-        turnSim = new TalonFXSim(DCMotor.getFalcon500(1), SwerveConstants.TURNING_GEAR_RATIO,
-                0.004, SwerveConstants.TURNING_GEAR_RATIO);
-
-        turnFeedback.enableContinuousInput(-Math.PI, -Math.PI);
-
-        driveSim.setController(driveFeedback);
-        turnSim.setController(turnFeedback);
+                this.driveController = new PIDController(0.05, 0.0, 0.0);
+                this.turnController = new PIDController(8.0, 0.0, 0.0);
+        
+                // Enable wrapping for turn PID
+                turnController.enableContinuousInput(-Math.PI, Math.PI);
 
         DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Position");
         DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Velocity");

@@ -21,7 +21,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 
-@Logged
 public class LimelightFilters {
     private Limelight3G limelight;
     private LimelightFiltersConfig config;
@@ -39,7 +38,7 @@ public class LimelightFilters {
     }
 
     public boolean isValidForReset() {
-        return limelight.getTargetCount() > 1 && limelight.getRawFiducial().distToRobot < 2.5 && limelight.getRawFiducial().ambiguity < 0.5;
+        return limelight.getTargetCount() > 1 && limelight.getRawFiducial().distToCamera < 2 && limelight.getRawFiducial().ambiguity < 0.5;
     }
 
     public boolean isValidForUpdate() {
