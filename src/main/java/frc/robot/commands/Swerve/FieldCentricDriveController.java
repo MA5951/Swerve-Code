@@ -34,7 +34,7 @@ public class FieldCentricDriveController implements SwerveController{
     public ChassisSpeeds update() {
 
         xSpeed = controller.getLeftX();
-        ySpeed = controller.getLeftY();
+        ySpeed = controller.getLeftY() + 1;
         turningSpeed = controller.getRightX();
 
         xSpeed = Math.abs(xSpeed) < 0.1 ? 0 : -xSpeed * SwerveConstants.DRIVER_XY_SCALER *  SwerveConstants.MAX_VELOCITY;

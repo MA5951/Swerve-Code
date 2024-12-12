@@ -86,6 +86,8 @@ public class SwerveSubsystem extends SubsystemBase {
     
 
     gyro.reset();
+
+    //PhoenixOdometryThread.getInstance().start();
   }
 
   public SwerveModulePosition[] getSwerveModulePositions() {

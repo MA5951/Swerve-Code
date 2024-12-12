@@ -40,6 +40,7 @@ public class SwerveConstants {
                         Math.pow(WIDTH, 2) + Math.pow(LENGTH, 2)) / 2.0;
         public final static double BUMPER_WIDTH = WIDTH + 0.16;
         public final static double BUMPER_LENGTH = LENGTH + 0.16;
+        public final static double ROBOT_MASS = 54;
 
         // Modules constants
         public final static double TURNING_GEAR_RATIO = 150d / 7;
@@ -160,8 +161,8 @@ public class SwerveConstants {
                 if (Robot.isReal()) {
                         return new SwerveThreadOdometry(ODOMETRY_CONFIG);
                 }
-
-                return new Swerve50HzOdometry(ODOMETRY_CONFIG);
+                return new SwerveThreadOdometry(ODOMETRY_CONFIG);
+                //return new Swerve50HzOdometry(ODOMETRY_CONFIG);
         }
 
         // Modules config
@@ -212,7 +213,7 @@ public class SwerveConstants {
         public final static DriveTrainSimulationConfig DRIVE_TRAIN_SIMULATION_CONFIG = DriveTrainSimulationConfig.Default()
                         // Specify gyro type (for realistic gyro drifting and error simulation)
                         .withGyro(GyroSimulation.getPigeon2())
-
+                        .withRobotMass(edu.wpi.first.units.Units.Kilogram.of(ROBOT_MASS))
                         // Specify swerve module (for realistic swerve dynamics)
                         .withSwerveModule(SwerveModuleSimulation.getMark4i(
                                         DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60

@@ -32,6 +32,7 @@ import frc.robot.PortMap;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
+import frc.robot.Subsystem.Swerve.Util.TunerConstants;
 import frc.robot.Utils.PhoenixUtil;
 
 public class SwerveModuleSim implements SwerveModule {
@@ -48,7 +49,7 @@ public class SwerveModuleSim implements SwerveModule {
     private double driveAppliedVolts = 0.0;
     private double turnAppliedVolts = 0.0;
 
-    private double rpsDriveSetPoint;
+    private double radiansPerSecond;
 
     private SwerveModuleData moduleData = new SwerveModuleData();
     private final SwerveModuleSimulation moduleSimulation;
@@ -72,11 +73,10 @@ public class SwerveModuleSim implements SwerveModule {
                 .useGenericControllerForSteer()
                 .withCurrentLimit(Amps.of(20));
 
-                this.driveController = new PIDController(0.05, 0.0, 0.0);
-                this.turnController = new PIDController(8.0, 0.0, 0.0);
+        this.driveController = new PIDController(2, 0.0, 0.0);
+        this.turnController = new PIDController(100, 0.0, 0.0);
         
-                // Enable wrapping for turn PID
-                turnController.enableContinuousInput(-Math.PI, Math.PI);
+        turnController.enableContinuousInput(-Math.PI, Math.PI);
 
         DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Position");
         DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Velocity");
@@ -91,40 +91,48 @@ public class SwerveModuleSim implements SwerveModule {
 
         this.moduleSimulation = moduleSimulation;
 
-        moduleSimulation.useDriveMotorController(
-                new PhoenixUtil.TalonFXMotorControllerSim(driveMotor, isDriveMotorReversed));
 
-        moduleSimulation.useSteerMotorController(new PhoenixUtil.TalonFXMotorControllerWithRemoteCancoderSim(
-                turningMotor,
-                isTurningMotorReversed,
-                absoluteEcoder,
-                false,
-                Rotations.of(0)));
         
     }
 
     public SwerveModuleData update() {
 
-        driveSim.update(Timer.getFPGATimestamp());
-        turnSim.update(Timer.getFPGATimestamp());
+        if (driveClosedLoop) {
+            driveAppliedVolts = driveFFVolts
+                    + driveController.calculate(
+                            moduleSimulation.getDriveWheelFinalSpeed().in(RadiansPerSecond));
+        } else {
+            driveController.reset();
+        }
+        if (turnClosedLoop) {
+            turnAppliedVolts = turnController.calculate(
+                    moduleSimulation.getSteerAbsoluteFacing().getRadians());
+        } else {
+            turnController.reset();
+        }
+
+        System.out.println("UPDATEEEEEEEEEEEEE");
+        driveMotor.requestVoltage(Volts.of(driveAppliedVolts));
+        turnMotor.requestVoltage(Volts.of(turnAppliedVolts));
 
 
         moduleData.updateData(
-            moduleSimulation.getDriveWheelFinalPosition().in(Revolutions),//todo
-            moduleSimulation.getDriveWheelFinalSpeed().in(RevolutionsPerSecond),//todo
-            moduleSimulation.getDriveMotorStatorCurrent().in(Amps),
-            moduleSimulation.getDriveMotorAppliedVoltage().in(Volts),
+            getDrivePosition(),
+            getDriveVelocity(),
+            getDriveCurrent(),
+            getDriveVolts(),
             getDriveTemp(),
             getSteerTemp(),
             getSteerPosition(),
-            moduleSimulation.getSteerMotorStatorCurrent().in(Amps),
-            moduleSimulation.getSteerMotorAppliedVoltage().in(Volts),
-            moduleSimulation.getSteerAbsoluteFacing().getDegrees(),
-            moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RadiansPerSecond),
+            getSteerCurrent(),
+            getSteerVolts(),
+            getAbsolutePosition(),
+            getSteerVelocity(), 
             Arrays.stream(moduleSimulation.getCachedDriveWheelFinalPositions())
-                .mapToDouble(angle -> angle.in(Revolutions))
-                .toArray(),
+                .mapToDouble(angle -> angle.in(Rotation) * SwerveConstants.WHEEL_CIRCUMFERENCE)
+                .toArray(), 
             moduleSimulation.getCachedSteerAbsolutePositions());
+
 
         DrivePosition.update(getDrivePosition());
         DriveVelocity.update(getDriveVelocity());
@@ -139,6 +147,89 @@ public class SwerveModuleSim implements SwerveModule {
 
         return moduleData;
 
+    }
+
+    public double getSteerVelocity() {
+        return moduleSimulation.getSteerAbsoluteEncoderSpeed().in(RotationsPerSecond);
+    }
+
+    public double getDriveVolts() {
+        return driveAppliedVolts;
+    }
+
+    public double getSteerVolts() {
+        return turnAppliedVolts;
+    }
+
+    public double getDriveCurrent() {
+        return Math.abs(moduleSimulation.getDriveMotorStatorCurrent().in(Amps));
+    }
+
+    public double getSteerCurrent() {
+        return Math.abs(moduleSimulation.getSteerMotorStatorCurrent().in(Amps));
+    }
+
+    public double getAbsolutePosition() {
+        return moduleSimulation.getSteerAbsoluteFacing().getDegrees();
+    }
+
+    public double getDrivePosition() {
+        return moduleSimulation.getDriveWheelFinalPosition().in(Rotations) * SwerveConstants.WHEEL_CIRCUMFERENCE;
+    }
+
+    public double getSteerPosition() {
+        return moduleSimulation.getSteerAbsoluteFacing().getDegrees();
+    }
+
+    public double getDriveVelocity() {
+        return (moduleSimulation.getDriveWheelFinalSpeed().in(RotationsPerSecond) * 60) * Math.PI * (SwerveConstants.WHEEL_RADIUS * 2) / 60;
+    }
+
+    public double getDriveTemp() {
+        return 0;
+    }
+
+    public double getSteerTemp() {
+        return 0;
+    }
+
+    public void turningMotorSetPower(double power) {
+        turningMotorSetVoltage(12 * power);
+    }
+
+    public void driveMotorSetPower(double power) {
+        driveMotorSetVoltage(12 * power);
+    }
+
+    public void turningMotorSetVoltage(double volt) {
+        turnClosedLoop = false;
+        turnAppliedVolts = volt;
+    }
+
+    public void driveMotorSetVoltage(double volt) {
+        driveClosedLoop = false;
+        driveAppliedVolts = volt;
+    }
+
+    public void turningUsingPID(double setPoint) {
+        turnClosedLoop = true;
+        turnController.setSetpoint(setPoint);
+    }
+
+    public void driveUsingPID(double setPoint, double feedForward) {
+        driveClosedLoop = true;
+        radiansPerSecond = (setPoint / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI ) * 6.2831853071796;
+        driveController.setSetpoint(radiansPerSecond);
+    }
+
+    public void setNeutralModeDrive(Boolean isBrake) {
+
+    }
+
+    public void setNeutralModeTurn(Boolean isBrake) {
+    }
+
+    public void resetSteer() {
     }
 
 }

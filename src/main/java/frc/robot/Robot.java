@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
+import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
 
@@ -60,6 +61,7 @@ public class Robot extends TimedRobot {
     matchTimeLog = new LoggedDouble("/Dash/Match Time");
 
     SimulatedArena.getInstance();
+    SimulatedArena.getInstance().addDriveTrainSimulation(SwerveConstants.SWERVE_DRIVE_SIMULATION);
   }
 
   @Override
