@@ -35,21 +35,18 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class AutoSelector {
     private SendableChooser<edu.wpi.first.wpilibj2.command.Command> commandChooser;
     private AutoOption[] autoOptions;
-    
+
     double[] lastarr = new double[0];
     private String lastPublishedAuto = "0";
     private String deafultAuto;
     private Field2d field = new Field2d();
     private List<Pose2d> posesList = new ArrayList<>();
-    private DoubleArrayPublisher pathPub =
-        NetworkTableInstance.getDefault().getDoubleArrayTopic("/Dash/path").publish();
+    private DoubleArrayPublisher pathPub = NetworkTableInstance.getDefault().getDoubleArrayTopic("/Dash/path")
+            .publish();
     private static final HashMap<Command, AutoOption> autoOptionByCommand = new HashMap<>();
     private boolean preVizualizAuto;
     private PathPlannerPath[] pathsArry;
     private Supplier<Pose2d> poseSupplier;
-
-    
-
 
     public AutoSelector(Supplier<Pose2d> robotPoseSupplier) {
         commandChooser = new SendableChooser<>();
@@ -59,7 +56,7 @@ public class AutoSelector {
 
     }
 
-    public void setAutoOptions(AutoOption[] options , boolean preViz) {
+    public void setAutoOptions(AutoOption[] options, boolean preViz) {
         preVizualizAuto = preViz;
         autoOptions = options;
         for (AutoOption autoOption : autoOptions) {
@@ -81,7 +78,23 @@ public class AutoSelector {
         return autoOptionByCommand.get(getSelectedAutoCommand());
     }
 
-    //Previz stuff
+    public String getAutonomousName() {
+        return getSelectedAuto().getName();
+    }
+
+    public boolean getIsPathPLannerAuto() {
+        return getSelectedAuto().isPathPlannerAuto();
+    }
+
+    public AutoOption getCurrentSelectedAutoOption() {
+        return getSelectedAuto();
+    }
+
+    public Pose2d getSelectedAutoStartingPose() {
+        return getSelectedAuto().getStartPose();
+    }
+
+    // Previz stuff
     public void clearCurrentPath() {
         pathPub.set(new double[0]);
         lastarr = new double[0];
@@ -106,7 +119,6 @@ public class AutoSelector {
             ndx += 3;
         }
 
-
         Stream<Double> stream1 = Arrays.stream(lastarr).boxed();
         Stream<Double> stream2 = DoubleStream.of(arr).boxed();
 
@@ -122,25 +134,26 @@ public class AutoSelector {
             if (!DriverStation.isTeleopEnabled()) {
                 if (getSelectedAuto().isPathPlannerAuto()) {
                     if (lastPublishedAuto != getSelectedAuto().getPathPlannerAutoName()) {
-                    clearCurrentPath();
-                    String auto = "";
-                    auto = getSelectedAuto().getPathPlannerAutoName();
-                    //pathsArry = PathPlannerAuto.getPathGroupFromAutoFile(auto).toArray(new PathPlannerPath[0]);
-                    for (PathPlannerPath path : pathsArry) {
-                        if (DriverStationUtil.getAlliance() == Alliance.Red) {
-                            path.flipPath();
+                        clearCurrentPath();
+                        String auto = "";
+                        auto = getSelectedAuto().getPathPlannerAutoName();
+                        // pathsArry = PathPlannerAuto.getPathGroupFromAutoFile(auto).toArray(new
+                        // PathPlannerPath[0]);
+                        for (PathPlannerPath path : pathsArry) {
+                            if (DriverStationUtil.getAlliance() == Alliance.Red) {
+                                path.flipPath();
+                            }
+                            setCurrentPath(path);
                         }
-                        setCurrentPath(path);
-                    }
-                    
-                    lastPublishedAuto = getSelectedAuto().getPathPlannerAutoName();
-                    for (int i = 0; i < lastarr.length; i += 3) {
-                        double x = lastarr[i];
-                        double y = lastarr[i + 1];
-                        double rotation = lastarr[i + 2];
-                        posesList.add(new Pose2d(x, y, new Rotation2d(rotation)));
-                    }
-                    field.getObject("Auto").setPoses(posesList);
+
+                        lastPublishedAuto = getSelectedAuto().getPathPlannerAutoName();
+                        for (int i = 0; i < lastarr.length; i += 3) {
+                            double x = lastarr[i];
+                            double y = lastarr[i + 1];
+                            double rotation = lastarr[i + 2];
+                            posesList.add(new Pose2d(x, y, new Rotation2d(rotation)));
+                        }
+                        field.getObject("Auto").setPoses(posesList);
                     }
                 } else {
                     clearCurrentPath();

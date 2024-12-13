@@ -28,7 +28,7 @@ public class PoseEstimator {
     private LoggedBool odometryUpdateConstrains;
     private LoggedBool visionUpdateConstrains;
     private LoggedBool updatedVisionLog;
-
+  
 
     public PoseEstimator() {
         vision = Vision.getInstance();
@@ -57,7 +57,6 @@ public class PoseEstimator {
         robotPoseEstimator.updateWithTime(timestemp,yaw, wheelPositions);
     }
 
-
     public void updateVision() {
         robotPoseEstimator.addVisionMeasurement(vision.getEstiman(), Timer.getFPGATimestamp());
     }
@@ -66,14 +65,11 @@ public class PoseEstimator {
         return robotPoseEstimator.getEstimatedPosition();
     }
 
-
     public void update() {
         estimatedRobotPose.update(getEstimatedRobotPose());
         odometryUpdateConstrains.update(PoseEstimatorConstants.ODOMETRY_UPDATE_CONSTRAINS.get());
-
         
     }
-
 
     public static PoseEstimator getInstance() {
         if (poseEstimator == null) {
@@ -81,7 +77,5 @@ public class PoseEstimator {
         }
         return poseEstimator;
         }
-
-
 
 }

@@ -93,7 +93,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
 
         boolean includeMeasurement = true;
 
-        skidDetected = Math.abs(skidDetector.getSkiddingRatio()) > config.skidRatio;
+        skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < config.skidRatio;
         collisionDetected = collisionDtector.getForce() > config.collisionForce;
 
         skidDetectedLog.update(skidDetected);
@@ -110,7 +110,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         }
         
         if (!((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected)) {
-            includeMeasurement = false; //Should inclus every stamp from that cycle or just one?
+            includeMeasurement = false;
         }
         
         if (includeMeasurement) {

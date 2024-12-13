@@ -13,7 +13,6 @@
 
 package frc.robot.Utils;
 
-import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.ctre.phoenix6.StatusCode;

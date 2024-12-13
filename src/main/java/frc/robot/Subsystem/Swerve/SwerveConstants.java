@@ -223,28 +223,22 @@ public class SwerveConstants {
 
         public final static DriveTrainSimulationConfig DRIVE_TRAIN_SIMULATION_CONFIG = DriveTrainSimulationConfig
                         .Default()
-                        // Specify gyro type (for realistic gyro drifting and error simulation)
                         .withGyro(GyroSimulation.getPigeon2())
                         .withRobotMass(edu.wpi.first.units.Units.Kilogram.of(ROBOT_MASS))
-                        // Specify swerve module (for realistic swerve dynamics)
                         .withSwerveModule(SwerveModuleSimulation.getMark4i(
-                                        DCMotor.getKrakenX60(1), // Drive motor is a Kraken X60
-                                        DCMotor.getFalcon500(1), // Steer motor is a Falcon 500
-                                        SwerveModuleSimulation.WHEEL_GRIP.DEFAULT_NEOPRENE_TREAD.cof, // Use the COF for
-                                                                                                      // Colson Wheels
+                                        DCMotor.getKrakenX60(1),
+                                        DCMotor.getFalcon500(1),
+                                        SwerveModuleSimulation.WHEEL_GRIP.DEFAULT_NEOPRENE_TREAD.cof,
                                         3 // Gear ratio (l3 gear ratio)
                         ))
-
-                        // Configures the track length and track width (spacing between swerve modules)
                         .withTrackLengthTrackWidth(edu.wpi.first.units.Units.Meter.of(LENGTH),
                                         edu.wpi.first.units.Units.Meter.of(WIDTH))
-
-                        // Configures the bumper size (dimensions of the robot bumper)
                         .withBumperSize(edu.wpi.first.units.Units.Meter.of(BUMPER_WIDTH),
                                         edu.wpi.first.units.Units.Meter.of(BUMPER_LENGTH));
 
         public final static SwerveDriveSimulation SWERVE_DRIVE_SIMULATION = new SwerveDriveSimulation(
                         DRIVE_TRAIN_SIMULATION_CONFIG, new Pose2d(2,2, new Rotation2d()));
+                        
 
         // Module Limits
         public final static ModuleLimits DEFUALT = new ModuleLimits(5.2, Units.feetToMeters(65),
@@ -253,7 +247,7 @@ public class SwerveConstants {
         // Odometry
         public final static double ODOMETRY_UPDATE_RATE = 200;
         public final static OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
-                        true, true, 0.15, 1.85);
+                        true, true, 0.15, 2);
 
         // Swerve controllers
 

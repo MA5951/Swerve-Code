@@ -46,7 +46,7 @@ public class Swerve50HzOdometry implements SwerveOdometry{
     public void updateOdometry() {
         swerveSubsystem.updateHardwereData();
 
-        skidDetected = Math.abs(skidDetector.getSkiddingRatio()) > odometryConfig.skidRatio;
+        skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < odometryConfig.skidRatio;
         collisionDetected = collisionDtector.getForce() > odometryConfig.collisionForce;
 
         skidDetectedLog.update(skidDetected);

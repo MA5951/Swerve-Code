@@ -224,6 +224,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     currenStatesLog.update(currentStates);
     
+    
     swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
     swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
     swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
