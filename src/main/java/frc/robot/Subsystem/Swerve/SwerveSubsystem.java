@@ -4,6 +4,8 @@
 
 package frc.robot.Subsystem.Swerve;
 
+import java.util.function.Supplier;
+
 import com.ma5951.utils.RobotConstantsMAUtil;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
@@ -87,7 +89,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     gyro.reset();
 
-    //PhoenixOdometryThread.getInstance().start();
   }
 
   public SwerveModulePosition[] getSwerveModulePositions() {

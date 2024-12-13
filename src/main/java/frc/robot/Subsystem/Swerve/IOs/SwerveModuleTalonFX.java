@@ -4,7 +4,6 @@ package frc.robot.Subsystem.Swerve.IOs;
 import java.util.Queue;
 
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
@@ -24,8 +23,8 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Robot;
 import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
-// import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
@@ -44,7 +43,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
     protected boolean isTurningMotorReversed;
     private double rpsDriveSetPoint;
 
-    //private MotionMagicVoltage turnController = new MotionMagicVoltage(0);
     private PositionVoltage pidTurnController = new PositionVoltage(0);
     private VelocityVoltage driveController = new VelocityVoltage(0);
     
@@ -82,28 +80,30 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     public SwerveModuleTalonFX(String moduleNameN , int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
-            boolean isTurningMotorReversed, CANBus canbus) {
+            boolean isTurningMotorReversed) {
         
-        this.driveMotor = new TalonFX(driveID, canbus);
-        this.turningMotor = new TalonFX(turningID, canbus);
-        this.absoluteEcoder = new CANcoder(absoluteEncoderID, canbus);
+        driveMotor = new TalonFX(driveID);
+        turningMotor = new TalonFX(turningID);
+        absoluteEcoder = new CANcoder(absoluteEncoderID);
       
 
         this.isDriveMotorReversed = isDriveMotorReversed;
         this.isTurningMotorReversed = isTurningMotorReversed;
         this.moduleName = moduleNameN;
 
-        DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Position");
-        DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Velocity");
-        DriveCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Current");
-        DriveVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Volts");
-        DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Temp");
-        SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Temp");
-        SteerPosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Position");
-        SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Current");
-        SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Volts");
-        AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Absolute Angle");
-        velociSteer = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Velocity");
+        if (Robot.isReal()) {
+            DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Position");
+            DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Velocity");
+            DriveCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Current");
+            DriveVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Volts");
+            DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Temp");
+            SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Temp");
+            SteerPosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Position");
+            SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Current");
+            SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Volts");
+            AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Absolute Angle");
+            velociSteer = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Velocity");
+        }
         
 
         drivePosition = driveMotor.getPosition();
@@ -120,8 +120,10 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
         driveMotor.setPosition(0);
 
-        drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
-        turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
+        if (Robot.isReal()) {
+            drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
+            turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
+        }
         
         
 
@@ -280,7 +282,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     public void turningUsingPID(double setPointRdians) {
-        //turningMotor.setControl(turnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
         turningMotor.setControl(pidTurnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
     }
     //In Ammperes
@@ -306,7 +307,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
         SteerTemp.update(swerveModuleData.getSteerTemp());
     }
 
-    public SwerveModuleData update() {
+    public void refreshAll() {
         BaseStatusSignal.refreshAll(
             driveTemp.refresh(),
             steerTemp.refresh(),
@@ -320,6 +321,11 @@ public class SwerveModuleTalonFX implements SwerveModule {
             driveVelocity.refresh(),
             steerVelocitt.refresh()
         );
+    }
+
+    public SwerveModuleData update() {
+        refreshAll();
+
 
         moduleData.updateData(
             getDrivePosition(),
@@ -339,7 +345,9 @@ public class SwerveModuleTalonFX implements SwerveModule {
             .toArray(), 
             turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new));
 
-        logData(moduleData);
+        if (Robot.isReal()) {
+            logData(moduleData);
+        }
 
         drivePositionQueue.clear();
         turnPositionQueue.clear();

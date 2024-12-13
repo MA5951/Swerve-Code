@@ -5,11 +5,12 @@
 package frc.robot.Subsystem.Swerve.IOs;
 
 
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 
 import com.ma5951.utils.Logger.LoggedDouble;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
@@ -62,9 +63,9 @@ public class GyroSim implements Gyro{
     public GyroData update(ChassisSpeeds robotSpeeds) {
         gyroData.updateData(
             0d,
-            0d,
-            0d,
             gyroSimulation.getGyroReading().getDegrees(),
+            0d,
+            gyroSimulation.getMeasuredAngularVelocity().in(DegreesPerSecond),
             0d,
             0d,
             0d,
@@ -72,7 +73,6 @@ public class GyroSim implements Gyro{
             gyroSimulation.getGyroReading().getDegrees(),
             gyroSimulation.getCachedGyroReadings() 
         );
-        
         yaw.update(gyroSimulation.getGyroReading().getDegrees());
 
         return gyroData;
