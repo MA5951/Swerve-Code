@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 // import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
@@ -119,8 +120,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
         driveMotor.setPosition(0);
 
-        // drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
-        // turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
+        drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
+        turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
         
         
 

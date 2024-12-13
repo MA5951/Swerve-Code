@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
     PoseEstimator.getInstance();
 
     MALog.getInstance().startLog();
-
+    DriverStation.silenceJoystickConnectionWarning(true);
     
 
     currentRobotStateLog = new LoggedString("/RobotControl/Current Robot State");

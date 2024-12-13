@@ -12,7 +12,7 @@ import frc.robot.Subsystem.Swerve.SwerveConstants;
 
 public class FieldCentricDriveController implements SwerveController{
 
-    private ChassisSpeeds chassisSpeeds;
+    private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
     private PS5Controller controller;
     private Supplier<Boolean> reductionBoolean;
     private static Supplier<Double> angleSupplier;

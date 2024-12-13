@@ -58,7 +58,7 @@ public class PhoenixOdometryThread extends Thread {
     signalsLock.lock();
     SwerveThreadOdometry.odometryLock.lock();
     try {
-      isCANFD = PortMap.CanBus.CANivoreBus.isNetworkFD();
+      isCANFD = PortMap.CanBus.RioBus.isNetworkFD();
       BaseStatusSignal[] newSignals = new BaseStatusSignal[signals.length + 1];
       System.arraycopy(signals, 0, newSignals, 0, signals.length);
       newSignals[signals.length] = signal;
