@@ -33,7 +33,7 @@ public class FieldCentricDriveController implements SwerveController{
 
     public ChassisSpeeds update() {
 
-        xSpeed = controller.getLeftX();
+        xSpeed = -controller.getLeftX();
         ySpeed = controller.getLeftY();
         turningSpeed = controller.getRightX();
 

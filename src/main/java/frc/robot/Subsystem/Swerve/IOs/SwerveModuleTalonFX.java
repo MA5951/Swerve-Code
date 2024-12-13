@@ -23,6 +23,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import frc.robot.PortMap;
 import frc.robot.Robot;
 import frc.robot.Subsystem.Swerve.PhoenixOdometryThread;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
@@ -82,9 +83,9 @@ public class SwerveModuleTalonFX implements SwerveModule {
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
             boolean isTurningMotorReversed) {
         
-        driveMotor = new TalonFX(driveID);
-        turningMotor = new TalonFX(turningID);
-        absoluteEcoder = new CANcoder(absoluteEncoderID);
+        driveMotor = new TalonFX(driveID , PortMap.Swerve.SwervBus);
+        turningMotor = new TalonFX(turningID , PortMap.Swerve.SwervBus);
+        absoluteEcoder = new CANcoder(absoluteEncoderID , PortMap.Swerve.SwervBus);
       
 
         this.isDriveMotorReversed = isDriveMotorReversed;

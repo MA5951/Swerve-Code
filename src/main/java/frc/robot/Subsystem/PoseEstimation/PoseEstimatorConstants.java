@@ -13,7 +13,6 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
 /** Add your docs here. */
 public class PoseEstimatorConstants {

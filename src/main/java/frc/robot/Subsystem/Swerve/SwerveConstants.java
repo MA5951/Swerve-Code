@@ -173,9 +173,6 @@ public class SwerveConstants {
         }
 
         public static final SwerveOdometry getOdometry() {
-                if (Robot.isReal()) {
-                        return new SwerveThreadOdometry(ODOMETRY_CONFIG);
-                }
                 return new SwerveThreadOdometry(ODOMETRY_CONFIG);
         }
 
@@ -239,8 +236,8 @@ public class SwerveConstants {
                         ))
 
                         // Configures the track length and track width (spacing between swerve modules)
-                        .withTrackLengthTrackWidth(edu.wpi.first.units.Units.Meter.of(WIDTH),
-                                        edu.wpi.first.units.Units.Meter.of(LENGTH))
+                        .withTrackLengthTrackWidth(edu.wpi.first.units.Units.Meter.of(LENGTH),
+                                        edu.wpi.first.units.Units.Meter.of(WIDTH))
 
                         // Configures the bumper size (dimensions of the robot bumper)
                         .withBumperSize(edu.wpi.first.units.Units.Meter.of(BUMPER_WIDTH),

@@ -60,8 +60,7 @@ public class Robot extends TimedRobot {
     batteryVoltageLog = new LoggedDouble("/Dash/Battery Vlotage");
     matchTimeLog = new LoggedDouble("/Dash/Match Time");
 
-    SimulatedArena.getInstance();
-    SimulatedArena.getInstance().addDriveTrainSimulation(SwerveConstants.SWERVE_DRIVE_SIMULATION);
+    
   }
 
   @Override
@@ -146,7 +145,9 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {}
 
   @Override
-  public void simulationInit() {}
+  public void simulationInit() {
+    SimulatedArena.getInstance().addDriveTrainSimulation(SwerveConstants.SWERVE_DRIVE_SIMULATION);
+  }
 
   @Override
   public void simulationPeriodic() {

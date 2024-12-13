@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.security.PublicKey;
+
 import com.ctre.phoenix6.CANBus;
 
 public class PortMap {
@@ -20,6 +22,8 @@ public class PortMap {
     
 
     public class Swerve {
+        public static final CANBus SwervBus = CanBus.CANivoreBus;
+
         public static final int leftFrontAbsoluteEncoder = 22;
         public static final int leftFrontDriveID = 8;
         public static final int leftFrontTurningID = 5;
