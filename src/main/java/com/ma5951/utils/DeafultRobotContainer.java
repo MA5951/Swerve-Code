@@ -51,7 +51,6 @@ public class DeafultRobotContainer {
 
     private LoggedString currentRobotStateLog;
     private LoggedString lastRobotStateLog;
-    private LoggedInt currentRobotStateNumberLog;
     private LoggedBool isStartingPoseLog;
     private LoggedString currentSelectedAuto;
     private LoggedPose2d startingPoseLog;
@@ -140,7 +139,7 @@ public class DeafultRobotContainer {
         if(!Robot.isReal()) {
             SwerveConstants.SWERVE_DRIVE_SIMULATION.setSimulationWorldPose(autoSelector.getSelectedAutoStartingPose());
         }
-        PoseEstimator.getInstance().resetPose(autoSelector.getSelectedAutoStartingPose());
+        poseEstimator.resetPose(autoSelector.getSelectedAutoStartingPose());
     }
 
     public void updatePeriodic() {

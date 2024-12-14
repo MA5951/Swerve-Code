@@ -21,7 +21,7 @@ public class PoseEstimator {
     private static PoseEstimator poseEstimator;
 
     private SwerveDrivePoseEstimator robotPoseEstimator;
-    private Vision vision;
+    //private Vision vision;
     private SwerveSubsystem swerve = SwerveSubsystem.getInstance();
 
     private LoggedPose2d estimatedRobotPose;
@@ -31,7 +31,7 @@ public class PoseEstimator {
   
 
     public PoseEstimator() {
-        vision = Vision.getInstance();
+        //vision = Vision.getInstance();
         robotPoseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics , swerve.getRotation2d() , 
         new  SwerveModulePosition[] {
             new SwerveModulePosition(),
@@ -58,7 +58,7 @@ public class PoseEstimator {
     }
 
     public void updateVision() {
-        robotPoseEstimator.addVisionMeasurement(vision.getEstiman(), Timer.getFPGATimestamp());
+        //robotPoseEstimator.addVisionMeasurement(vision.getEstiman(), Timer.getFPGATimestamp());
     }
 
     public Pose2d getEstimatedRobotPose() {

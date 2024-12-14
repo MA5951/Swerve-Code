@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
+import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
 
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -24,11 +25,13 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private boolean isTeleop = false;
   public static boolean isStartingPose = false;
+  private LoggedPose2d simulationPose2d;
 
   @Override
   public void robotInit() {
     MALog.getInstance();
     m_robotContainer = new RobotContainer();
+    simulationPose2d = new LoggedPose2d("/Simulation/Pose");
     PoseEstimator.getInstance();
 
     MALog.getInstance().startLog();
@@ -101,6 +104,7 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
+    simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose());
   }
 
   public int getStateAsNum() {
