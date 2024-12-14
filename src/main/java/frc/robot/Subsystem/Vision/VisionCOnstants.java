@@ -5,7 +5,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 
-public class VisionCOnstants {
+public class VisionConstants {
 
 
     // Our camera is mounted 0.1 meters forward and 0.5 meters up from the robot pose,
@@ -16,4 +16,7 @@ public class VisionCOnstants {
     public final static Rotation3d robotToCameraRot = new Rotation3d(0, Math.toRadians(-15), 0);
     public final static Transform3d robotToCamera = new Transform3d(robotToCameraTrl, robotToCameraRot);
 
+    public static final VisionIO getVisionIO() {
+        return new VisionSim();
+    }
 }

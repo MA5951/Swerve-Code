@@ -1,17 +1,30 @@
 package frc.robot.Subsystem.Vision;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonTargetSortMode;
+import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
+import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
+import com.ma5951.utils.Utils.GeomUtil;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.PoseEstimate;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.RawDetection;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.RawFiducial;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
 public class VisionSim implements VisionIO {
@@ -21,6 +34,8 @@ public class VisionSim implements VisionIO {
     private SimCameraProperties cameraProp;
     private PhotonCamera camera;
     private PhotonCameraSim cameraSim;
+    private PhotonPipelineResult result;
+    private int numOftags = 0;
 
     public VisionSim() {
         visionSim = new VisionSystemSim("main");
@@ -43,22 +58,39 @@ public class VisionSim implements VisionIO {
         camera = new PhotonCamera("SimCam");
         cameraSim = new PhotonCameraSim(camera, cameraProp);
 
+        cameraSim.setTargetSortMode(PhotonTargetSortMode.Largest);
+        cameraSim.setMaxSightRange(5);
+
+        visionSim.addCamera(cameraSim, VisionConstants.robotToCamera);
+        visionSim.update(new Pose2d(2, 2, new Rotation2d()));
+
         cameraSim.enableRawStream(true);
         cameraSim.enableProcessedStream(true);
+        //cameraSim.setWireframeResolution(1280);
         cameraSim.enableDrawWireframe(true);
 
-        visionSim.addCamera(cameraSim, VisionCOnstants.robotToCamera);
+        
     }
 
     @Override
     public PoseEstimate getEstimatedPose() {
-        return new PoseEstimate(null, getTy(), getTx(), getTargetCount(), getTargetCount(), getTagID(), getTa(), null);
+        if (result.getMultiTagResult().isPresent()) {
+
+            return new PoseEstimate(
+                    GeomUtil.toPose2d(result.getMultiTagResult().get().estimatedPose.best),
+                    result.getTimestampSeconds(),
+                    Timer.getFPGATimestamp() - result.getTimestampSeconds(), getTargetCount(), 1, 0, 0, null);
+        }
+
+        return new PoseEstimate();
     }
 
     @Override
     public boolean isTarget() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isTarget'");
+        if (numOftags != 0) {
+            return result.hasTargets();
+        }
+        return false;
     }
 
     @Override
@@ -93,20 +125,27 @@ public class VisionSim implements VisionIO {
 
     @Override
     public double getTx() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTx'");
+        if (numOftags != 0) {
+            return result.getBestTarget().getYaw();
+        }
+        return 0d;
+        
     }
 
     @Override
     public double getTy() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTy'");
+        if (numOftags != 0) {
+            return result.getBestTarget().getPitch();
+        }
+        return 0d;
     }
 
     @Override
     public double getTa() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTa'");
+        if (numOftags != 0) {
+            return result.getBestTarget().getArea();
+        }
+        return 0d;
     }
 
     @Override
@@ -117,12 +156,34 @@ public class VisionSim implements VisionIO {
 
     @Override
     public int getTagID() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTagID'");
+        return result.targets.get(0).getFiducialId();
+    }
+
+    public static Pose3d pose2dToPose3d(Pose2d pose) {
+        return new Pose3d(
+                pose.getX(), pose.getY(), 0, new Rotation3d(0, 0, pose.getRotation().getRadians()));
     }
 
     public void update() {
+        PhotonPipelineResult latestResult = cameraSim.process(
+                0,
+                GeomUtil.toPose3d((SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()))
+                        .plus(VisionConstants.robotToCamera),
+                tagLayout.getTags().stream()
+                        .map(
+                                (a) -> new VisionTargetSim(
+                                        a.pose, TargetModel.kAprilTag36h11, a.ID))
+                        .collect(Collectors.toList()));
+        cameraSim.submitProcessedFrame(latestResult);
         visionSim.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose());
+        List<PhotonPipelineResult> latest = camera.getAllUnreadResults();
+        numOftags = latest.size();
+        System.out.println(numOftags);
+        if (latest.size() > 0) {
+            result = latest.get(0);
+        } else {
+            result = new PhotonPipelineResult();
+        }
     }
 
 }

@@ -4,6 +4,7 @@ package com.ma5951.utils.Utils;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -59,7 +60,8 @@ public class GeomUtil {
   }
 
   /**
-   * Converts a Transform2d to a Pose2d to be used as a position or as the start of a kinematic
+   * Converts a Transform2d to a Pose2d to be used as a position or as the start
+   * of a kinematic
    * chain
    *
    * @param transform The transform that will represent the pose
@@ -92,7 +94,7 @@ public class GeomUtil {
   /**
    * Multiplies a twist by a scaling factor
    *
-   * @param twist The twist to multiply
+   * @param twist  The twist to multiply
    * @param factor The scaling factor for the twist components
    * @return The new twist
    */
@@ -111,7 +113,8 @@ public class GeomUtil {
   }
 
   /**
-   * Converts a Transform3d to a Pose3d to be used as a position or as the start of a kinematic
+   * Converts a Transform3d to a Pose3d to be used as a position or as the start
+   * of a kinematic
    * chain
    *
    * @param transform The transform that will represent the pose
@@ -122,7 +125,8 @@ public class GeomUtil {
   }
 
   /**
-   * Converts a ChassisSpeeds to a Twist2d by extracting two dimensions (Y and Z). chain
+   * Converts a ChassisSpeeds to a Twist2d by extracting two dimensions (Y and Z).
+   * chain
    *
    * @param speeds The original translation
    * @return The resulting translation
@@ -135,7 +139,7 @@ public class GeomUtil {
   /**
    * Creates a new pose from an existing one using a different translation value.
    *
-   * @param pose The original pose
+   * @param pose        The original pose
    * @param translation The new translation to use
    * @return The new pose with the new translation and original rotation
    */
@@ -146,7 +150,7 @@ public class GeomUtil {
   /**
    * Creates a new pose from an existing one using a different rotation value.
    *
-   * @param pose The original pose
+   * @param pose     The original pose
    * @param rotation The new rotation to use
    * @return The new pose with the original translation and new rotation
    */
@@ -156,10 +160,22 @@ public class GeomUtil {
 
   public static double distanceTo(Pose2d point1, Pose2d point2) {
     return point1.getTranslation().getDistance(point2.getTranslation());
-    
+
   }
 
   public static double getAngleBetween(Pose2d point1, Pose2d point2) {
-    return Math.atan2(Math.abs(point2.getTranslation().getY() - point1.getTranslation().getY()), Math.abs(point2.getTranslation().getX() - point1.getTranslation().getX()));
+    return Math.atan2(Math.abs(point2.getTranslation().getY() - point1.getTranslation().getY()),
+        Math.abs(point2.getTranslation().getX() - point1.getTranslation().getX()));
   }
+
+  public static Pose3d toPose3d(Pose2d pose) {
+    return new Pose3d(
+        pose.getX(), pose.getY(), 0, new Rotation3d(0, 0, pose.getRotation().getRadians()));
+  }
+
+  public static Pose2d toPose2d(Transform3d transform) {
+    return new Pose2d(transform.getTranslation().toTranslation2d(), transform.getRotation().toRotation2d());
+  }
+
+
 }
