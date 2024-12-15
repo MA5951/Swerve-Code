@@ -1,10 +1,15 @@
 package frc.robot.Subsystem.Vision;
 
+import java.io.Console;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonTargetSortMode;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.estimation.TargetModel;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -35,7 +40,10 @@ public class VisionSim implements VisionIO {
     private PhotonCamera camera;
     private PhotonCameraSim cameraSim;
     private PhotonPipelineResult result;
-    private int numOftags = 0;
+    private boolean isResult = true;
+    private PhotonPoseEstimator poseEstimator;
+    private List<Integer> lastFilterArry;
+    private PhotonPipelineResult blankResult = new PhotonPipelineResult();;
 
     public VisionSim() {
         visionSim = new VisionSystemSim("main");
@@ -64,20 +72,25 @@ public class VisionSim implements VisionIO {
         visionSim.addCamera(cameraSim, VisionConstants.robotToCamera);
         visionSim.update(new Pose2d(2, 2, new Rotation2d()));
 
+        poseEstimator = new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+                VisionConstants.robotToCamera);
+
         cameraSim.enableRawStream(true);
         cameraSim.enableProcessedStream(true);
-        //cameraSim.setWireframeResolution(1280);
+        // cameraSim.setWireframeResolution(1280);
         cameraSim.enableDrawWireframe(true);
 
-        
+        // filterTags(new int[] {0});
+
     }
 
     @Override
     public PoseEstimate getEstimatedPose() {
-        if (result.getMultiTagResult().isPresent()) {
+        System.out.println(poseEstimator.update(result).get().estimatedPose.toPose2d().toString());
+        if (poseEstimator.update(result).isPresent() ) {
 
             return new PoseEstimate(
-                    GeomUtil.toPose2d(result.getMultiTagResult().get().estimatedPose.best),
+                    poseEstimator.update(result).get().estimatedPose.toPose2d(),
                     result.getTimestampSeconds(),
                     Timer.getFPGATimestamp() - result.getTimestampSeconds(), getTargetCount(), 1, 0, 0, null);
         }
@@ -87,10 +100,7 @@ public class VisionSim implements VisionIO {
 
     @Override
     public boolean isTarget() {
-        if (numOftags != 0) {
-            return result.hasTargets();
-        }
-        return false;
+        return result.hasTargets();
     }
 
     @Override
@@ -119,39 +129,31 @@ public class VisionSim implements VisionIO {
 
     @Override
     public void filterTags(int[] tagsArry) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'filterTags'");
+        // lastFilterArry = new ArrayList<Integer>(tagsArry.length);
+        // for (int i : tagsArry) {
+        // lastFilterArry.add(i);
+        // }
     }
 
     @Override
     public double getTx() {
-        if (numOftags != 0) {
-            return result.getBestTarget().getYaw();
-        }
-        return 0d;
-        
+        return result.getBestTarget().yaw;
+
     }
 
     @Override
     public double getTy() {
-        if (numOftags != 0) {
-            return result.getBestTarget().getPitch();
-        }
-        return 0d;
+        return result.getBestTarget().pitch;
     }
 
     @Override
     public double getTa() {
-        if (numOftags != 0) {
-            return result.getBestTarget().getArea();
-        }
-        return 0d;
+        return result.getBestTarget().area;
     }
 
     @Override
     public int getTargetCount() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTargetCount'");
+        return result.targets.size();
     }
 
     @Override
@@ -159,9 +161,15 @@ public class VisionSim implements VisionIO {
         return result.targets.get(0).getFiducialId();
     }
 
-    public static Pose3d pose2dToPose3d(Pose2d pose) {
-        return new Pose3d(
-                pose.getX(), pose.getY(), 0, new Rotation3d(0, 0, pose.getRotation().getRadians()));
+    private PhotonPipelineResult filterTagsID() {
+
+        for (PhotonTrackedTarget tag : result.targets) {
+            if (lastFilterArry.contains(Integer.valueOf(tag.fiducialId))) {
+                result.targets.remove(tag);
+            }
+        }
+
+        return result;
     }
 
     public void update() {
@@ -177,13 +185,8 @@ public class VisionSim implements VisionIO {
         cameraSim.submitProcessedFrame(latestResult);
         visionSim.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose());
         List<PhotonPipelineResult> latest = camera.getAllUnreadResults();
-        numOftags = latest.size();
-        System.out.println(numOftags);
-        if (latest.size() > 0) {
-            result = latest.get(0);
-        } else {
-            result = new PhotonPipelineResult();
-        }
+        result = latest.get(0);
+        // filterTagsID();
     }
 
 }
