@@ -51,12 +51,12 @@ public class SwerveConstants {
 
         // rear left module
         public final static boolean REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = true;
-        public final static boolean REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
+        public final static boolean REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_LEFT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         // rear right module
         public final static boolean REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED = false;
-        public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = false;
+        public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
         //Module locations

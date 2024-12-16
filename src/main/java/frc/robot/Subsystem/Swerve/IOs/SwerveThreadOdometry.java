@@ -86,6 +86,8 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         timestampQueue.clear();
 
         swerveSubsystem.updateHardwereData();
+        modulesData = swerveSubsystem.getModulesData();
+        gyroData = swerveSubsystem.getGyroData();
         
         odometryLock.unlock();
 
