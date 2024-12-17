@@ -8,41 +8,42 @@
 
 //Is Flickering detection 
 
-package com.ma5951.utils.Vision.Filters;
+package frc.robot.Subsystem.Vision.Filters;
 
 import java.util.function.Supplier;
 
-import com.ma5951.utils.Vision.Limelights.Limelight3G;
 
-import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Subsystem.Vision.VisionIO;
 
-public class LimelightFilters {
-    private Limelight3G limelight;
-    private LimelightFiltersConfig config;
+public class VisionFilters {
+    private VisionIO visionIO;
+    private VisionFiltersConfig config;
     private Supplier<Pose2d> robotPoSupplier;
     private Supplier<ChassisSpeeds> robotSpeedsSupplier;
     private Translation2d robotPose;
     private ChassisSpeeds robotSpeeds;
     private Pose2d deafultPose = new Pose2d();
 
-    public LimelightFilters(Limelight3G camera , LimelightFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds) {
-        limelight = camera;
+    public VisionFilters(VisionIO VisionIO , VisionFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds) {
+        visionIO = VisionIO;
         config = configuration;
         robotPoSupplier = robotPose;
         robotSpeedsSupplier = robotSpeeds;
     }
 
     public boolean isValidForReset() {
-        return limelight.getTargetCount() > 1 && limelight.getRawFiducial().distToCamera < 2 && limelight.getRawFiducial().ambiguity < 0.5;
+        return visionIO.getTargetCount() > 1 && visionIO.getRawFiducial().distToCamera < 2 && visionIO.getRawFiducial().ambiguity < 0.5 && robotSpeeds.vxMetersPerSecond < 0.05 &&
+        robotSpeeds.vyMetersPerSecond < 0.05 &&
+        robotSpeeds.omegaRadiansPerSecond < 0.05;
     }
 
-    public boolean isValidForUpdate() {
-        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange() && shouldUpdateByRobotState() && notDeafultPose();
+    public boolean isValidForUpdate(Pose2d visionPose2d) {
+        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange(visionPose2d) && shouldUpdateByRobotState() && notDeafultPose();
     }
 
     private boolean inVelocityFilter() {
@@ -69,10 +70,11 @@ public class LimelightFilters {
         return true;
     }
 
-    private boolean inOdometryRange() {
+    private boolean inOdometryRange(Pose2d visiPose2d) {
         if ((config.visionToOdometryInTeleop && DriverStation.isTeleop()) || DriverStation.isAutonomous()) {
             robotPose = robotPoSupplier.get().getTranslation();
-            return robotPose.getDistance(limelight.getEstimatedPose().pose.getTranslation()) < config.visionToOdometry;
+            System.out.println(visiPose2d.getTranslation().toString());
+            return robotPose.getDistance(visionIO.getEstimatedPose().pose.getTranslation()) < config.visionToOdometry;
         }
         return true; 
     }
@@ -86,7 +88,7 @@ public class LimelightFilters {
     }
 
     private boolean notDeafultPose() {
-        return limelight.getEstimatedPose().pose !=deafultPose;
+        return visionIO.getEstimatedPose().pose !=deafultPose;
     }
 
 }

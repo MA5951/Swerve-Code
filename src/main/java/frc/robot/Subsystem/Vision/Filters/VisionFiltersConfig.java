@@ -1,11 +1,11 @@
 
-package com.ma5951.utils.Vision.Filters;
+package frc.robot.Subsystem.Vision.Filters;
 
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-public class LimelightFiltersConfig {
+public class VisionFiltersConfig {
 
     private final static double FIELD_TOLERANCE = 0.5;
 
@@ -17,7 +17,7 @@ public class LimelightFiltersConfig {
     public boolean visionToOdometryInTeleop;
 
 
-    public LimelightFiltersConfig(
+    public VisionFiltersConfig(
         boolean UpdateInAuto,
         ChassisSpeeds RobotUpdateSpeed,
         Rectangle2d FieldRectangle,
@@ -33,7 +33,7 @@ public class LimelightFiltersConfig {
         visionToOdometryInTeleop = VisionToOdometryInTeleop;
     }
 
-    public LimelightFiltersConfig() {
+    public VisionFiltersConfig() {
         this(false, new ChassisSpeeds(), new Rectangle2d(null, null), new Rectangle2d[1], 0d, false);
     }
 

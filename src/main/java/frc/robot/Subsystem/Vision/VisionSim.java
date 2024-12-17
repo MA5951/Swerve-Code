@@ -1,8 +1,5 @@
 package frc.robot.Subsystem.Vision;
 
-import java.io.Console;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,10 +23,8 @@ import com.ma5951.utils.Vision.Limelights.LimelightHelpers.RawFiducial;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.math.geometry.Translation3d;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
 public class VisionSim implements VisionIO {
@@ -40,10 +35,10 @@ public class VisionSim implements VisionIO {
     private PhotonCamera camera;
     private PhotonCameraSim cameraSim;
     private PhotonPipelineResult result;
-    private boolean isResult = true;
     private PhotonPoseEstimator poseEstimator;
     private List<Integer> lastFilterArry;
     private PhotonPipelineResult blankResult = new PhotonPipelineResult();;
+    private PoseEstimate toReturn = new PoseEstimate();
 
     public VisionSim() {
         visionSim = new VisionSystemSim("main");
@@ -58,8 +53,8 @@ public class VisionSim implements VisionIO {
 
         cameraProp = new SimCameraProperties();
         cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(86));
-        cameraProp.setFPS(18);
-        cameraProp.setCalibError(0.6, 0.2);
+        cameraProp.setFPS(38);
+        cameraProp.setCalibError(0.25, 0.08);// 0.6 0.2
         cameraProp.setAvgLatencyMs(30);
         cameraProp.setLatencyStdDevMs(5);
 
@@ -86,16 +81,20 @@ public class VisionSim implements VisionIO {
 
     @Override
     public PoseEstimate getEstimatedPose() {
-        System.out.println(poseEstimator.update(result).get().estimatedPose.toPose2d().toString());
-        if (poseEstimator.update(result).isPresent() ) {
+        // if (!poseEstimator.update(result).isEmpty()) {
 
-            return new PoseEstimate(
-                    poseEstimator.update(result).get().estimatedPose.toPose2d(),
-                    result.getTimestampSeconds(),
-                    Timer.getFPGATimestamp() - result.getTimestampSeconds(), getTargetCount(), 1, 0, 0, null);
-        }
-
-        return new PoseEstimate();
+        // return new
+        // PoseEstimate(poseEstimator.update(result).get().estimatedPose.toPose2d(), 0d
+        // ,0d ,0 ,0d ,0d ,0d , new RawFiducial[]{});
+        // }
+        toReturn = new PoseEstimate();
+        poseEstimator.update(result).ifPresent((estimator) -> {
+            toReturn = new PoseEstimate(estimator.estimatedPose.toPose2d(), 0d, 0d, 0, 0d, 0d, 0d,
+                    new RawFiducial[] {});
+        });
+        return toReturn;
+        // return new PoseEstimate(new Pose2d(), 0d ,0d ,0 ,0d ,0d ,0d , new
+        // RawFiducial[]{});
     }
 
     @Override
@@ -105,26 +104,32 @@ public class VisionSim implements VisionIO {
 
     @Override
     public RawDetection getRawDetection(int detectionIndex) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRawDetection'");
+        return getRawDetection();
     }
 
     @Override
     public RawDetection getRawDetection() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRawDetection'");
+        if (isTarget()) {
+            return new RawDetection(getTagID(), getTx(), getTy(), getTa(), 0, 0, 0, 0, 0, 0, 0, 0);
+        }
+        return new RawDetection(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     @Override
     public RawFiducial getRawFiducial(int detectionIndex) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRawFiducial'");
+        return getRawFiducial();
     }
 
     @Override
     public RawFiducial getRawFiducial() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRawFiducial'");
+        if (isTarget()) {
+            return new RawFiducial(getTagID(), getTx(), getTy(), getTa(),
+                    result.targets.get(0).bestCameraToTarget.getTranslation().getDistance(new Translation3d()),
+                    result.targets.get(0).bestCameraToTarget.getTranslation().getDistance(new Translation3d()),
+                    result.targets.get(0).poseAmbiguity);
+        }
+
+        return new RawFiducial(0, 0, 0, 0, 0, 0, 0);
     }
 
     @Override
@@ -137,28 +142,46 @@ public class VisionSim implements VisionIO {
 
     @Override
     public double getTx() {
-        return result.getBestTarget().yaw;
+        if (isTarget()) {
+            return result.getBestTarget().yaw;
+        }
+        return 0d;
 
     }
 
     @Override
     public double getTy() {
-        return result.getBestTarget().pitch;
+
+        if (isTarget()) {
+            return result.getBestTarget().pitch;
+        }
+        return 0d;
     }
 
     @Override
     public double getTa() {
-        return result.getBestTarget().area;
+        if (isTarget()) {
+            return result.getBestTarget().area;
+        }
+        return 0d;
     }
 
     @Override
     public int getTargetCount() {
-        return result.targets.size();
+        if (isTarget()) {
+            return result.targets.size();
+
+        }
+        return 0;
     }
 
     @Override
     public int getTagID() {
-        return result.targets.get(0).getFiducialId();
+        if (isTarget()) {
+            return result.targets.get(0).getFiducialId();
+
+        }
+        return 0;
     }
 
     private PhotonPipelineResult filterTagsID() {
