@@ -12,6 +12,7 @@ public class PortMap {
     public static class CanBus {
         public static final CANBus CANivoreBus= new CANBus("Swerve");
         public static final CANBus RioBus = new CANBus("rio");
+        public static final CANBus CANivore2Bus = new CANBus("CAN2");
     }
     
     public static class Controllers {

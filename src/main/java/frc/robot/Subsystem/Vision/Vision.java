@@ -9,6 +9,7 @@ import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedInt;
 import com.ma5951.utils.Logger.LoggedPose2d;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
@@ -28,6 +29,8 @@ public class Vision extends SubsystemBase {
   private LoggedInt targetCountLog;
   private LoggedBool isValidLog;
   private LoggedBool isValidForResetLog;
+  private Pose2d visionPose2d;
+  private boolean isUpdate;
 
   public Vision() {
     visionPose2dLog = new LoggedPose2d("/Subsystems/Vision/Vision Pose");
@@ -50,14 +53,19 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     visionIO.update();
 
-    System.out.println(visionIO.getEstimatedPose().pose.getTranslation().toString());
-    visionPose2dLog.update(visionIO.getEstimatedPose().pose);
+    visionPose2d = visionIO.getEstimatedPose().pose;
+    isUpdate = visionFilters.isValidForUpdate(visionPose2d);
+    visionPose2dLog.update(visionPose2d);
     tXLog.update(visionIO.getTx());
     tYLog.update(visionIO.getTy());
     hasTargetLog.update(visionIO.isTarget());
     targetCountLog.update(visionIO.getTargetCount());
-    isValidLog.update(visionFilters.isValidForUpdate(visionIO.getEstimatedPose().pose));
+    isValidLog.update(isUpdate);
     isValidForResetLog.update(visionFilters.isValidForReset());
+
+    if (isUpdate) {
+      PoseEstimator.getInstance().updateVision(visionPose2d);
+    }
     
   }
 }

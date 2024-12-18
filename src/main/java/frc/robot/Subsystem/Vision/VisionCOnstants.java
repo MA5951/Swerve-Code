@@ -23,7 +23,7 @@ public class VisionConstants {
         new ChassisSpeeds(4, 4, ConvUtil.DegreesToRadians(720)), 
         new Rectangle2d(new Translation2d(), new Translation2d(16.58 , 8.20)), 
         null, 
-        2, 
+        0.2, 
         true);
 
     public static final VisionIO getVisionIO() {

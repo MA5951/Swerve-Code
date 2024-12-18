@@ -246,7 +246,7 @@ public class SwerveConstants {
                         Units.degreesToRadians(700));
 
         // Odometry
-        public final static double ODOMETRY_UPDATE_RATE = 200;
+        public final static double ODOMETRY_UPDATE_RATE = 250;
         public final static OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
                         true, true, 0.15, 2);
 

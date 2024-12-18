@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
 
@@ -36,8 +37,6 @@ public class Robot extends TimedRobot {
 
     MALog.getInstance().startLog();
 
-    
-    
   }
 
   @Override

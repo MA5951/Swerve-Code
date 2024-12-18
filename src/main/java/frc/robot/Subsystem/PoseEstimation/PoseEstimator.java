@@ -57,8 +57,8 @@ public class PoseEstimator {
         robotPoseEstimator.updateWithTime(timestemp,yaw, wheelPositions);
     }
 
-    public void updateVision() {
-        //robotPoseEstimator.addVisionMeasurement(vision.getEstiman(), Timer.getFPGATimestamp());
+    public void updateVision(Pose2d pose) {
+        robotPoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp());
     }
 
     public Pose2d getEstimatedRobotPose() {

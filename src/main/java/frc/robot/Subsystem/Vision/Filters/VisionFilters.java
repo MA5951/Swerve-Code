@@ -73,8 +73,7 @@ public class VisionFilters {
     private boolean inOdometryRange(Pose2d visiPose2d) {
         if ((config.visionToOdometryInTeleop && DriverStation.isTeleop()) || DriverStation.isAutonomous()) {
             robotPose = robotPoSupplier.get().getTranslation();
-            System.out.println(visiPose2d.getTranslation().toString());
-            return robotPose.getDistance(visionIO.getEstimatedPose().pose.getTranslation()) < config.visionToOdometry;
+            return robotPose.getDistance(visiPose2d.getTranslation()) < config.visionToOdometry;
         }
         return true; 
     }
