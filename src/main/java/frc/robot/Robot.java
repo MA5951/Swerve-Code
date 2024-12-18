@@ -107,27 +107,4 @@ public class Robot extends TimedRobot {
     simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose());
   }
 
-  public int getStateAsNum() {
-    if (RobotContainer.currentRobotState == RobotConstants.IDLE) {
-      return 0;
-    } else if (RobotContainer.currentRobotState == RobotConstants.INTAKE) {
-      return 2;
-    } else if (RobotContainer.currentRobotState == RobotConstants.EJECT) {
-      return 4;
-    } else if (RobotContainer.currentRobotState == RobotConstants.WARMING) {
-      return 6;
-    } else if (RobotContainer.currentRobotState == RobotConstants.AMP) {
-      return 8;
-    } else if (RobotContainer.currentRobotState == RobotConstants.FEEDING) {
-      return 10;
-    } else if (RobotContainer.currentRobotState == RobotConstants.SOURCE_INTAKE) {
-      return 12;
-    } else if (RobotContainer.currentRobotState == RobotConstants.STATIONARY_SHOOTING) {
-      return 14;
-    } else if (RobotContainer.currentRobotState == RobotConstants.PRESET_SHOOTING) {
-      return 16;
-    } else {
-      return 0;
-    } 
-  }
 }
