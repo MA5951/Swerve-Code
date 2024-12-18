@@ -12,8 +12,6 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
@@ -26,7 +24,6 @@ public class PoseEstimator {
 
     private LoggedPose2d estimatedRobotPose;
     private LoggedBool odometryUpdateConstrains;
-    private LoggedBool visionUpdateConstrains;
     private LoggedBool updatedVisionLog;
   
 
@@ -45,7 +42,6 @@ public class PoseEstimator {
 
         estimatedRobotPose = new LoggedPose2d("/Pose Estimator/Estimated Robot Pose");
         odometryUpdateConstrains = new LoggedBool("/Pose Estimator/Odometry Update Constrains");
-        visionUpdateConstrains = new LoggedBool("/Pose Estimator/Vision Update Constrains");
         updatedVisionLog = new LoggedBool("/Pose Estimator/Vision Update");
     }
 
@@ -57,8 +53,8 @@ public class PoseEstimator {
         robotPoseEstimator.updateWithTime(timestemp,yaw, wheelPositions);
     }
 
-    public void updateVision(Pose2d pose) {
-        robotPoseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp());
+    public void updateVision(Pose2d pose , double timestamp) {
+        robotPoseEstimator.addVisionMeasurement(pose, timestamp);
     }
 
     public Pose2d getEstimatedRobotPose() {

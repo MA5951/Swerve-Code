@@ -13,7 +13,6 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ma5951.utils.Utils.GeomUtil;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.PoseEstimate;
@@ -25,6 +24,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
 public class VisionSim implements VisionIO {
@@ -36,8 +36,7 @@ public class VisionSim implements VisionIO {
     private PhotonCameraSim cameraSim;
     private PhotonPipelineResult result;
     private PhotonPoseEstimator poseEstimator;
-    private List<Integer> lastFilterArry;
-    private PhotonPipelineResult blankResult = new PhotonPipelineResult();;
+    // private List<Integer> lastFilterArry;
     private PoseEstimate toReturn = new PoseEstimate();
 
     public VisionSim() {
@@ -72,7 +71,6 @@ public class VisionSim implements VisionIO {
 
         cameraSim.enableRawStream(true);
         cameraSim.enableProcessedStream(true);
-        // cameraSim.setWireframeResolution(1280);
         cameraSim.enableDrawWireframe(true);
 
         // filterTags(new int[] {0});
@@ -81,20 +79,13 @@ public class VisionSim implements VisionIO {
 
     @Override
     public PoseEstimate getEstimatedPose() {
-        // if (!poseEstimator.update(result).isEmpty()) {
 
-        // return new
-        // PoseEstimate(poseEstimator.update(result).get().estimatedPose.toPose2d(), 0d
-        // ,0d ,0 ,0d ,0d ,0d , new RawFiducial[]{});
-        // }
         toReturn = new PoseEstimate();
         poseEstimator.update(result).ifPresent((estimator) -> {
-            toReturn = new PoseEstimate(estimator.estimatedPose.toPose2d(), 0d, 0d, 0, 0d, 0d, 0d,
+            toReturn = new PoseEstimate(estimator.estimatedPose.toPose2d(), Timer.getFPGATimestamp(), 0d, 0, 0d, 0d, 0d,
                     new RawFiducial[] {});
         });
         return toReturn;
-        // return new PoseEstimate(new Pose2d(), 0d ,0d ,0 ,0d ,0d ,0d , new
-        // RawFiducial[]{});
     }
 
     @Override
@@ -184,16 +175,16 @@ public class VisionSim implements VisionIO {
         return 0;
     }
 
-    private PhotonPipelineResult filterTagsID() {
+    // private PhotonPipelineResult filterTagsID() {
 
-        for (PhotonTrackedTarget tag : result.targets) {
-            if (lastFilterArry.contains(Integer.valueOf(tag.fiducialId))) {
-                result.targets.remove(tag);
-            }
-        }
+    //     for (PhotonTrackedTarget tag : result.targets) {
+    //         if (lastFilterArry.contains(Integer.valueOf(tag.fiducialId))) {
+    //             result.targets.remove(tag);
+    //         }
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
 
     public void update() {
         PhotonPipelineResult latestResult = cameraSim.process(

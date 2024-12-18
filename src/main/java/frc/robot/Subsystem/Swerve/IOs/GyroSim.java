@@ -78,6 +78,10 @@ public class GyroSim implements Gyro{
         return gyroData;
     }
 
+    public void updateOffset() {
+        System.out.println("Gyro Update");
+    }
+
     
 
 

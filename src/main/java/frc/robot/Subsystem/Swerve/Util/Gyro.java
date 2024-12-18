@@ -6,6 +6,8 @@ public interface Gyro {
 
     void reset();
 
+    void updateOffset();
+
     double getPitch();
 
     double getRoll();

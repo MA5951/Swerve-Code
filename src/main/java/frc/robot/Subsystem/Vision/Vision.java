@@ -8,8 +8,8 @@ import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedInt;
 import com.ma5951.utils.Logger.LoggedPose2d;
+import com.ma5951.utils.Vision.Limelights.LimelightHelpers.PoseEstimate;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
@@ -29,8 +29,10 @@ public class Vision extends SubsystemBase {
   private LoggedInt targetCountLog;
   private LoggedBool isValidLog;
   private LoggedBool isValidForResetLog;
-  private Pose2d visionPose2d;
-  private boolean isUpdate;
+  private PoseEstimate visionPoseEstimate;
+  private boolean isUpdateForOdometry;
+  private boolean isUpdateGyro;
+  private boolean didUpdatedGyro;
 
   public Vision() {
     visionPose2dLog = new LoggedPose2d("/Subsystems/Vision/Vision Pose");
@@ -40,6 +42,26 @@ public class Vision extends SubsystemBase {
     targetCountLog = new LoggedInt("/Subsystems/Vision/Target Count");
     isValidLog = new LoggedBool("/Subsystems/Vision/Is Valid For Update");
     isValidForResetLog = new LoggedBool("/Subsystems/Vision/Is Valid For Reset");
+  }
+
+  public double getTx() {
+    return visionIO.getTx();
+  }
+
+  public double getTy() {
+    return visionIO.getTy();
+  }
+
+  public double getTa() {
+    return visionIO.getTa();
+  }
+
+  public boolean isTarget() {
+    return visionIO.isTarget();
+  }
+
+  public int getTargetCount() {
+    return visionIO.getTargetCount();
   }
 
   public static Vision getInstance() {
@@ -53,18 +75,28 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     visionIO.update();
 
-    visionPose2d = visionIO.getEstimatedPose().pose;
-    isUpdate = visionFilters.isValidForUpdate(visionPose2d);
-    visionPose2dLog.update(visionPose2d);
+    visionPoseEstimate = visionIO.getEstimatedPose();
+    isUpdateForOdometry = visionFilters.isValidForUpdate(visionPoseEstimate.pose);
+    isUpdateGyro = visionFilters.isValidForReset();
+    
+    
+    visionPose2dLog.update(visionPoseEstimate.pose);
     tXLog.update(visionIO.getTx());
     tYLog.update(visionIO.getTy());
     hasTargetLog.update(visionIO.isTarget());
     targetCountLog.update(visionIO.getTargetCount());
-    isValidLog.update(isUpdate);
+    isValidLog.update(isUpdateForOdometry);
     isValidForResetLog.update(visionFilters.isValidForReset());
 
-    if (isUpdate) {
-      PoseEstimator.getInstance().updateVision(visionPose2d);
+    if (isUpdateForOdometry) {
+      PoseEstimator.getInstance().updateVision(visionPoseEstimate.pose , visionPoseEstimate.timestampSeconds);
+    }
+
+    if (!didUpdatedGyro) {
+      if (isUpdateGyro) {
+        didUpdatedGyro = true;
+        SwerveSubsystem.getInstance().getGyro().updateOffset();;
+      }
     }
     
   }
