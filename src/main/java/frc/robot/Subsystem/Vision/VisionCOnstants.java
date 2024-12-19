@@ -24,7 +24,7 @@ public class VisionConstants {
         new Rectangle2d(new Translation2d(), new Translation2d(16.58 , 8.20)), 
         null, 
         1, 
-        true);
+        false);
 
     public static final VisionIO getVisionIO() {
         return new VisionSim();

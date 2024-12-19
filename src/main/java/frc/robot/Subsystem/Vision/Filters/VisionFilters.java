@@ -28,12 +28,14 @@ public class VisionFilters {
     private Translation2d robotPose;
     private ChassisSpeeds robotSpeeds;
     private Pose2d deafultPose = new Pose2d();
+    private Supplier<Double> robotVelocityVectorSupplier;
 
-    public VisionFilters(VisionIO VisionIO , VisionFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds) {
+    public VisionFilters(VisionIO VisionIO , VisionFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds , Supplier<Double> robotVelocityVector) {
         visionIO = VisionIO;
         config = configuration;
         robotPoSupplier = robotPose;
         robotSpeedsSupplier = robotSpeeds;
+        robotVelocityVectorSupplier = robotVelocityVector;
     }
 
     public boolean isValidForReset() {
@@ -43,7 +45,7 @@ public class VisionFilters {
     }
 
     public boolean isValidForUpdate(Pose2d visionPose2d) {
-        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange(visionPose2d) && shouldUpdateByRobotState() && notDeafultPose();
+        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange(visionPose2d) && shouldUpdateByRobotState() && notDeafultPose() && isVisionMatchingVelocity(visionPose2d);
     }
 
     private boolean inVelocityFilter() {
@@ -76,6 +78,10 @@ public class VisionFilters {
             return robotPose.getDistance(visiPose2d.getTranslation()) < config.visionToOdometry;
         }
         return true; 
+    }
+
+    private boolean isVisionMatchingVelocity(Pose2d visionPose2d) {
+        return (robotPoSupplier.get().getTranslation().getDistance(visionPose2d.getTranslation()) <= robotVelocityVectorSupplier.get() * 0.02 + 0.35) && robotVelocityVectorSupplier.get();
     }
     
     private boolean shouldUpdateByRobotState() {

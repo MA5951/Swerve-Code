@@ -20,7 +20,8 @@ public class Vision extends SubsystemBase {
 
   private VisionIO visionIO = VisionConstants.getVisionIO();
 
-  private VisionFilters visionFilters = new VisionFilters(visionIO, VisionConstants.FILTERS_CONFIG, () -> PoseEstimator.getInstance().getEstimatedRobotPose(), () -> SwerveSubsystem.getInstance().getRobotRelativeSpeeds());
+  private VisionFilters visionFilters = new VisionFilters(visionIO, VisionConstants.FILTERS_CONFIG, () -> PoseEstimator.getInstance().getEstimatedRobotPose(), () -> SwerveSubsystem.getInstance().getRobotRelativeSpeeds()
+  , () -> SwerveSubsystem.getInstance().getVelocityVector());
 
   private LoggedPose2d visionPose2dLog;
   private LoggedDouble tXLog;
@@ -95,7 +96,7 @@ public class Vision extends SubsystemBase {
     if (!didUpdatedGyro) {
       if (isUpdateGyro) {
         didUpdatedGyro = true;
-        SwerveSubsystem.getInstance().getGyro().updateOffset();;
+        SwerveSubsystem.getInstance().getGyro().updateOffset();
       }
     }
     

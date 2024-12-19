@@ -53,7 +53,7 @@ public class VisionSim implements VisionIO {
         cameraProp = new SimCameraProperties();
         cameraProp.setCalibration(1280, 800, Rotation2d.fromDegrees(86));
         cameraProp.setFPS(38);
-        cameraProp.setCalibError(0.25, 0.08);// 0.6 0.2
+        cameraProp.setCalibError(0.125, 0.04);// 0.6 0.2
         cameraProp.setAvgLatencyMs(30);
         cameraProp.setLatencyStdDevMs(5);
 
@@ -83,7 +83,7 @@ public class VisionSim implements VisionIO {
         toReturn = new PoseEstimate();
         poseEstimator.update(result).ifPresent((estimator) -> {
             toReturn = new PoseEstimate(estimator.estimatedPose.toPose2d(), Timer.getFPGATimestamp(), 0d, 0, 0d, 0d, 0d,
-                    new RawFiducial[] {});
+                    new RawFiducial[] {},true);
         });
         return toReturn;
     }
