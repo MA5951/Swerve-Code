@@ -127,7 +127,7 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
         configTurningMotor();
         configDriveMotor();
-        resetSteer();
+        //resetSteer();
 
         BaseStatusSignal.setUpdateFrequencyForAll(SwerveConstants.ODOMETRY_UPDATE_RATE, 
         drivePosition , steerPosition);

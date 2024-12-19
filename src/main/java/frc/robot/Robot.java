@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
+import frc.robot.commands.Swerve.FieldCentricDriveController;
 
 
 
@@ -67,6 +68,10 @@ public class Robot extends TimedRobot {
     lastRobotStateLog.update(RobotContainer.lastRobotState.getName());
     currentRobotStateNumberLog.update(getStateAsNum());
     RobotContainer.update();
+
+    if (RobotController.getBatteryVoltage() < 11.9 && DriverStation.isDisabled()) {
+      FieldCentricDriveController.slow = true;
+    }
 
     batteryVoltageLog.update(RobotController.getBatteryVoltage());
     matchTimeLog.update(DriverStation.getMatchTime());
