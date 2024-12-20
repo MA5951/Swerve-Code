@@ -1,17 +1,15 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.Subsystem.PoseEstimation;
 
 
-import com.ma5951.utils.Logger.LoggedBool;
+import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedPose2d;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
@@ -19,16 +17,13 @@ public class PoseEstimator {
     private static PoseEstimator poseEstimator;
 
     private SwerveDrivePoseEstimator robotPoseEstimator;
-    //private Vision vision;
     private SwerveSubsystem swerve = SwerveSubsystem.getInstance();
 
     private LoggedPose2d estimatedRobotPose;
-    private LoggedBool odometryUpdateConstrains;
-    private LoggedBool updatedVisionLog;
+    private LoggedDouble lastVisionUpdateLog;
   
 
     public PoseEstimator() {
-        //vision = Vision.getInstance();
         robotPoseEstimator = new SwerveDrivePoseEstimator(SwerveConstants.kinematics , swerve.getRotation2d() , 
         new  SwerveModulePosition[] {
             new SwerveModulePosition(),
@@ -41,8 +36,7 @@ public class PoseEstimator {
         PoseEstimatorConstants.VISION_DEVS);//Vision Devs
 
         estimatedRobotPose = new LoggedPose2d("/Pose Estimator/Estimated Robot Pose");
-        odometryUpdateConstrains = new LoggedBool("/Pose Estimator/Odometry Update Constrains");
-        updatedVisionLog = new LoggedBool("/Pose Estimator/Vision Update");
+        lastVisionUpdateLog = new LoggedDouble("/Pose Estimator/Last VisionUpdate");
     }
 
     public void resetPose(Pose2d pose) {
@@ -54,6 +48,7 @@ public class PoseEstimator {
     }
 
     public void updateVision(Pose2d pose , double timestamp) {
+        lastVisionUpdateLog.update(Timer.getFPGATimestamp());
         robotPoseEstimator.addVisionMeasurement(pose, timestamp);
     }
 
@@ -62,9 +57,7 @@ public class PoseEstimator {
     }
 
     public void update() {
-        estimatedRobotPose.update(getEstimatedRobotPose());
-        odometryUpdateConstrains.update(PoseEstimatorConstants.ODOMETRY_UPDATE_CONSTRAINS.get());
-        
+        estimatedRobotPose.update(getEstimatedRobotPose());        
     }
 
     public static PoseEstimator getInstance() {

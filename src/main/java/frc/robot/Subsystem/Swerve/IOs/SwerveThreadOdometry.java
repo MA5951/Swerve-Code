@@ -8,10 +8,11 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
-import com.ma5951.utils.DashBoard.MAShuffleboard.pidControllerGainSupplier;
 import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.wpilibj.Timer;
@@ -60,16 +61,18 @@ public class SwerveThreadOdometry implements SwerveOdometry{
     private SwerveModule[] modulesArry;
     private ModuleLimits swerveLimits;
     private double avrageCurrent;
+    private Debouncer currentDebouncer;
 
     public SwerveThreadOdometry(OdometryConfig Config) {
         swerveSubsystem = SwerveSubsystem.getInstance();
         config = Config;
         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
-        lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
-        lastCollisionLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Collision");
+        lastSkidLog = new LoggedDouble("/Subsystems/Swerve/Odometry/Last Skid");
+        lastCollisionLog = new LoggedDouble("/Subsystems/Swerve/Odometry/Last Collision");
         stuckDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Stuck Detected");
-        lastStuckLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Stuck");
+        lastStuckLog = new LoggedDouble("/Subsystems/Swerve/Odometry/Last Stuck");
+        currentDebouncer = new Debouncer(0.5, DebounceType.kRising);
 
         skidDetector = new SkidDetector(SwerveConstants.kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates());
         collisionDtector = new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData());
@@ -104,13 +107,16 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < config.skidRatio;
         collisionDetected = collisionDtector.getForce() > config.collisionForce;
 
+        skidDetected = false;
+        collisionDetected = false;
+
         avrageCurrent = 0;
 
         for (int i = 0; i < modulesData.length; i++) {
             avrageCurrent += modulesData[i].getDriveCurrent();
         }
 
-        stuckDetected = avrageCurrent / 4 > config.currentWhenStck;
+        stuckDetected = currentDebouncer.calculate(avrageCurrent / 4 > config.currentWhenStck);
 
 
         skidDetectedLog.update(skidDetected);
@@ -132,7 +138,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
             lastStuckLog.update(lastStuck);
         }
         
-        if (!((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected)) {
+        if (!(((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected) && ((stuckDetected && config.updateWhenStuck) || !stuckDetected))) {
             includeMeasurement = false;
         }
         

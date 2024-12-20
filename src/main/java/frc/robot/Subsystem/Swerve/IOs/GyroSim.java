@@ -27,7 +27,7 @@ public class GyroSim implements Gyro{
 
     public GyroSim(String type) {
 
-        yaw = new LoggedDouble("/Swerve/" + type + "/Yaw");
+        yaw = new LoggedDouble("/Subsystems/Swerve/" + type + "/Yaw");
 
         gyroData = new GyroData();
 

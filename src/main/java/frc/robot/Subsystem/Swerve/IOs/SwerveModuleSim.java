@@ -10,7 +10,6 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.Arrays;
 
-import com.ma5951.utils.Logger.LoggedDouble;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
 import frc.robot.Utils.PhoenixUtil;
@@ -23,17 +22,6 @@ public class SwerveModuleSim extends SwerveModuleTalonFX {
     private SwerveModuleData moduleData = new SwerveModuleData();
     private final SwerveModuleSimulation moduleSimulation;
 
-    private LoggedDouble DrivePosition;
-    private LoggedDouble DriveVelocity;
-    private LoggedDouble DriveCurrent;
-    private LoggedDouble DriveVolts;
-    private LoggedDouble SteerPosition;
-    private LoggedDouble SteerCurrent;
-    private LoggedDouble SteerVolts;
-    private LoggedDouble AbsAngle;
-    private LoggedDouble DriveTemp;
-    private LoggedDouble SteerTemp;
-
     public SwerveModuleSim(String moduleNameN , int driveID, int turningID, int absoluteEncoderID, boolean isDriveMotorReversed, boolean isTurningMotorReversed,SwerveModuleSimulation simulation) {
         super(moduleNameN, driveID, turningID, absoluteEncoderID, isDriveMotorReversed, isTurningMotorReversed);
         
@@ -41,20 +29,6 @@ public class SwerveModuleSim extends SwerveModuleTalonFX {
         moduleSimulation = simulation;
         moduleSimulation.useDriveMotorController(new PhoenixUtil.TalonFXMotorControllerSim(driveMotor ,isDriveMotorReversed ));
         moduleSimulation.useSteerMotorController(new PhoenixUtil.TalonFXMotorControllerWithRemoteCancoderSim(turningMotor, isTurningMotorReversed, absoluteEcoder, false, edu.wpi.first.units.Units.Degrees.of(0)));
-
-        
-
-        DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Position");
-        DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Velocity");
-        DriveCurrent = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Current");
-        DriveVolts = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Volts");
-        SteerPosition = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Steer Position");
-        SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Steer Current");
-        SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Steer Volts");
-        AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Absolute Angle");
-        DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Drive Temp");
-        SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleNameN + "Sim" + "/Steer Temp");
-
 
 
         

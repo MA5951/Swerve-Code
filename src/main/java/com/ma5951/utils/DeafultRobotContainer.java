@@ -115,13 +115,17 @@ public class DeafultRobotContainer {
         return getSelectedAuto().getCommand();
     }
 
+    public Command getAutonomousCommand() {
+        return getSelectedAuto().getCommand();
+    }
+
     public boolean isAtStartingPose() {
         if (DriverStationUtil.getAlliance() == Alliance.Red) {
             
             return autoSelector.getSelectedAutoStartingPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;
         }
         
-        return autoSelector.getSelectedAutoStartingPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;
+        return autoSelector.getSelectedAutoStartingPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;//TODO
     }
 
 

@@ -1,6 +1,5 @@
 package frc.robot.Subsystem.Swerve.IOs;
 
-
 import java.util.Queue;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -46,8 +45,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     private PositionVoltage pidTurnController = new PositionVoltage(0);
     private VelocityVoltage driveController = new VelocityVoltage(0);
-    
-
 
     private StatusSignal<Angle> drivePosition;
     private StatusSignal<AngularVelocity> driveVelocity;
@@ -62,50 +59,44 @@ public class SwerveModuleTalonFX implements SwerveModule {
     private StatusSignal<AngularVelocity> steerVelocitt;
     private String moduleName;
 
-    private LoggedDouble DrivePosition;
-    private LoggedDouble DriveVelocity;
-    private LoggedDouble DriveCurrent;
-    private LoggedDouble DriveVolts;
-    private LoggedDouble SteerPosition;
-    private LoggedDouble SteerCurrent;
-    private LoggedDouble SteerVolts;
-    private LoggedDouble AbsAngle;
-    private LoggedDouble velociSteer;
-    private LoggedDouble DriveTemp;
-    private LoggedDouble SteerTemp;
+    protected LoggedDouble DrivePosition;
+    protected LoggedDouble DriveVelocity;
+    protected LoggedDouble DriveCurrent;
+    protected LoggedDouble DriveVolts;
+    protected LoggedDouble SteerPosition;
+    protected LoggedDouble SteerCurrent;
+    protected LoggedDouble SteerVolts;
+    protected LoggedDouble AbsAngle;
+    protected LoggedDouble velociSteer;
+    protected LoggedDouble DriveTemp;
+    protected LoggedDouble SteerTemp;
 
     private Queue<Double> drivePositionQueue;
     private Queue<Double> turnPositionQueue;
 
-    
-
-    public SwerveModuleTalonFX(String moduleNameN , int driveID,
+    public SwerveModuleTalonFX(String moduleNameN, int driveID,
             int turningID, int absoluteEncoderID, boolean isDriveMotorReversed,
             boolean isTurningMotorReversed) {
-        
-        driveMotor = new TalonFX(driveID , PortMap.Swerve.SwervBus);
-        turningMotor = new TalonFX(turningID , PortMap.Swerve.SwervBus);
-        absoluteEcoder = new CANcoder(absoluteEncoderID , PortMap.Swerve.SwervBus);
-      
+
+        driveMotor = new TalonFX(driveID, PortMap.Swerve.SwervBus);
+        turningMotor = new TalonFX(turningID, PortMap.Swerve.SwervBus);
+        absoluteEcoder = new CANcoder(absoluteEncoderID, PortMap.Swerve.SwervBus);
 
         this.isDriveMotorReversed = isDriveMotorReversed;
         this.isTurningMotorReversed = isTurningMotorReversed;
         this.moduleName = moduleNameN;
 
-        if (Robot.isReal()) {
-            DrivePosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Position");
-            DriveVelocity = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Velocity");
-            DriveCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Current");
-            DriveVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Volts");
-            DriveTemp = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Drive Temp");
-            SteerTemp = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Temp");
-            SteerPosition = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Position");
-            SteerCurrent = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Current");
-            SteerVolts = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Volts");
-            AbsAngle = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Absolute Angle");
-            velociSteer = new LoggedDouble("/Swerve/Modules/" + moduleName + "/Steer Velocity");
-        }
-        
+        DrivePosition = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Position");
+        DriveVelocity = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Velocity");
+        DriveCurrent = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Current");
+        DriveVolts = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Volts");
+        DriveTemp = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Temp");
+        SteerTemp = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Temp");
+        SteerPosition = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Position");
+        SteerCurrent = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Current");
+        SteerVolts = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Volts");
+        AbsAngle = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Absolute Angle");
+        velociSteer = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Velocity");
 
         drivePosition = driveMotor.getPosition();
         driveVelocity = driveMotor.getVelocity();
@@ -125,50 +116,38 @@ public class SwerveModuleTalonFX implements SwerveModule {
             drivePositionQueue = PhoenixOdometryThread.getInstance().registerSignal(driveMotor, drivePosition);
             turnPositionQueue = PhoenixOdometryThread.getInstance().registerSignal(turningMotor, steerPosition);
         }
-        
-        
 
         configTurningMotor();
         configDriveMotor();
         resetSteer();
 
-        BaseStatusSignal.setUpdateFrequencyForAll(SwerveConstants.ODOMETRY_UPDATE_RATE, 
-        drivePosition , steerPosition);
+        BaseStatusSignal.setUpdateFrequencyForAll(SwerveConstants.ODOMETRY_UPDATE_RATE,
+                drivePosition, steerPosition);
     }
 
     private void configTurningMotor() {
-        
+
         turningConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
         turningConfiguration.Feedback.SensorToMechanismRatio = SwerveConstants.TURNING_GEAR_RATIO;
 
         turningConfiguration.ClosedLoopGeneral.ContinuousWrap = true;
 
-        turningConfiguration.MotorOutput.Inverted = 
-            isTurningMotorReversed ? InvertedValue.Clockwise_Positive : 
-            InvertedValue.CounterClockwise_Positive;
+        turningConfiguration.MotorOutput.Inverted = isTurningMotorReversed ? InvertedValue.Clockwise_Positive
+                : InvertedValue.CounterClockwise_Positive;
 
         turningConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-
 
         turningConfiguration.Slot0.kP = SwerveConstants.TURNING_kP;
         turningConfiguration.Slot0.kI = SwerveConstants.TURNING_kI;
         turningConfiguration.Slot0.kD = SwerveConstants.TURNING_kD;
-        
 
-
-
-        turningConfiguration.CurrentLimits.SupplyCurrentLimitEnable = 
-            SwerveConstants.TURNING_ENABLE_CURRENT_LIMIT;
-        turningConfiguration.CurrentLimits.SupplyCurrentLimit =
-            SwerveConstants.TURNING_CURRENT_LIMIT;
-        turningConfiguration.CurrentLimits.SupplyCurrentLowerLimit =
-            SwerveConstants.TURNING_CONTINUOUS_LOWER_LIMIT;
-        turningConfiguration.CurrentLimits.SupplyCurrentLowerTime = 
-            SwerveConstants.TURNING_CONTINUOUS_CURRENT_DURATION;
+        turningConfiguration.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.TURNING_ENABLE_CURRENT_LIMIT;
+        turningConfiguration.CurrentLimits.SupplyCurrentLimit = SwerveConstants.TURNING_CURRENT_LIMIT;
+        turningConfiguration.CurrentLimits.SupplyCurrentLowerLimit = SwerveConstants.TURNING_CONTINUOUS_LOWER_LIMIT;
+        turningConfiguration.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.TURNING_CONTINUOUS_CURRENT_DURATION;
 
         turningMotor.getConfigurator().apply(turningConfiguration);
 
-        
     }
 
     private void configDriveMotor() {
@@ -182,9 +161,8 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
         driveConfiguration.ClosedLoopGeneral.ContinuousWrap = false;
 
-        driveConfiguration.MotorOutput.Inverted = 
-            isDriveMotorReversed ? InvertedValue.Clockwise_Positive : 
-            InvertedValue.CounterClockwise_Positive;
+        driveConfiguration.MotorOutput.Inverted = isDriveMotorReversed ? InvertedValue.Clockwise_Positive
+                : InvertedValue.CounterClockwise_Positive;
 
         driveConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
@@ -195,21 +173,16 @@ public class SwerveModuleTalonFX implements SwerveModule {
         driveConfiguration.Slot0.kV = SwerveConstants.DRIVE_kV;
         driveConfiguration.Slot0.kA = SwerveConstants.DRIVE_kA;
 
-
-        driveConfiguration.CurrentLimits.SupplyCurrentLimitEnable = 
-            SwerveConstants.DRIVE_ENBLE_CURRENT_LIMIT;
-        driveConfiguration.CurrentLimits.SupplyCurrentLimit =
-            SwerveConstants.DRIVE_CURRENT_LIMIT;
-        driveConfiguration.CurrentLimits.SupplyCurrentLowerLimit =
-            SwerveConstants.DRIVE_CONTINUOS_LOWER__LIMIT;
-        driveConfiguration.CurrentLimits.SupplyCurrentLowerTime = 
-            SwerveConstants.DRIVE_CONTINUOUS_CURRENT_DURATION;
+        driveConfiguration.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_ENBLE_CURRENT_LIMIT;
+        driveConfiguration.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_CURRENT_LIMIT;
+        driveConfiguration.CurrentLimits.SupplyCurrentLowerLimit = SwerveConstants.DRIVE_CONTINUOS_LOWER__LIMIT;
+        driveConfiguration.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.DRIVE_CONTINUOUS_CURRENT_DURATION;
 
         driveMotor.getConfigurator().apply(driveConfiguration);
     }
 
     public void resetSteer() {
-        turningMotor.setPosition((getAbsolutePosition() / 360 ));
+        turningMotor.setPosition((getAbsolutePosition() / 360));
     }
 
     public double getDriveTemp() {
@@ -283,14 +256,15 @@ public class SwerveModuleTalonFX implements SwerveModule {
     }
 
     public void turningUsingPID(double setPointRdians) {
-        turningMotor.setControl(pidTurnController.withPosition(Units.radiansToRotations(setPointRdians)).withSlot(SwerveConstants.SLOT_CONFIG));
+        turningMotor.setControl(pidTurnController.withPosition(Units.radiansToRotations(setPointRdians))
+                .withSlot(SwerveConstants.SLOT_CONFIG));
     }
-    //In Ammperes
-    public void driveUsingPID(double setPointMPS , double feedForward) {
-        rpsDriveSetPoint = (setPointMPS / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI );
+
+    public void driveUsingPID(double setPointMPS, double feedForward) {
+        rpsDriveSetPoint = (setPointMPS / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI);
         driveMotor.setControl(driveController.withVelocity(rpsDriveSetPoint)
-        .withFeedForward(feedForward)
-        .withSlot(SwerveConstants.SLOT_CONFIG));
+                .withFeedForward(feedForward)
+                .withSlot(SwerveConstants.SLOT_CONFIG));
 
     }
 
@@ -310,41 +284,39 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     public void refreshAll() {
         BaseStatusSignal.refreshAll(
-            driveTemp.refresh(),
-            steerTemp.refresh(),
-            driveCurrent.refresh(),
-            steerCurrent.refresh(),
-            driveVolts.refresh(),
-            steerVolts.refresh(),
-            absAngle.refresh(),
-            drivePosition.refresh(),
-            steerPosition.refresh(),
-            driveVelocity.refresh(),
-            steerVelocitt.refresh()
-        );
+                driveTemp.refresh(),
+                steerTemp.refresh(),
+                driveCurrent.refresh(),
+                steerCurrent.refresh(),
+                driveVolts.refresh(),
+                steerVolts.refresh(),
+                absAngle.refresh(),
+                drivePosition.refresh(),
+                steerPosition.refresh(),
+                driveVelocity.refresh(),
+                steerVelocitt.refresh());
     }
 
     public SwerveModuleData update() {
         refreshAll();
 
-
         moduleData.updateData(
-            getDrivePosition(),
-            getDriveVelocity(),
-            getDriveCurrent(),
-            getDriveVolts(),
-            getDriveTemp(),
-            getSteerTemp(),
-            getSteerPosition(),
-            getSteerCurrent(),
-            getSteerVolts(),
-            getAbsolutePosition(),
-            getSteerVelocity(), 
-            drivePositionQueue.stream()
-            .mapToDouble(
-                signalValue -> Units.rotationsToRadians(signalValue) * SwerveConstants.WHEEL_RADIUS)
-            .toArray(), 
-            turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new));
+                getDrivePosition(),
+                getDriveVelocity(),
+                getDriveCurrent(),
+                getDriveVolts(),
+                getDriveTemp(),
+                getSteerTemp(),
+                getSteerPosition(),
+                getSteerCurrent(),
+                getSteerVolts(),
+                getAbsolutePosition(),
+                getSteerVelocity(),
+                drivePositionQueue.stream()
+                        .mapToDouble(
+                                signalValue -> Units.rotationsToRadians(signalValue) * SwerveConstants.WHEEL_RADIUS)
+                        .toArray(),
+                turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new));
 
         if (Robot.isReal()) {
             logData(moduleData);

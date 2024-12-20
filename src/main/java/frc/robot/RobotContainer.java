@@ -1,14 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
 
 
 import com.ma5951.utils.DeafultRobotContainer;
-import com.ma5951.utils.DashBoard.AutoSelector;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,7 +14,6 @@ import frc.robot.commands.Swerve.TeleopSwerveController;
 
 public class RobotContainer extends DeafultRobotContainer{
 
-  public static boolean alignForAmp = true;
 
 
   public RobotContainer() {
@@ -37,8 +31,6 @@ public class RobotContainer extends DeafultRobotContainer{
     
   }
 
-
-
   private void configureBindings() {
 
     //Update Offset
@@ -48,8 +40,4 @@ public class RobotContainer extends DeafultRobotContainer{
 
   }
 
-  
-  public Command getAutonomousCommand() {
-    return null;
-  }
 }

@@ -36,8 +36,8 @@ public class Swerve50HzOdometry implements SwerveOdometry{
         odometryConfig = Config;
         skidDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Skid Detected");
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
-        lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
-        lastCollisionLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Collision");
+        lastSkidLog = new LoggedDouble("/Subsystems/Swerve/Odometry/Last Skid");
+        lastCollisionLog = new LoggedDouble("/Subsystems/Swerve/Odometry/Last Collision");
         skidDetector = new SkidDetector(SwerveConstants.kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates());
         collisionDtector = new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData());
     }

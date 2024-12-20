@@ -36,8 +36,8 @@ public class TeleopSwerveController extends Command {
     angleAdjustController = new AngleAdjustController( () -> SwerveSubsystem.getInstance().getFusedHeading());
     relativAngleAdjustController = new RelativAngleAdjustController(0 , () -> 0d);
 
-    xyControllerLog = new LoggedString("/Swerve/Controllers/XY Controller");
-    theathControllerLog = new LoggedString("/Swerve/Controllers/Theath Controller");
+    xyControllerLog = new LoggedString("/Subsystems/Swerve/Controllers/XY Controller");
+    theathControllerLog = new LoggedString("/Subsystems/Swerve/Controllers/Theath Controller");
 
 
     addRequirements(swerve);

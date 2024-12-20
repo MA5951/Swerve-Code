@@ -73,11 +73,11 @@ public class SwerveSubsystem extends SubsystemBase {
     });
 
 
-    currenStatesLog = new LoggedSwerveStates("/Swerve/States/Current States");
-    setPoinStatesLog = new LoggedSwerveStates("/Swerve/States/SetPoint States");
-    swerevXvelocityLog = new LoggedDouble("/Swerve/Chassis Speed/X Velocity");
-    swerevYvelocityLog = new LoggedDouble("/Swerve/Chassis Speed/Y Velocity");
-    swerevTheatavelocityLog = new LoggedDouble("/Swerve/Chassis Speed/Theat Velocity");
+    currenStatesLog = new LoggedSwerveStates("/Subsystems/Swerve/States/Current States");
+    setPoinStatesLog = new LoggedSwerveStates("/Subsystems/Swerve/States/SetPoint States");
+    swerevXvelocityLog = new LoggedDouble("/Subsystems/Swerve/Chassis Speed/X Velocity");
+    swerevYvelocityLog = new LoggedDouble("/Subsystems/Swerve/Chassis Speed/Y Velocity");
+    swerevTheatavelocityLog = new LoggedDouble("/Subsystems/Swerve/Chassis Speed/Theat Velocity");
 
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].setNeutralModeDrive(true);

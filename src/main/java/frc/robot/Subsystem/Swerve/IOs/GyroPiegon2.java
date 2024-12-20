@@ -69,15 +69,15 @@ public class GyroPiegon2 implements Gyro{
         gyroVeloYaw = gyro.getAngularVelocityZDevice();
         gyroVeloRoll = gyro.getAngularVelocityYDevice();
 
-        yaw = new LoggedDouble("/Swerve/" + name + "/Yaw");
-        pitch = new LoggedDouble("/Swerve/" + name + "/Pitch");
-        roll = new LoggedDouble("/Swerve/" + name + "/Roll");
-        accelX = new LoggedDouble("/Swerve/" + name + "/Accel X");
-        accelY = new LoggedDouble("/Swerve/" + name + "/Accel Y");
-        yawNormal = new LoggedDouble("/Swerve/" + name + "/Yaw Normal");
-        veloRoll = new LoggedDouble("/Swerve/" + name + "/Roll Accel");
-        veloPitch = new LoggedDouble("/Swerve/" + name + "/Pitch Accel");
-        veloYaw = new LoggedDouble("/Swerve/" + name + "/Yaw Accel");
+        yaw = new LoggedDouble("/Subsystems/Swerve/" + name + "/Yaw");
+        pitch = new LoggedDouble("/Subsystems/Swerve/" + name + "/Pitch");
+        roll = new LoggedDouble("/Subsystems/Swerve/" + name + "/Roll");
+        accelX = new LoggedDouble("/Subsystems/Swerve/" + name + "/Accel X");
+        accelY = new LoggedDouble("/Subsystems/Swerve/" + name + "/Accel Y");
+        yawNormal = new LoggedDouble("/Subsystems/Swerve/" + name + "/Yaw Normal");
+        veloRoll = new LoggedDouble("/Subsystems/Swerve/" + name + "/Roll Accel");
+        veloPitch = new LoggedDouble("/Subsystems/Swerve/" + name + "/Pitch Accel");
+        veloYaw = new LoggedDouble("/Subsystems/Swerve/" + name + "/Yaw Accel");
 
         gyro.getConfigurator().setYaw(0);
 

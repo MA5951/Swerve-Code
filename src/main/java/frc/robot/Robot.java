@@ -1,12 +1,11 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.ChassisReference;
+import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
 
@@ -27,15 +26,23 @@ public class Robot extends TimedRobot {
   private boolean isTeleop = false;
   public static boolean isStartingPose = false;
   private LoggedPose2d simulationPose2d;
+  private TalonFX motor;
+  private TalonFXSimState sim;
+  private double x = 0;
 
   @Override
   public void robotInit() {
     MALog.getInstance();
     m_robotContainer = new RobotContainer();
     simulationPose2d = new LoggedPose2d("/Simulation/Pose");
+    motor = new TalonFX(44);
+    sim =motor.getSimState();
+    sim.Orientation = ChassisReference.Clockwise_Positive;
     PoseEstimator.getInstance();
 
     MALog.getInstance().startLog();
+
+
 
   }
 
@@ -49,7 +56,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-
     if (isTeleop) {
       MALog.getInstance().stopLog();
     }
@@ -58,7 +64,6 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
     
-
   }
 
   @Override
@@ -102,8 +107,21 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {
-    SimulatedArena.getInstance().simulationPeriodic();
-    simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose());
+    //SimulatedArena.getInstance().simulationPeriodic();
+    //simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()) ;
+    sim.setSupplyVoltage(12);
+
+    System.out.println(motor.getVelocity().refresh().getValueAsDouble());
+
+    //motor.setVoltage(11);
+    sim.setRawRotorPosition(x);
+    sim.setRotorVelocity(5);
+
+    //System.out.println(x);
+
+    x += 0.1;
+
+
   }
 
 }

@@ -1,5 +1,6 @@
 package frc.robot.Subsystem.Swerve;
 
+import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
@@ -224,12 +225,12 @@ public class SwerveConstants {
 
         public final static DriveTrainSimulationConfig DRIVE_TRAIN_SIMULATION_CONFIG = DriveTrainSimulationConfig
                         .Default()
-                        .withGyro(GyroSimulation.getPigeon2())
+                        .withGyro(COTS.ofPigeon2())
                         .withRobotMass(edu.wpi.first.units.Units.Kilogram.of(ROBOT_MASS))
-                        .withSwerveModule(SwerveModuleSimulation.getMark4i(
+                        .withSwerveModule(COTS.ofMark4i(
                                         DCMotor.getKrakenX60(1),
                                         DCMotor.getFalcon500(1),
-                                        SwerveModuleSimulation.WHEEL_GRIP.DEFAULT_NEOPRENE_TREAD.cof,
+                                        COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof,
                                         3 // Gear ratio (l3 gear ratio)
                         ))
                         .withTrackLengthTrackWidth(edu.wpi.first.units.Units.Meter.of(LENGTH),
