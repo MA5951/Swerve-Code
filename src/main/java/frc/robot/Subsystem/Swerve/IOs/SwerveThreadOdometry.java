@@ -33,8 +33,10 @@ public class SwerveThreadOdometry implements SwerveOdometry{
 
     private LoggedBool skidDetectedLog;
     private LoggedBool collisionDetectedLog;
+    private LoggedBool stuckDetectedLog;
     private LoggedDouble lastSkidLog;
     private LoggedDouble lastCollisionLog;
+    private LoggedDouble lastStuckLog;
 
     private SwerveSubsystem swerveSubsystem;
     private SkidDetector skidDetector;
@@ -66,6 +68,8 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         collisionDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Collision Detected");
         lastSkidLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Skid");
         lastCollisionLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Collision");
+        stuckDetectedLog = new LoggedBool("/Subsystems/Swerve/Odometry/Stuck Detected");
+        lastStuckLog = new LoggedDouble("/Subystems/Swerve/Odometry/Last Stuck");
 
         skidDetector = new SkidDetector(SwerveConstants.kinematics, () -> SwerveSubsystem.getInstance().getSwerveModuleStates());
         collisionDtector = new CollisionDtector(() -> SwerveSubsystem.getInstance().getGyroData());
@@ -100,11 +104,18 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < config.skidRatio;
         collisionDetected = collisionDtector.getForce() > config.collisionForce;
 
+        avrageCurrent = 0;
 
-        stuckDetected = swerveSubsystem.getModulesData()
+        for (int i = 0; i < modulesData.length; i++) {
+            avrageCurrent += modulesData[i].getDriveCurrent();
+        }
+
+        stuckDetected = avrageCurrent / 4 > config.currentWhenStck;
+
 
         skidDetectedLog.update(skidDetected);
         collisionDetectedLog.update(collisionDetected);
+        stuckDetectedLog.update(stuckDetected);
 
         if (skidDetected) {
             lastSkid = Timer.getFPGATimestamp();
@@ -114,6 +125,11 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         if (collisionDetected) {
             lastCollid = Timer.getFPGATimestamp();
             lastCollisionLog.update(lastCollid);
+        }
+
+        if (stuckDetected) {
+            lastStuck = Timer.getFPGATimestamp();
+            lastStuckLog.update(lastStuck);
         }
         
         if (!((skidDetected && config.updateInSkid) || !skidDetected) && ((collisionDetected && config.updateInCollision) || !collisionDetected)) {
