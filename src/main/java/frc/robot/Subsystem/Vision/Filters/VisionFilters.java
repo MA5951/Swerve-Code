@@ -81,7 +81,7 @@ public class VisionFilters {
     }
 
     private boolean isVisionMatchingVelocity(Pose2d visionPose2d) {
-        return (robotPoSupplier.get().getTranslation().getDistance(visionPose2d.getTranslation()) <= robotVelocityVectorSupplier.get() * 0.02 + 0.35) && robotVelocityVectorSupplier.get();
+        return (robotPoSupplier.get().getTranslation().getDistance(visionPose2d.getTranslation()) <= robotVelocityVectorSupplier.get() * 0.02 + 0.35) ;
     }
     
     private boolean shouldUpdateByRobotState() {

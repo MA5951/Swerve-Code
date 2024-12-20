@@ -8,6 +8,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
+import com.ma5951.utils.DashBoard.MAShuffleboard.pidControllerGainSupplier;
 import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 
@@ -41,8 +42,10 @@ public class SwerveThreadOdometry implements SwerveOdometry{
 
     private boolean skidDetected;
     private boolean collisionDetected;
+    private boolean stuckDetected;
     private double lastSkid;
     private double lastCollid;
+    private double lastStuck;
 
     private SwerveModulePosition[] wheelPositions = new  SwerveModulePosition[4];
     private SwerveModulePosition[] lastPositions = null;
@@ -54,6 +57,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
     private GyroData gyroData;
     private SwerveModule[] modulesArry;
     private ModuleLimits swerveLimits;
+    private double avrageCurrent;
 
     public SwerveThreadOdometry(OdometryConfig Config) {
         swerveSubsystem = SwerveSubsystem.getInstance();
@@ -95,6 +99,9 @@ public class SwerveThreadOdometry implements SwerveOdometry{
 
         skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < config.skidRatio;
         collisionDetected = collisionDtector.getForce() > config.collisionForce;
+
+
+        stuckDetected = swerveSubsystem.getModulesData()
 
         skidDetectedLog.update(skidDetected);
         collisionDetectedLog.update(collisionDetected);

@@ -248,7 +248,7 @@ public class SwerveConstants {
         // Odometry
         public final static double ODOMETRY_UPDATE_RATE = 250;
         public final static OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
-                        true, true, 0.15, 2);
+                        true, true, 0.15, 2d , false , 85d);
 
         // Swerve controllers
 
