@@ -66,13 +66,12 @@ public class DeafultRobotContainer {
         autoSelector = new AutoSelector(() -> PoseEstimator.getInstance().getEstimatedRobotPose());
 
         robotPoseSupplier = () -> PoseEstimator.getInstance().getEstimatedRobotPose();
-
+        batteryVoltagSupplier = () -> RobotController.getBatteryVoltage();
         if (Robot.isReal()) {
             batteryVoltagSupplier = () -> RobotController.getBatteryVoltage();
         } else {
-            batteryVoltagSupplier = () -> SimulatedBattery.getInstance().getBatteryVoltage().baseUnitMagnitude();
+            batteryVoltagSupplier = () -> SimulatedBattery.getBatteryVoltage().baseUnitMagnitude();
         }
-
         
 
         currentRobotStateLog = new LoggedString("/RobotControl/Current Robot State");

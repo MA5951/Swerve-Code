@@ -9,6 +9,7 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -26,20 +27,13 @@ public class Robot extends TimedRobot {
   private boolean isTeleop = false;
   public static boolean isStartingPose = false;
   private LoggedPose2d simulationPose2d;
-  private TalonFX motor;
-  private TalonFXSimState sim;
-  private double x = 0;
 
   @Override
   public void robotInit() {
     MALog.getInstance();
     m_robotContainer = new RobotContainer();
     simulationPose2d = new LoggedPose2d("/Simulation/Pose");
-    motor = new TalonFX(44);
-    sim =motor.getSimState();
-    sim.Orientation = ChassisReference.Clockwise_Positive;
     PoseEstimator.getInstance();
-
     MALog.getInstance().startLog();
 
 
@@ -50,7 +44,8 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
     PoseEstimator.getInstance().update();
-    
+    m_robotContainer.updatePeriodic();
+
     
   }
 
@@ -63,12 +58,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    
+    m_robotContainer.updateDisablePeriodic();
   }
 
   @Override
   public void autonomousInit() {
-    
+    m_robotContainer.updateAutoInit();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -107,19 +102,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void simulationPeriodic() {
-    //SimulatedArena.getInstance().simulationPeriodic();
-    //simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()) ;
-    sim.setSupplyVoltage(12);
+    SimulatedArena.getInstance().simulationPeriodic();
+    simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()) ;
 
-    System.out.println(motor.getVelocity().refresh().getValueAsDouble());
-
-    //motor.setVoltage(11);
-    sim.setRawRotorPosition(x);
-    sim.setRotorVelocity(5);
-
-    //System.out.println(x);
-
-    x += 0.1;
 
 
   }
