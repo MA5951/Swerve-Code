@@ -1,70 +1,28 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.Subsystem.Intake.IOs;
 
-import com.ma5951.utils.Logger.LoggedDouble;
+import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.ma5951.utils.ControlledMotors.Sim.TalonFXMotorSim;
+import com.ma5951.utils.Utils.ConvUtil;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import frc.robot.RobotConstants;
-import frc.robot.Subsystem.Intake.IntakeConstants;
 
-/** Add your docs here. */
-public class IntakeIOSim implements IntakeIO{
+public class IntakeIOSim extends IntakeIOReal{
 
-    private DCMotorSim motor;
-    private double appliedVolts;
-
-    private LoggedDouble motorTempLog;
-    private LoggedDouble appliedVoltsLog;
-    private LoggedDouble velocityLog;
-    private LoggedDouble currentDrawLog;
+    private TalonFXMotorSim motorSim;
 
     public IntakeIOSim() {
-        //motor = new DCMotorSim(DCMotor.getFalcon500(1), IntakeConstants.Gear, 0.05);
-     
-        motorTempLog = new LoggedDouble("/Subsystems/Intake/Sim/Motor Temp");
-        appliedVoltsLog = new LoggedDouble("/Subsystems/Intake/Sim/Applied Voltage");
-        velocityLog = new LoggedDouble("/Subsystems/Intake/Sim/Velocity");
-        currentDrawLog = new LoggedDouble("/Subsystems/Intake/Sim/Motor Current");
+        super();
+        motorSim = new TalonFXMotorSim(intakeMotor, motorConfig, DCMotor.getKrakenX60(1), 0.002);
 
     }
 
-    public double getCurrentDraw() {
-        return motor.getCurrentDrawAmps();
-    }
-
-    public double getVelocity() {
-      return  motor.getAngularVelocityRPM();
-    }
-    
-    public double getMotorTemp() {
-        return 0;
-    }
-
-    public double getAppliedVolts() {
-       return appliedVolts;
-    }
-
-    public void setNutralMode(boolean isBrake) {
-        
-    }
-     
-    public void setVoltage(double volt) {
-        
-        appliedVolts = volt;
-        motor.setInputVoltage(volt);
-    }
-     
+    @Override
     public void updatePeriodic() {
-        motor.update(RobotConstants.kDELTA_TIME);    
-        
-        motorTempLog.update(getMotorTemp());
-        appliedVoltsLog.update(getAppliedVolts());
-        velocityLog.update(getVelocity());
-        currentDrawLog.update(getCurrentDraw());
+        motorSim.updateSim();
+        super.updatePeriodic();
     }
 
 }

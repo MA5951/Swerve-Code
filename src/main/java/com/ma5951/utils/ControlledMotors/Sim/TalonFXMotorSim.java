@@ -1,57 +1,37 @@
 
 package com.ma5951.utils.ControlledMotors.Sim;
 
-import com.ctre.phoenix6.StatusSignal;
+import org.ironmaple.simulation.motorsims.SimulatedBattery;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+import com.ma5951.utils.Utils.ConvUtil;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularAcceleration;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class TalonFXMotorSim {
 
-    private TalonFX talonFX;
-    private TalonFXConfiguration config;
-    private TalonFXSimState talonFxSim;
+    private TalonFXSimState motorSimState;
+    private DCMotorSim physicshSim;
 
-    public TalonFXMotorSim(TalonFX motor , TalonFXConfiguration motorConfig) {
-        talonFX = motor;
-        config = motorConfig;
-
-        motor.getConfigurator().apply(config);
-        talonFxSim = motor.getSimState();
-
-        talonFxSim.addRotorPosition(null);
+    public TalonFXMotorSim(TalonFX motor , TalonFXConfiguration motorConfig , DCMotor motorType , double Inertia) {
+        motorSimState = motor.getSimState();
+        physicshSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motorType, Inertia, motorConfig.Feedback.SensorToMechanismRatio), motorType ,  0.5 , 0.5);
+        SimulatedBattery.addElectricalAppliances(() -> motor.getSupplyCurrent().refresh().getValue());
 
     }
 
-    public StatusSignal<Current> getCurrent() {
-        return talonFX.getStatorCurrent();
-    }
+    public void updateSim() {
+        motorSimState.setSupplyVoltage(SimulatedBattery.getBatteryVoltage().baseUnitMagnitude());
+        physicshSim.setInputVoltage(motorSimState.getMotorVoltage());
+        physicshSim.update(0.02);
 
-    public StatusSignal<AngularVelocity> getVelocity() {
-        return talonFX.getVelocity();
+        motorSimState.setRawRotorPosition(physicshSim.getAngularPositionRotations());
+        motorSimState.setRotorVelocity(ConvUtil.RPMtoRPS(physicshSim.getAngularVelocityRPM()));
     }
-
-    public StatusSignal<Voltage> getAppliedVolts() {
-        return talonFX.getMotorVoltage();
-    }
-
-    public StatusSignal<AngularAcceleration> getAcceleration() {
-        return talonFX.getAcceleration();
-    }
-
-    public StatusSignal<Angle> getPosition() {
-        return talonFX.getRotorPosition();
-    }
-
 
 
 

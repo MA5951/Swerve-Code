@@ -18,7 +18,7 @@ public class IntakeConstants {
     public static final double INTAKE_POWER = 8;
     public static final double EJECT_POWER = -6;
     
-    public static final double Gear = 0.333;
+    public static final double Gear = 1;
     
     public static final double PeakCurrentLimit = 30; 
     public static final double ContinuesCurrentLimit = 25; 

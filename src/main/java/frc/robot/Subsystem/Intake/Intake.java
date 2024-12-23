@@ -54,7 +54,7 @@ public class Intake extends StateControlledSubsystem {
   }
 
   public void setVoltage(double voltage ) {
-    intakeIO.setVoltage(voltage * board.getNum("Intake Adjust"));
+    intakeIO.setVoltage(voltage);
   }
 
   public void setPower(double power) {

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Subsystem.Intake.Intake;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
@@ -37,7 +38,6 @@ public class Robot extends TimedRobot {
     MALog.getInstance().startLog();
 
 
-
   }
 
   @Override
@@ -58,11 +58,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    m_robotContainer.updateDisablePeriodic();
+    //m_robotContainer.updateDisablePeriodic();
   }
 
   @Override
   public void autonomousInit() {
+
     m_robotContainer.updateAutoInit();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -85,6 +86,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    Intake.getInstance().setVoltage(12);
   }
 
   @Override
@@ -104,8 +106,6 @@ public class Robot extends TimedRobot {
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
     simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()) ;
-
-
 
   }
 

@@ -22,8 +22,8 @@ import frc.robot.Subsystem.Intake.IntakeConstants;
 
 public class IntakeIOReal implements IntakeIO {
 
-    private TalonFX intakeMotor;
-    private TalonFXConfiguration motorConfig = new TalonFXConfiguration();
+    protected TalonFX intakeMotor;
+    protected TalonFXConfiguration motorConfig = new TalonFXConfiguration();
     private StatusSignal<Current> currentDraw;
     private StatusSignal<AngularVelocity> velocity;
     private StatusSignal<Temperature> motorTemp;
@@ -61,10 +61,7 @@ public class IntakeIOReal implements IntakeIO {
         motorConfig.Voltage.PeakForwardVoltage = 12;
         motorConfig.Voltage.PeakReverseVoltage = -12;
 
-        // motorConfig.CurrentLimits.SupplyCurrentLimitEnable = IntakeConstants.IsCurrentLimitEnabled;
-        // motorConfig.CurrentLimits.SupplyCurrentLimit = IntakeConstants.ContinuesCurrentLimit;
-        // motorConfig.CurrentLimits.SupplyCurrentThreshold = IntakeConstants.PeakCurrentLimit;
-        // motorConfig.CurrentLimits.SupplyTimeThreshold = IntakeConstants.PeakCurrentTime;
+
 
         intakeMotor.getConfigurator().apply(motorConfig);
     }
