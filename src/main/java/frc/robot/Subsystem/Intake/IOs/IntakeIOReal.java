@@ -12,7 +12,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Utils.ConvUtil;
 
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
@@ -20,7 +19,7 @@ import edu.wpi.first.units.measure.Voltage;
 import frc.robot.PortMap;
 import frc.robot.Subsystem.Intake.IntakeConstants;
 
-public class IntakeIOReal implements IntakeIO {
+public class IntakeIOReal {
 
     protected TalonFX intakeMotor;
     protected TalonFXConfiguration motorConfig = new TalonFXConfiguration();
@@ -60,6 +59,10 @@ public class IntakeIOReal implements IntakeIO {
 
         motorConfig.Voltage.PeakForwardVoltage = 12;
         motorConfig.Voltage.PeakReverseVoltage = -12;
+
+        motorConfig.Slot0.kP = 0.12;
+        motorConfig.Slot0.kI = 0;
+        motorConfig.Slot0.kD = 0.001;
 
 
 

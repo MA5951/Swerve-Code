@@ -29,6 +29,7 @@ public class VisionFilters {
     private ChassisSpeeds robotSpeeds;
     private Pose2d deafultPose = new Pose2d();
     private Supplier<Double> robotVelocityVectorSupplier;
+    private Pose2d lastRobotPose;
 
     public VisionFilters(VisionIO VisionIO , VisionFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds , Supplier<Double> robotVelocityVector) {
         visionIO = VisionIO;
@@ -45,7 +46,8 @@ public class VisionFilters {
     }
 
     public boolean isValidForUpdate(Pose2d visionPose2d) {
-        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange(visionPose2d) && shouldUpdateByRobotState() && notDeafultPose() && isVisionMatchingVelocity(visionPose2d);
+        lastRobotPose = visionPose2d;
+        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange() && shouldUpdateByRobotState() && notDeafultPose() && isVisionMatchingVelocity();
     }
 
     private boolean inVelocityFilter() {
@@ -72,16 +74,20 @@ public class VisionFilters {
         return true;
     }
 
-    private boolean inOdometryRange(Pose2d visiPose2d) {
+    private boolean inOdometryRange() {
         if ((config.visionToOdometryInTeleop && DriverStation.isTeleop()) || DriverStation.isAutonomous()) {
             robotPose = robotPoSupplier.get().getTranslation();
-            return robotPose.getDistance(visiPose2d.getTranslation()) < config.visionToOdometry;
+            return robotPose.getDistance(lastRobotPose.getTranslation()) < config.visionToOdometry;
         }
         return true; 
     }
 
-    private boolean isVisionMatchingVelocity(Pose2d visionPose2d) {
-        return (robotPoSupplier.get().getTranslation().getDistance(visionPose2d.getTranslation()) <= robotVelocityVectorSupplier.get() * 0.02 + 0.35) ;
+    public boolean isFlickering() {
+        return isVisionMatchingVelocity();
+    }
+
+    private boolean isVisionMatchingVelocity() {
+        return (robotPoSupplier.get().getTranslation().getDistance(lastRobotPose.getTranslation()) <= robotVelocityVectorSupplier.get() * 0.02 + 0.35) ;
     }
     
     private boolean shouldUpdateByRobotState() {

@@ -18,7 +18,7 @@ public class TalonFXMotorSim {
     private DCMotorSim physicshSim;
 
     public TalonFXMotorSim(TalonFX motor , TalonFXConfiguration motorConfig , DCMotor motorType , double Inertia) {
-        motorSimState = motor.getSimState();
+        motorSimState = motor.getSimState();//TODO REVERSE
         physicshSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motorType, Inertia, motorConfig.Feedback.SensorToMechanismRatio), motorType ,  0.5 , 0.5);
         SimulatedBattery.addElectricalAppliances(() -> motor.getSupplyCurrent().refresh().getValue());
 

@@ -1,9 +1,7 @@
 package frc.robot.Subsystem.Swerve;
 
 import org.ironmaple.simulation.drivesims.COTS;
-import org.ironmaple.simulation.drivesims.GyroSimulation;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
-import org.ironmaple.simulation.drivesims.SwerveModuleSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -18,12 +16,9 @@ import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
 import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
-//import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
 import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
-// import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
-//import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;

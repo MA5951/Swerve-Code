@@ -3,13 +3,9 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.sim.ChassisReference;
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
 
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -17,7 +13,12 @@ import frc.robot.Subsystem.Intake.Intake;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
-
+/*
+ * is motor conecterd to can
+ * is motor stuk
+ * rotet the motor and check if the iner match the extrnal
+ * jumping  
+ */
 
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;

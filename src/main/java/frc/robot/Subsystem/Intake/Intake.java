@@ -6,21 +6,16 @@ package frc.robot.Subsystem.Intake;
 
 import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
-import com.ma5951.utils.StateControl.StatesTypes.StatesConstants;
 import com.ma5951.utils.StateControl.Subsystems.StateControlledSubsystem;
 
-import frc.robot.RobotConstants;
-import frc.robot.RobotContainer;
-import frc.robot.Subsystem.Intake.IOs.IntakeIO;
+import frc.robot.Subsystem.Intake.IOs.IntakeIOReal;
 
 public class Intake extends StateControlledSubsystem {
   private static Intake intake;
 
-  private IntakeIO intakeIO =  IntakeConstants.getIntakeIO();
+  private IntakeIOReal intakeIO =  new IntakeIOReal();
 
   private LoggedDouble offsetLog;
-  private LoggedBool IntakeCanMove;
-  private LoggedBool EjectCanMove;
   private LoggedBool CanMove;
   
   private Intake() {
@@ -28,12 +23,11 @@ public class Intake extends StateControlledSubsystem {
     intakeIO.setNutralMode(true);
     board.addNum("Intake Adjust" , 1);
     offsetLog = new LoggedDouble("/Subsystems/Intake/Offset");
-    IntakeCanMove = new LoggedBool("/Subsystems/Intake/Can Move/Intake");
-    EjectCanMove = new LoggedBool("/Subsystems/Intake/Can Move/Eject");
     CanMove = new LoggedBool("/Subsystems/Intake/Can Move");
   }
 
   public double getAppliedVolts() {
+    
     return intakeIO.getAppliedVolts();
   }
 

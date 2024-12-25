@@ -1,13 +1,9 @@
 
 package frc.robot.Subsystem.Intake.IOs;
 
-import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ma5951.utils.ControlledMotors.Sim.TalonFXMotorSim;
-import com.ma5951.utils.Utils.ConvUtil;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public class IntakeIOSim extends IntakeIOReal{
 

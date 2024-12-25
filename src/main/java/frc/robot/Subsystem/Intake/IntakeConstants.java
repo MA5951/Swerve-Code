@@ -8,7 +8,6 @@ import com.ma5951.utils.StateControl.StatesTypes.State;
 import com.ma5951.utils.StateControl.StatesTypes.StatesConstants;
 
 import frc.robot.Robot;
-import frc.robot.Subsystem.Intake.IOs.IntakeIO;
 import frc.robot.Subsystem.Intake.IOs.IntakeIOReal;
 import frc.robot.Subsystem.Intake.IOs.IntakeIOSim;
 
@@ -31,13 +30,6 @@ public class IntakeConstants {
 
     public static final State[] SYSTEM_STATES = {IDLE, INTAKING, EJECTING};
 
-    public static final IntakeIO getIntakeIO() {
-        if (Robot.isReal()) {
-            return new IntakeIOReal();
-        } else {
-            return new IntakeIOSim();
-        }
-    }
 
 
 
