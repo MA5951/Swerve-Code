@@ -49,9 +49,9 @@ public class SwerveAutoFollower {
             () -> swerve.getRobotRelativeSpeeds(),
             (speeds , feedforwards) -> swerve.drive(speeds , feedforwards),
             new PPHolonomicDriveController(
-                new PIDConstants(1, 0, 0),
-                new PIDConstants(1, 0, 0),
-                new PIDConstants(0.5, 0, 0)),
+                new PIDConstants(0.09, 0, 0),
+                new PIDConstants(0.4, 0, 0),
+                new PIDConstants(0.25, 0, 0)),
                 config,
             () -> {
                 var alliance = DriverStation.getAlliance();
