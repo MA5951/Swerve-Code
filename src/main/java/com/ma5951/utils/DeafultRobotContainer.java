@@ -8,14 +8,10 @@ import com.ma5951.utils.DashBoard.AutoOption;
 import com.ma5951.utils.DashBoard.AutoSelector;
 import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
-import com.ma5951.utils.Logger.LoggedInt;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.LoggedString;
 import com.ma5951.utils.StateControl.StatesTypes.State;
 import com.ma5951.utils.Utils.DriverStationUtil;
-import com.pathplanner.lib.commands.PathPlannerAuto;
-import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.PS5Controller;
@@ -23,9 +19,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.wpilibj.simulation.PS5ControllerSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotConstants;
@@ -47,7 +40,6 @@ public class DeafultRobotContainer {
 
     public static State currentRobotState = RobotConstants.IDLE;
     public static State lastRobotState = currentRobotState;
-    private static PoseEstimator poseEstimator;
 
     private LoggedString currentRobotStateLog;
     private LoggedString lastRobotStateLog;
@@ -121,10 +113,10 @@ public class DeafultRobotContainer {
     public boolean isAtStartingPose() {
         if (DriverStationUtil.getAlliance() == Alliance.Red) {
             
-            return autoSelector.getSelectedAutoStartingPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;
+            return getSelectedAuto().getStartPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;
         }
         
-        return autoSelector.getSelectedAutoStartingPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;//TODO
+        return getSelectedAuto().getStartPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;//TODO
     }
 
 
@@ -140,9 +132,9 @@ public class DeafultRobotContainer {
 
     public void updateAutoInit() {
         if(!Robot.isReal()) {
-            SwerveConstants.SWERVE_DRIVE_SIMULATION.setSimulationWorldPose(autoSelector.getSelectedAutoStartingPose());
+            SwerveConstants.SWERVE_DRIVE_SIMULATION.setSimulationWorldPose(getSelectedAuto().getStartPose());
+            PoseEstimator.getInstance().resetPose(getSelectedAuto().getStartPose());
         }
-        poseEstimator.resetPose(autoSelector.getSelectedAutoStartingPose());
     }
 
     public void updatePeriodic() {
@@ -156,7 +148,7 @@ public class DeafultRobotContainer {
     public void updateDisablePeriodic() {
         autoSelector.updateViz();
         currentSelectedAuto.update(getAutonomousName());
-        startingPoseLog.update(autoSelector.getSelectedAutoStartingPose());
+        startingPoseLog.update(getSelectedAuto().getStartPose());
         isStartingPoseLog.update(isAtStartingPose());
     }
 

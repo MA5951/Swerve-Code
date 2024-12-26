@@ -3,19 +3,29 @@ package frc.robot.Subsystem.Swerve;
 
 
 
+import java.io.IOException;
+
+import org.json.simple.parser.ParseException;
+
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.config.PIDConstants;
 import frc.robot.Utils.PPHolonomicDriveController;
+
+import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 
 public class SwerveAutoFollower {
+    private static SwerveAutoFollower swerveAutoFollower;
+
 
     private SwerveSubsystem swerve = SwerveSubsystem.getInstance();
     private PoseEstimator poseEstimate = PoseEstimator.getInstance();
@@ -23,7 +33,7 @@ public class SwerveAutoFollower {
     private LoggedPose2d currentPoseLog;
     private RobotConfig config;
 
-    public SwerveAutoFollower() {
+    private SwerveAutoFollower() {
         targetPoseLog = new LoggedPose2d("/Auto/Target Pose");
         currentPoseLog = new LoggedPose2d("/Auto/Current Pose");
         
@@ -39,9 +49,9 @@ public class SwerveAutoFollower {
             () -> swerve.getRobotRelativeSpeeds(),
             (speeds , feedforwards) -> swerve.drive(speeds , feedforwards),
             new PPHolonomicDriveController(
-                new PIDConstants(0, 0, 0),
-                new PIDConstants(0, 0, 0),
-                new PIDConstants(0, 0, 0)),
+                new PIDConstants(1, 0, 0),
+                new PIDConstants(1, 0, 0),
+                new PIDConstants(0.5, 0, 0)),
                 config,
             () -> {
                 var alliance = DriverStation.getAlliance();
@@ -60,4 +70,20 @@ public class SwerveAutoFollower {
     public static Command buildAuto(String autoName) {
         return new PathPlannerAuto(autoName);
     }
+
+    public static Command followPath(String path) {
+        try {
+            return AutoBuilder.followPath(PathPlannerPath.fromPathFile(path));
+        } catch (FileVersionException | IOException | ParseException e) {
+            e.printStackTrace();
+        }
+        return new InstantCommand();
+    }
+
+    public static SwerveAutoFollower getInstance() {
+        if (swerveAutoFollower == null) {
+            swerveAutoFollower = new SwerveAutoFollower();  
+        }
+        return swerveAutoFollower;
+      }
 }

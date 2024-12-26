@@ -59,7 +59,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    //m_robotContainer.updateDisablePeriodic();
+    m_robotContainer.updateDisablePeriodic();
   }
 
   @Override

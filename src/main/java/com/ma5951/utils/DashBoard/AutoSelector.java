@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 /** Add your docs here. */
 public class AutoSelector {
@@ -75,7 +76,11 @@ public class AutoSelector {
     }
 
     public AutoOption getSelectedAuto() {
-        return autoOptionByCommand.get(getSelectedAutoCommand());
+        if (autoOptionByCommand.get(getSelectedAutoCommand()) != null) {
+            return autoOptionByCommand.get(getSelectedAutoCommand());
+        }
+
+        return new AutoOption("", new InstantCommand(), new Pose2d());
     }
 
     public String getAutonomousName() {
