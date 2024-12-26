@@ -1,0 +1,63 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 0.77,
+        "y": 6.677279833432906
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 1.4348373860128,
+        "y": 7.038604499744211
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.614895244101759,
+        "y": 7.240041385270605
+      },
+      "prevControl": {
+        "x": 2.381297928964374,
+        "y": 6.740728186286426
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "END 3 Shooting"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -170.0
+    },
+    {
+      "waypointRelativePos": 0.5,
+      "rotationDegrees": -170.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 4.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -154.0
+  },
+  "reversed": false,
+  "folder": "Close 3",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
