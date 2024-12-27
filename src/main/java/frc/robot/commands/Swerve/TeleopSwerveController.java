@@ -7,6 +7,7 @@ package frc.robot.commands.Swerve;
 import com.ma5951.utils.Logger.LoggedString;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
@@ -21,7 +22,6 @@ public class TeleopSwerveController extends Command {
   private ChassisSpeeds relativAngleAdjustControllerSpeeds;
   
   public static boolean atPoint;
-  
 
   private SwerveSubsystem swerve;
   private ChassisSpeeds robotSpeeds;

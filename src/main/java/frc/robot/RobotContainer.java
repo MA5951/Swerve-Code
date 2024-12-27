@@ -15,6 +15,7 @@ import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveAutoFollower;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 import frc.robot.Subsystem.Vision.Vision;
+import frc.robot.commands.Auto.AutoTest;
 import frc.robot.commands.Swerve.FieldCentricDriveController;
 import frc.robot.commands.Swerve.TeleopSwerveController;
 
@@ -35,7 +36,7 @@ public class RobotContainer extends DeafultRobotContainer{
   }
 
   public void setUpAutoCommands() {
-    setAutoOptions(new AutoOption[] {new AutoOption("Test", SwerveAutoFollower.followPath("Test"), new Pose2d(1.383, 5.528, new Rotation2d(0)))});
+    setAutoOptions(new AutoOption[] {new AutoOption("Test", SwerveAutoFollower.followPath("Test"), new Pose2d(1.43, 6.917, Rotation2d.k180deg))});
   }
 
   private void configureBindings() {
@@ -45,6 +46,11 @@ public class RobotContainer extends DeafultRobotContainer{
 
 
 
+  }
+
+  @Override
+  public Command getAutonomousCommand() {
+    return new AutoTest();
   }
 
 

@@ -5,7 +5,9 @@ import org.ironmaple.simulation.SimulatedArena;
 
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
+import com.pathplanner.lib.commands.PathfindingCommand;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -29,16 +31,18 @@ public class Robot extends TimedRobot {
   private boolean isTeleop = false;
   public static boolean isStartingPose = false;
   private LoggedPose2d simulationPose2d;
+  private static DigitalInput sensor;
 
   @Override
   public void robotInit() {
     MALog.getInstance();
     m_robotContainer = new RobotContainer();
     simulationPose2d = new LoggedPose2d("/Simulation/Pose");
+    sensor = new DigitalInput(0);
     PoseEstimator.getInstance();
     MALog.getInstance().startLog();
 
-
+    PathfindingCommand.warmupCommand().schedule();
   }
 
   @Override
@@ -108,6 +112,10 @@ public class Robot extends TimedRobot {
     SimulatedArena.getInstance().simulationPeriodic();
     simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()) ;
 
+  }
+
+  public static boolean getSensor() {
+    return sensor.get();
   }
 
 }

@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotConstants;
@@ -65,6 +66,7 @@ public class DeafultRobotContainer {
             batteryVoltagSupplier = () -> SimulatedBattery.getBatteryVoltage().baseUnitMagnitude();
         }
         
+        DriverStation.silenceJoystickConnectionWarning(true);
 
         currentRobotStateLog = new LoggedString("/RobotControl/Current Robot State");
         lastRobotStateLog = new LoggedString("/RobotControl/Last Robot State");
