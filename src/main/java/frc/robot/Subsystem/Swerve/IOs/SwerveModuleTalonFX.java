@@ -284,17 +284,17 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     public void refreshAll() {
         BaseStatusSignal.refreshAll(
-                driveTemp.refresh(),
-                steerTemp.refresh(),
-                driveCurrent.refresh(),
-                steerCurrent.refresh(),
-                driveVolts.refresh(),
-                steerVolts.refresh(),
-                absAngle.refresh(),
-                drivePosition.refresh(),
-                steerPosition.refresh(),
-                driveVelocity.refresh(),
-                steerVelocitt.refresh());
+                driveTemp,
+                steerTemp,
+                driveCurrent,
+                steerCurrent,
+                driveVolts,
+                steerVolts,
+                absAngle,
+                drivePosition,
+                steerPosition,
+                driveVelocity,
+                steerVelocitt);
     }
 
     public SwerveModuleData update() {
