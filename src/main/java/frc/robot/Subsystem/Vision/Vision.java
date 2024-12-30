@@ -65,6 +65,10 @@ public class Vision extends SubsystemBase {
     return visionIO.getTargetCount();
   }
 
+  public void updateOdometry() {
+    PoseEstimator.getInstance().updateVision(visionPoseEstimate.pose , visionPoseEstimate.timestampSeconds);
+  }
+
   public static Vision getInstance() {
     if (vision == null) {
       vision = new Vision();
@@ -90,7 +94,7 @@ public class Vision extends SubsystemBase {
     isValidForResetLog.update(visionFilters.isValidForReset());
 
     if (isUpdateForOdometry) {
-      PoseEstimator.getInstance().updateVision(visionPoseEstimate.pose , visionPoseEstimate.timestampSeconds);
+      updateOdometry();
     }
 
     if (!didUpdatedGyro) {

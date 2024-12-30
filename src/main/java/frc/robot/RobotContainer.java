@@ -39,6 +39,8 @@ public class RobotContainer extends DeafultRobotContainer{
     //Update Offset
     new Trigger(() -> driverController.getTriangleButton()).onTrue(new InstantCommand(() -> FieldCentricDriveController.updateDriveHeading()));
 
+    //Manuel Vision Update
+    new Trigger(() -> driverController.getPSButton()).onTrue(new InstantCommand(() -> Vision.getInstance().updateOdometry()));
 
 
   }
