@@ -4,6 +4,7 @@
 
 package com.ma5951.utils.DashBoard;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,11 +13,12 @@ import java.util.function.Supplier;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
+import org.json.simple.parser.ParseException;
+
 import com.ma5951.utils.Utils.DriverStationUtil;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPoint;
-import com.pathplanner.lib.util.PathPlannerLogging;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,14 +34,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
-/** Add your docs here. */
+@SuppressWarnings("unused")
 public class AutoSelector {
     private SendableChooser<edu.wpi.first.wpilibj2.command.Command> commandChooser;
     private AutoOption[] autoOptions;
 
     double[] lastarr = new double[0];
     private String lastPublishedAuto = "0";
-    private String deafultAuto;
     private Field2d field = new Field2d();
     private List<Pose2d> posesList = new ArrayList<>();
     private DoubleArrayPublisher pathPub = NetworkTableInstance.getDefault().getDoubleArrayTopic("/Dash/path")
@@ -48,6 +49,7 @@ public class AutoSelector {
     private boolean preVizualizAuto;
     private PathPlannerPath[] pathsArry;
     private Supplier<Pose2d> poseSupplier;
+    private String Auto;
 
     public AutoSelector(Supplier<Pose2d> robotPoseSupplier) {
         commandChooser = new SendableChooser<>();
@@ -66,9 +68,7 @@ public class AutoSelector {
         }
 
         commandChooser.setDefaultOption(autoOptions[0].getName(), autoOptions[0].getCommand());
-        if (autoOptions[0].isPathPlannerAuto()) {
-            deafultAuto = autoOptions[0].getPathPlannerAutoName();
-        }
+
     }
 
     public Command getSelectedAutoCommand() {
@@ -136,34 +136,35 @@ public class AutoSelector {
     public void updateViz() {
         field.setRobotPose(poseSupplier.get());
         if (preVizualizAuto) {
-            if (!DriverStation.isTeleopEnabled()) {
-                if (getSelectedAuto().isPathPlannerAuto()) {
-                    if (lastPublishedAuto != getSelectedAuto().getPathPlannerAutoName()) {
-                        clearCurrentPath();
-                        String auto = "";
-                        auto = getSelectedAuto().getPathPlannerAutoName();
-                        // pathsArry = PathPlannerAuto.getPathGroupFromAutoFile(auto).toArray(new
-                        // PathPlannerPath[0]);
-                        for (PathPlannerPath path : pathsArry) {
-                            if (DriverStationUtil.getAlliance() == Alliance.Red) {
-                                path.flipPath();
-                            }
-                            setCurrentPath(path);
-                        }
-
-                        lastPublishedAuto = getSelectedAuto().getPathPlannerAutoName();
-                        for (int i = 0; i < lastarr.length; i += 3) {
-                            double x = lastarr[i];
-                            double y = lastarr[i + 1];
-                            double rotation = lastarr[i + 2];
-                            posesList.add(new Pose2d(x, y, new Rotation2d(rotation)));
-                        }
-                        field.getObject("Auto").setPoses(posesList);
-                    }
-                } else {
+            if (getSelectedAuto().isPathPlannerAuto()) {
+                if (lastPublishedAuto != getSelectedAuto().getPathPlannerAutoName()) {
                     clearCurrentPath();
+                    Auto = getSelectedAuto().getPathPlannerAutoName();
+                    try {
+                        pathsArry = PathPlannerAuto.getPathGroupFromAutoFile(Auto).toArray(new PathPlannerPath[0]);
+                    } catch (IOException | ParseException e) {
+                        e.printStackTrace();
+                    }
+                    for (PathPlannerPath path : pathsArry) {
+                        if (DriverStationUtil.getAlliance() == Alliance.Red) {
+                            path.flipPath();
+                        }
+                        setCurrentPath(path);
+                    }
+
+                    lastPublishedAuto = getSelectedAuto().getPathPlannerAutoName();
+                    for (int i = 0; i < lastarr.length; i += 3) {
+                        double x = lastarr[i];
+                        double y = lastarr[i + 1];
+                        double rotation = lastarr[i + 2];
+                        posesList.add(new Pose2d(x, y, new Rotation2d(rotation)));
+                    }
+                    field.getObject("Auto").setPoses(posesList);
                 }
+            } else {
+                clearCurrentPath();
             }
+
         }
     }
 }

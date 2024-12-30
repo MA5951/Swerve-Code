@@ -13,7 +13,6 @@ public class LoggedDouble {
 
     private DoublePublisher loggedNum;
     private double lastNum;
-    private double lastValue;
     private NetworkTable networkTable;
 
     public LoggedDouble(String name) {
@@ -30,9 +29,4 @@ public class LoggedDouble {
         }   
 
     }
-
-    //public double getValue() {
-    //    if (lastValue == loggedNum.getTopic().getGenericEntry().getDouble(0))
-    //    return lastValue;
-    //}
 }

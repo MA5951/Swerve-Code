@@ -21,6 +21,4 @@ public class PoseEstimatorConstants {
 
     public static Supplier<Boolean> ODOMETRY_UPDATE_CONSTRAINS = () -> DriverStation.isEnabled() && !DriverStation.isTest();
 
-    public final static double xyDEVS_COEFFICIENT = 0.02;
-    public final static double thetaDEVS_COEFFICIENT = 0.04;
 }

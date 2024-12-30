@@ -31,8 +31,7 @@ public abstract class StateControlledSubsystem extends SubsystemBase {
     private String systemName;
     protected MAShuffleboard board;
 
-
-    public StateControlledSubsystem(State[] states , String name) {
+    public StateControlledSubsystem(State[] states, String name) {
         targetState = StatesConstants.IDLE;
         systemStatesList = Arrays.asList(states);
         currentStateLog = new LoggedString("/RobotControl/" + name + "/Current State");
@@ -41,11 +40,18 @@ public abstract class StateControlledSubsystem extends SubsystemBase {
         systemCanMoveLog = new LoggedBool("/RobotControl/" + name + "/Can Move");
         board = new MAShuffleboard(name);
         systemName = name;
+        System.out.println(systemName + " Manuel");
         board.addBoolean(systemName + " Manuel", false);
 
     }
 
     public void setSystemFunctionState(State FunctioState) {
+        if (FunctioState == StatesConstants.MANUEL) {
+            board.addBoolean(systemName + " Manuel", true);
+        } else {
+            board.addBoolean(systemName + " Manuel", false);
+        }
+
         systemFunctionState = FunctioState;
     }
 
@@ -53,7 +59,7 @@ public abstract class StateControlledSubsystem extends SubsystemBase {
         return systemFunctionState;
     }
 
-    //add get posiible states as arry
+    // add get posiible states as arry
 
     public State getTargetState() {
         return targetState;
@@ -81,19 +87,18 @@ public abstract class StateControlledSubsystem extends SubsystemBase {
         return targetState;
     }
 
-   @Override
-   public void periodic() {
-       
-       currentStateLog.update(getCurrenState().getName());
-       systemFunctionStateLog.update(getSystemFunctionState().getName());
-       targetStateLog.update(getTargetState().getName());
-       systemCanMoveLog.update(canMove());
+    @Override
+    public void periodic() {
+        currentStateLog.update(getCurrenState().getName());
+        systemFunctionStateLog.update(getSystemFunctionState().getName());
+        targetStateLog.update(getTargetState().getName());
+        systemCanMoveLog.update(canMove());
 
-       if (board.getBoolean(systemName +" Manuel")) {
+        if (board.getBoolean(systemName + " Manuel")) {
             setSystemFunctionState(StatesConstants.MANUEL);
-       } else {
+        } else {
             setSystemFunctionState(StatesConstants.AUTOMATIC);
-       }
-   }
+        }
+    }
 
 }

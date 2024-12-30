@@ -16,9 +16,9 @@ import com.ma5951.utils.Vision.Limelights.LimelightHelpers.RawFiducial;
 
 public class Limelight3G {
   private String name;
-  private double cammeraHight;
-  private double cammeraAngle;
-  private double offset = 0;
+  // private double cammeraHight;
+  // private double cammeraAngle;
+  // private double offset = 0;
   private Supplier<Double> robotAngleSupplier;
 
   /**
@@ -30,10 +30,10 @@ public class Limelight3G {
    * @param angleSupplier The angle of the robot, **MUST** be absolute 0 is red alliance wall.
   **/
   public Limelight3G(
-    String cammeraName , double cammeraHight , double cammeraAngle , Supplier<Double> angleSupplier){
+    String cammeraName , Supplier<Double> angleSupplier){
       name  = cammeraName;
-      this.cammeraHight = cammeraHight;
-      this.cammeraAngle = cammeraAngle;
+      // this.cammeraHight = cammeraHight;
+      // this.cammeraAngle = cammeraAngle;
       robotAngleSupplier = angleSupplier;
   }
 

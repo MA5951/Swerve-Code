@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.ma5951.utils.Swerve.SwerveController;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PS5Controller;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
@@ -51,10 +52,10 @@ public class FieldCentricDriveController implements SwerveController{
         chassisSpeeds.vyMetersPerSecond = ySpeed;
         chassisSpeeds.omegaRadiansPerSecond = turningSpeed;
 
-        // chassisSpeeds.toRobotRelativeSpeeds(
-        //           new Rotation2d(
-        //             Math.toRadians((angleSupplier.get()
-        //              - gyroOffset))));
+        ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeeds ,
+                  new Rotation2d(
+                    Math.toRadians((angleSupplier.get()
+                     - gyroOffset))));
 
         return chassisSpeeds;
     }

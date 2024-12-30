@@ -5,6 +5,7 @@ import org.ironmaple.simulation.motorsims.SimulatedBattery;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.sim.ChassisReference;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ma5951.utils.Utils.ConvUtil;
 
@@ -17,10 +18,13 @@ public class TalonFXMotorSim {
     private TalonFXSimState motorSimState;
     private DCMotorSim physicshSim;
 
-    public TalonFXMotorSim(TalonFX motor , TalonFXConfiguration motorConfig , DCMotor motorType , double Inertia) {
-        motorSimState = motor.getSimState();//TODO REVERSE
+    public TalonFXMotorSim(TalonFX motor , TalonFXConfiguration motorConfig ,DCMotor motorType , double Inertia , boolean isRevers) {
+        motorSimState = motor.getSimState();
         physicshSim = new DCMotorSim(LinearSystemId.createDCMotorSystem(motorType, Inertia, motorConfig.Feedback.SensorToMechanismRatio), motorType ,  0.5 , 0.5);
         SimulatedBattery.addElectricalAppliances(() -> motor.getSupplyCurrent().refresh().getValue());
+        if (isRevers) {
+            motorSimState.Orientation = ChassisReference.Clockwise_Positive;
+        }
 
     }
 

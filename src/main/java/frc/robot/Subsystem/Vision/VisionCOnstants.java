@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.RobotConstants;
 import frc.robot.Subsystem.Vision.Filters.VisionFiltersConfig;
 
 public class VisionConstants {
@@ -21,7 +22,7 @@ public class VisionConstants {
     public final static VisionFiltersConfig FILTERS_CONFIG = new VisionFiltersConfig(
         true, 
         new ChassisSpeeds(4, 4, ConvUtil.DegreesToRadians(720)), 
-        new Rectangle2d(new Translation2d(), new Translation2d(16.58 , 8.20)), 
+        new Rectangle2d(new Translation2d(), RobotConstants.FieldCorner), 
         null, 
         1, 
         false);

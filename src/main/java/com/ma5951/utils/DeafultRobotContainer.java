@@ -12,6 +12,7 @@ import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.LoggedString;
 import com.ma5951.utils.StateControl.StatesTypes.State;
 import com.ma5951.utils.Utils.DriverStationUtil;
+import com.pathplanner.lib.util.FlippingUtil;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.PS5Controller;
@@ -19,7 +20,6 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Robot;
 import frc.robot.RobotConstants;
@@ -118,7 +118,7 @@ public class DeafultRobotContainer {
             return getSelectedAuto().getStartPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;
         }
         
-        return getSelectedAuto().getStartPose().getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;//TODO
+        return FlippingUtil.flipFieldPose(getSelectedAuto().getStartPose()).getTranslation().getDistance(robotPoseSupplier.get().getTranslation()) < IsAtStartingPoseDistance;
     }
 
 

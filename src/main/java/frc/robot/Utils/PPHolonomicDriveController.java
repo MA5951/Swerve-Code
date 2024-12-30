@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 /** Path following controller for holonomic drive trains */
 public class PPHolonomicDriveController implements PathFollowingController {
   private final PIDController xController;

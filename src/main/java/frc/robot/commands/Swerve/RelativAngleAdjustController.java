@@ -49,5 +49,13 @@ public class RelativAngleAdjustController implements SwerveController{
         return pid.atSetpoint();
     }
 
+    public void setSetPoint(double setPoint) {
+        pid.setSetpoint(setPoint);
+    }
+
+    public void setMeasurment(Supplier<Double> getMeasurment) {
+        measurment = getMeasurment;
+    }
+
 }
  
