@@ -3,7 +3,6 @@ package frc.robot;
 
 
 import com.ma5951.utils.DeafultRobotContainer;
-import com.ma5951.utils.DashBoard.AutoOption;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,7 +31,7 @@ public class RobotContainer extends DeafultRobotContainer{
   }
 
   public void setUpAutoCommands() {
-    setAutoOptions(new AutoOption[] {});
+    //setAutoOptions(null);
   }
 
   private void configureBindings() {
