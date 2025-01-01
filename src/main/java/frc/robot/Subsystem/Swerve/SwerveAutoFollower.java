@@ -15,8 +15,6 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.LocalADStar;
 import com.pathplanner.lib.pathfinding.Pathfinding;
-import com.pathplanner.lib.config.PIDConstants;
-import frc.robot.Utils.PPHolonomicDriveController;
 
 import com.pathplanner.lib.util.FileVersionException;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -52,10 +50,7 @@ public class SwerveAutoFollower {
             pose -> poseEstimate.resetPose(pose), 
             () -> swerve.getRobotRelativeSpeeds(),
             (speeds , feedforwards) -> swerve.drive(speeds , feedforwards),
-            new PPHolonomicDriveController(
-                new PIDConstants(0.09, 0, 0),
-                new PIDConstants(0.4, 0, 0),
-                new PIDConstants(0.25, 0, 0)),
+           SwerveConstants.getHolonomicController(),
                 config,
             () -> {
                 var alliance = DriverStation.getAlliance();

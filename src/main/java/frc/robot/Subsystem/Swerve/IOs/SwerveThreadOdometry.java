@@ -105,7 +105,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         boolean includeMeasurement = true;
 
         skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < config.skidRatio;
-        collisionDetected = collisionDtector.getForce() > config.collisionForce;
+        collisionDetected = collisionDtector.getForceVectorSize() > config.collisionForce;
 
         skidDetected = false;
         collisionDetected = false;

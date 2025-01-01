@@ -2,7 +2,7 @@
 package frc.robot.RobotControl;
 
 
-import com.ma5951.utils.StateControl.GenericSuperStracture;
+import com.ma5951.utils.RobotControl.GenericSuperStracture;
 
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;

@@ -4,6 +4,8 @@ import org.ironmaple.simulation.drivesims.COTS;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -14,6 +16,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
 import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
+import frc.robot.Utils.PPHolonomicDriveController;
 import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
@@ -64,7 +67,6 @@ public class SwerveConstants {
         public final static boolean REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED = true;
         public final static boolean REAR_RIGHT_MODULE_IS_ABSOLUTE_ENCODER_REVERSED = false;
 
-
         // Module locations
         public static final Translation2d frontLeftLocation = new Translation2d(
                         -WIDTH / 2,
@@ -94,8 +96,7 @@ public class SwerveConstants {
                                         PortMap.Swerve.leftFrontTurningID,
                                         PortMap.Swerve.leftFrontAbsoluteEncoder,
                                         SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                        SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED
-                                        );
+                                        SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED);
 
                         final SwerveModule frontRightModule = new SwerveModuleTalonFX(
                                         "Front Right",
@@ -103,8 +104,7 @@ public class SwerveConstants {
                                         PortMap.Swerve.rightFrontTurningID,
                                         PortMap.Swerve.rightFrontAbsoluteEncoder,
                                         SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                        SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED
-                                        );
+                                        SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED);
 
                         final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
                                         "Rear Left",
@@ -112,8 +112,7 @@ public class SwerveConstants {
                                         PortMap.Swerve.leftBackTurningID,
                                         PortMap.Swerve.leftBackAbsoluteEncoder,
                                         SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                        SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED
-                                        );
+                                        SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED);
 
                         final SwerveModule rearRightModule = new SwerveModuleTalonFX(
                                         "Rear Right",
@@ -121,8 +120,7 @@ public class SwerveConstants {
                                         PortMap.Swerve.rightBackTurningID,
                                         PortMap.Swerve.rightBackAbsoluteEncoder,
                                         SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                        SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED
-                                        );
+                                        SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED);
                         return new SwerveModule[] {
                                         frontLeftModule, frontRightModule, rearLeftModule, rearRightModule };
                 }
@@ -171,6 +169,20 @@ public class SwerveConstants {
 
         public static final SwerveOdometry getOdometry() {
                 return new SwerveThreadOdometry(ODOMETRY_CONFIG);
+        }
+
+        public static final PPHolonomicDriveController getHolonomicController() {
+                if (Robot.isReal()) {
+                        return new PPHolonomicDriveController(
+                                        new PIDConstants(0.09, 0, 0),//TODO
+                                        new PIDConstants(0.4, 0, 0),//TODO
+                                        new PIDConstants(0.25, 0, 0));//TODO
+                }
+
+                return new PPHolonomicDriveController(
+                                        new PIDConstants(0.09, 0, 0),
+                                        new PIDConstants(0.4, 0, 0),
+                                        new PIDConstants(0.25, 0, 0));
         }
 
         // Modules config
@@ -234,8 +246,7 @@ public class SwerveConstants {
                                         edu.wpi.first.units.Units.Meter.of(BUMPER_LENGTH));
 
         public final static SwerveDriveSimulation SWERVE_DRIVE_SIMULATION = new SwerveDriveSimulation(
-                        DRIVE_TRAIN_SIMULATION_CONFIG, new Pose2d(2,2, new Rotation2d()));
-                        
+                        DRIVE_TRAIN_SIMULATION_CONFIG, new Pose2d(2, 2, new Rotation2d()));
 
         // Module Limits
         public final static ModuleLimits DEFUALT = new ModuleLimits(5.2, Units.feetToMeters(65),
@@ -244,7 +255,7 @@ public class SwerveConstants {
         // Odometry
         public final static double ODOMETRY_UPDATE_RATE = 250;
         public final static OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
-                        true, true, 0.15, 2d , false , 85d);
+                        true, true, 0.15, 2d, false, 85d);
 
         // Swerve controllers
 

@@ -5,13 +5,11 @@
 //Flickering pose 1. stationery flickring 2. distance from odometry (only auto)
 //not deafult pose
 
-
 //Is Flickering detection 
 
 package frc.robot.Subsystem.Vision.Filters;
 
 import java.util.function.Supplier;
-
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
@@ -20,6 +18,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Subsystem.Vision.VisionIO;
 
+@SuppressWarnings("static-access")
 public class VisionFilters {
     private VisionIO visionIO;
     private VisionFiltersConfig config;
@@ -29,9 +28,11 @@ public class VisionFilters {
     private ChassisSpeeds robotSpeeds;
     private Pose2d deafultPose = new Pose2d();
     private Supplier<Double> robotVelocityVectorSupplier;
-    private Pose2d lastRobotPose;
+    private Pose2d visionPose;
+    private double robotVelocity;
 
-    public VisionFilters(VisionIO VisionIO , VisionFiltersConfig configuration , Supplier<Pose2d> robotPose , Supplier<ChassisSpeeds> robotSpeeds , Supplier<Double> robotVelocityVector) {
+    public VisionFilters(VisionIO VisionIO, VisionFiltersConfig configuration, Supplier<Pose2d> robotPose,
+            Supplier<ChassisSpeeds> robotSpeeds, Supplier<Double> robotVelocityVector) {
         visionIO = VisionIO;
         config = configuration;
         robotPoSupplier = robotPose;
@@ -39,22 +40,29 @@ public class VisionFilters {
         robotVelocityVectorSupplier = robotVelocityVector;
     }
 
-    public boolean isValidForReset() {
-        return visionIO.getTargetCount() > 1 && visionIO.getRawFiducial().distToCamera < 2 && visionIO.getRawFiducial().ambiguity < 0.5 && robotSpeeds.vxMetersPerSecond < 0.05 &&
-        robotSpeeds.vyMetersPerSecond < 0.05 &&
-        robotSpeeds.omegaRadiansPerSecond < 0.05;
+    public void updateFilterConfig(VisionFiltersConfig configuration) {
+        config = configuration;
+    }
+
+    public boolean isValidForGyroReset() {
+        return visionIO.getTargetCount() > 1 && visionIO.getRawFiducial().distToCamera < 2
+                && visionIO.getRawFiducial().ambiguity < config.AMBIGUITY_FOR_GYRO_RESET &&
+                robotSpeeds.vxMetersPerSecond < config.SPEED_FOR_GYRO_RESET &&
+                robotSpeeds.vyMetersPerSecond < config.SPEED_FOR_GYRO_RESET &&
+                robotSpeeds.omegaRadiansPerSecond < config.SPEED_FOR_GYRO_RESET;
     }
 
     public boolean isValidForUpdate(Pose2d visionPose2d) {
-        lastRobotPose = visionPose2d;
-        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange() && shouldUpdateByRobotState() && notDeafultPose() && isVisionMatchingVelocity();
+        visionPose = visionPose2d;
+        return inVelocityFilter() && inField() && notInFieldObstacles() && inOdometryRange()
+                && shouldUpdateByRobotState() && notDeafultPose() && isVisionMatchingVelocity();
     }
 
     private boolean inVelocityFilter() {
         robotSpeeds = robotSpeedsSupplier.get();
         return robotSpeeds.vxMetersPerSecond <= config.robotUpdateSpeed.vxMetersPerSecond &&
-        robotSpeeds.vyMetersPerSecond <= config.robotUpdateSpeed.vyMetersPerSecond &&
-        robotSpeeds.omegaRadiansPerSecond <= config.robotUpdateSpeed.omegaRadiansPerSecond;
+                robotSpeeds.vyMetersPerSecond <= config.robotUpdateSpeed.vyMetersPerSecond &&
+                robotSpeeds.omegaRadiansPerSecond <= config.robotUpdateSpeed.omegaRadiansPerSecond;
     }
 
     private boolean inField() {
@@ -64,7 +72,7 @@ public class VisionFilters {
     private boolean notInFieldObstacles() {
         if (config.fieldObstaclesRectangles != null) {
             robotPose = robotPoSupplier.get().getTranslation();
-            for (Rectangle2d obstacles: config.fieldObstaclesRectangles) {
+            for (Rectangle2d obstacles : config.fieldObstaclesRectangles) {
                 if (obstacles.contains(robotPose)) {
                     return false;
                 }
@@ -77,9 +85,9 @@ public class VisionFilters {
     private boolean inOdometryRange() {
         if ((config.visionToOdometryInTeleop && DriverStation.isTeleop()) || DriverStation.isAutonomous()) {
             robotPose = robotPoSupplier.get().getTranslation();
-            return robotPose.getDistance(lastRobotPose.getTranslation()) < config.visionToOdometry;
+            return robotPose.getDistance(visionPose.getTranslation()) < config.visionToOdometry;
         }
-        return true; 
+        return true;
     }
 
     public boolean isFlickering() {
@@ -87,9 +95,15 @@ public class VisionFilters {
     }
 
     private boolean isVisionMatchingVelocity() {
-        return (robotPoSupplier.get().getTranslation().getDistance(lastRobotPose.getTranslation()) <= robotVelocityVectorSupplier.get() * 0.02 + 0.35) ;
+        robotVelocity = robotVelocityVectorSupplier.get();
+        if (robotVelocity < config.maxVelocityForVisionVelocityFilter) {
+            return (robotPoSupplier.get().getTranslation().getDistance(
+                    visionPose.getTranslation()) <= robotVelocity * 0.02 + config.VISION_VELOCITY_TOLERANCE);
+        }
+
+        return true;
     }
-    
+
     private boolean shouldUpdateByRobotState() {
         if ((config.updateInAuto && DriverStation.isAutonomous()) || !DriverStation.isAutonomous()) {
             return true;
@@ -99,7 +113,7 @@ public class VisionFilters {
     }
 
     private boolean notDeafultPose() {
-        return visionIO.getEstimatedPose().pose !=deafultPose;
+        return visionIO.getEstimatedPose().pose != deafultPose;
     }
 
 }

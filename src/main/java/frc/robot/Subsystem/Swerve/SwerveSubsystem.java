@@ -53,6 +53,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private ModuleLimits currentLimits = SwerveConstants.DEFUALT;
   private ChassisSpeeds currentChassisSpeeds;
   private SwerveModuleState[] states;
+  private SwerveModuleState[] Optistates = new SwerveModuleState[4];
 
   private SwerveSetpoint currentSetpoint = new SwerveSetpoint(
     new ChassisSpeeds(),
@@ -169,17 +170,18 @@ public class SwerveSubsystem extends SubsystemBase {
   public void drive(ChassisSpeeds chassisSpeeds) {
     states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
-    SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
+    Optistates[0] = states[1];
+    Optistates[1] = states[3];
+    Optistates[2] = states[0];
+    Optistates[3] = states[2];
+    setPoinStatesLog.update(Optistates);
+    setModules(Optistates);
     setPoinStatesLog.update(Optistates);
     setModules(Optistates);
   }
 
   public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
-
-    SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
-    setPoinStatesLog.update(Optistates);
-    setModules(Optistates);
+    drive(chassisSpeeds);
   }
 
   public ModuleLimits getCurrentLimits() {

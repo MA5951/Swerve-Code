@@ -23,21 +23,16 @@ import frc.robot.Subsystem.Swerve.SwerveConstants;
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
-  
-
   private RobotContainer m_robotContainer;
-  private boolean isTeleop = false;
   public static boolean isStartingPose = false;
   private LoggedPose2d simulationPose2d;
+  private MALog maLog;
 
   @Override
   public void robotInit() {
-    MALog.getInstance();
     m_robotContainer = new RobotContainer();
     simulationPose2d = new LoggedPose2d("/Simulation/Pose");
-    PoseEstimator.getInstance();
-    MALog.getInstance().startLog();
-
+    maLog = MALog.getInstance(RobotConstants.COMP_LOG);
 
     PathfindingCommand.warmupCommand().schedule();
   }
@@ -48,14 +43,12 @@ public class Robot extends TimedRobot {
     PoseEstimator.getInstance().update();
     m_robotContainer.updatePeriodic();
 
-    
   }
 
   @Override
   public void disabledInit() {
-    if (isTeleop) {
-      MALog.getInstance().stopLog();
-    }
+    maLog.stopLog();
+    ;
   }
 
   @Override
@@ -65,6 +58,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    maLog.startAutoLog();
     m_robotContainer.updateAutoInit();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
@@ -74,15 +68,15 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+  }
 
   @Override
   public void teleopInit() {
+    maLog.startTeleopLog();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
-      }
-
-    isTeleop = true;
+    }
   }
 
   @Override
@@ -91,11 +85,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testInit() {
+    maLog.startTestLog();
     CommandScheduler.getInstance().cancelAll();
   }
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+  }
 
   @Override
   public void simulationInit() {
@@ -105,9 +101,8 @@ public class Robot extends TimedRobot {
   @Override
   public void simulationPeriodic() {
     SimulatedArena.getInstance().simulationPeriodic();
-    simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose()) ;
+    simulationPose2d.update(SwerveConstants.SWERVE_DRIVE_SIMULATION.getSimulatedDriveTrainPose());
 
   }
-
 
 }

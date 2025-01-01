@@ -16,9 +16,9 @@ public class CollisionDtector {
         gyroData = GyroData;
     }
 
-    public double getForce() {
-        return Math.sqrt(Math.pow(gyroData.get().getAccelX(), 2) +
-        Math.pow(gyroData.get().getAccelY(), 2));
+    public double getForceVectorSize() {
+        return Math.sqrt(Math.pow(getCollisionVector().getX(), 2) +
+        Math.pow(getCollisionVector().getY(), 2));
     }
 
     public Translation2d getCollisionVector() {

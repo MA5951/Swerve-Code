@@ -1,4 +1,4 @@
-package com.ma5951.utils;
+package com.ma5951.utils.RobotControl;
 
 import java.util.function.Supplier;
 
@@ -10,7 +10,7 @@ import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.LoggedString;
-import com.ma5951.utils.StateControl.StatesTypes.State;
+import com.ma5951.utils.RobotControl.StatesTypes.State;
 import com.ma5951.utils.Utils.DriverStationUtil;
 import com.pathplanner.lib.util.FlippingUtil;
 

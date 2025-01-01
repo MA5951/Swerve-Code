@@ -8,8 +8,10 @@ import com.ma5951.utils.Logger.LoggedBool;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedInt;
 import com.ma5951.utils.Logger.LoggedPose2d;
+import com.ma5951.utils.Vision.Limelights.LimelightHelpers;
 import com.ma5951.utils.Vision.Limelights.LimelightHelpers.PoseEstimate;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
@@ -20,7 +22,7 @@ public class Vision extends SubsystemBase {
 
   private VisionIO visionIO = VisionConstants.getVisionIO();
 
-  private VisionFilters visionFilters = new VisionFilters(visionIO, VisionConstants.FILTERS_CONFIG, () -> PoseEstimator.getInstance().getEstimatedRobotPose(), () -> SwerveSubsystem.getInstance().getRobotRelativeSpeeds()
+  private VisionFilters visionFilters = new VisionFilters(visionIO, VisionConstants.AUTO_FILTERS_CONFIG, () -> PoseEstimator.getInstance().getEstimatedRobotPose(), () -> SwerveSubsystem.getInstance().getRobotRelativeSpeeds()
   , () -> SwerveSubsystem.getInstance().getVelocityVector());
 
   private LoggedPose2d visionPose2dLog;
@@ -33,7 +35,7 @@ public class Vision extends SubsystemBase {
   private PoseEstimate visionPoseEstimate;
   private boolean isUpdateForOdometry;
   private boolean isUpdateGyro;
-  private boolean didUpdatedGyro;
+  private boolean didUpdatedGyro = false;
 
   public Vision() {
     visionPose2dLog = new LoggedPose2d("/Subsystems/Vision/Vision Pose");
@@ -43,6 +45,27 @@ public class Vision extends SubsystemBase {
     targetCountLog = new LoggedInt("/Subsystems/Vision/Target Count");
     isValidLog = new LoggedBool("/Subsystems/Vision/Is Valid For Update");
     isValidForResetLog = new LoggedBool("/Subsystems/Vision/Is Valid For Reset");
+  }
+
+  public void filterTags(int[] tagsArry) {
+    visionIO.filterTags(tagsArry);
+  }
+
+  public LimelightHelpers.PoseEstimate getPoseEstimate() {
+    return visionIO.getEstimatedPose();
+  }
+
+  public double getDirectDistanceToCamera() {
+    return visionIO.getRawFiducial().distToCamera;
+  }
+
+  public double getTrigoDistanceToCamera() {
+    if (getTagID() >= 0 && getTagID() - 1 < 0) {
+      return -1;
+    }
+    double deltaHight = VisionConstants.TAG_HIGHTS[6] - VisionConstants.ROBOT_TO_CAMERA_XYZ.getZ();
+    double deltaAngle = getTy() + VisionConstants.ROBOT_TO_CAMERA_ROTATION.getX(); // TODO: Cheack with rader what axis should it be
+    return deltaHight / Math.tan(Math.toRadians(deltaAngle));
   }
 
   public double getTx() {
@@ -59,6 +82,10 @@ public class Vision extends SubsystemBase {
 
   public boolean isTarget() {
     return visionIO.isTarget();
+  }
+
+  public int getTagID() {
+    return visionIO.getTagID();
   }
 
   public int getTargetCount() {
@@ -80,9 +107,15 @@ public class Vision extends SubsystemBase {
   public void periodic() {
     visionIO.update();
 
+    if (DriverStation.isAutonomous()) {
+      visionFilters.updateFilterConfig(VisionConstants.AUTO_FILTERS_CONFIG);
+    } else{
+      visionFilters.updateFilterConfig(VisionConstants.TELEOP_FILTERS_CONFIG);
+    }
+
     visionPoseEstimate = visionIO.getEstimatedPose();
     isUpdateForOdometry = visionFilters.isValidForUpdate(visionPoseEstimate.pose);
-    isUpdateGyro = visionFilters.isValidForReset();
+    isUpdateGyro = visionFilters.isValidForGyroReset();
     
     
     visionPose2dLog.update(visionPoseEstimate.pose);
@@ -91,7 +124,7 @@ public class Vision extends SubsystemBase {
     hasTargetLog.update(visionIO.isTarget());
     targetCountLog.update(visionIO.getTargetCount());
     isValidLog.update(isUpdateForOdometry);
-    isValidForResetLog.update(visionFilters.isValidForReset());
+    isValidForResetLog.update(isUpdateGyro);
 
     if (isUpdateForOdometry) {
       updateOdometry();
