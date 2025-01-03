@@ -41,7 +41,11 @@ public class GenericSuperStracture {
     }
 
     public boolean isRobotMoving() {
-        return robotVelocitySupplier.get() > 0.05; //lower value
+        return robotVelocitySupplier.get() > 0.01; //lower value
+    }
+
+    public double getRobotSpeed() {
+        return robotVelocitySupplier.get();
     }
     
     //has gamepiece
@@ -51,6 +55,10 @@ public class GenericSuperStracture {
               && currentPoseSupplier.get().getY() >= boundingBoxMin.getY()
               && currentPoseSupplier.get().getX() <= boundingBoxMax.getX()
               && currentPoseSupplier.get().getY() <= boundingBoxMax.getY();
+    }
+
+    public boolean hasGamePice() {
+        return false;
     }
 
 

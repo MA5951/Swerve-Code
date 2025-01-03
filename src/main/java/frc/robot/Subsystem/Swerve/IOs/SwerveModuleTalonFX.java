@@ -20,7 +20,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.PortMap;
 import frc.robot.Robot;
@@ -50,8 +49,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
     private StatusSignal<AngularVelocity> driveVelocity;
     private StatusSignal<Current> driveCurrent;
     private StatusSignal<Voltage> driveVolts;
-    private StatusSignal<Temperature> driveTemp;
-    private StatusSignal<Temperature> steerTemp;
     private StatusSignal<Angle> steerPosition;
     private StatusSignal<Current> steerCurrent;
     private StatusSignal<Voltage> steerVolts;
@@ -68,8 +65,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
     protected LoggedDouble SteerVolts;
     protected LoggedDouble AbsAngle;
     protected LoggedDouble velociSteer;
-    protected LoggedDouble DriveTemp;
-    protected LoggedDouble SteerTemp;
 
     private Queue<Double> drivePositionQueue;
     private Queue<Double> turnPositionQueue;
@@ -90,8 +85,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
         DriveVelocity = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Velocity");
         DriveCurrent = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Current");
         DriveVolts = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Volts");
-        DriveTemp = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Drive Temp");
-        SteerTemp = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Temp");
         SteerPosition = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Position");
         SteerCurrent = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Current");
         SteerVolts = new LoggedDouble("/Subsystems/Swerve/Modules/" + moduleName + "/Steer Volts");
@@ -102,8 +95,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
         driveVelocity = driveMotor.getVelocity();
         driveCurrent = driveMotor.getStatorCurrent();
         driveVolts = driveMotor.getMotorVoltage();
-        driveTemp = driveMotor.getDeviceTemp();
-        steerTemp = turningMotor.getDeviceTemp();
         steerPosition = turningMotor.getPosition();
         steerCurrent = turningMotor.getStatorCurrent();
         steerVolts = turningMotor.getMotorVoltage();
@@ -183,14 +174,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
 
     public void resetSteer() {
         turningMotor.setPosition((getAbsolutePosition() / 360));
-    }
-
-    public double getDriveTemp() {
-        return driveTemp.getValueAsDouble();
-    }
-
-    public double getSteerTemp() {
-        return steerTemp.getValueAsDouble();
     }
 
     public double getDriveCurrent() {
@@ -278,14 +261,10 @@ public class SwerveModuleTalonFX implements SwerveModule {
         SteerVolts.update(swerveModuleData.getSteerVolts());
         AbsAngle.update(swerveModuleData.getAbsoluteAngle());
         velociSteer.update(swerveModuleData.getSteerVelocity());
-        DriveTemp.update(swerveModuleData.getDriveTemp());
-        SteerTemp.update(swerveModuleData.getSteerTemp());
     }
 
     public void refreshAll() {
         BaseStatusSignal.refreshAll(
-                driveTemp,
-                steerTemp,
                 driveCurrent,
                 steerCurrent,
                 driveVolts,
@@ -305,8 +284,6 @@ public class SwerveModuleTalonFX implements SwerveModule {
                 getDriveVelocity(),
                 getDriveCurrent(),
                 getDriveVolts(),
-                getDriveTemp(),
-                getSteerTemp(),
                 getSteerPosition(),
                 getSteerCurrent(),
                 getSteerVolts(),

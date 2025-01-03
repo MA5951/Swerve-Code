@@ -7,6 +7,7 @@ package frc.robot.commands.Swerve;
 import com.ma5951.utils.Logger.LoggedString;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
@@ -14,27 +15,26 @@ import frc.robot.Subsystem.Vision.Vision;
 
 @SuppressWarnings("unused")
 public class TeleopSwerveController extends Command {
-  
-  private FieldCentricDriveController driveController;
-  private AngleAdjustController angleAdjustController;
-  private RelativAngleAdjustController relativAngleAdjustController;
+
+  public static FieldCentricDriveController driveController;
+  public static AngleAdjustController angleAdjustController;
+  public static RelativAngleAdjustController relativAngleAdjustController;
   private ChassisSpeeds driveControllerSpeeds;
   private ChassisSpeeds angleAdjustControllerSpeeds;
   private ChassisSpeeds relativAngleAdjustControllerSpeeds;
-  
 
   private SwerveSubsystem swerve;
   private ChassisSpeeds robotSpeeds;
   private LoggedString xyControllerLog;
   private LoggedString theathControllerLog;
-  
+
   public TeleopSwerveController(PS5Controller controller) {
     swerve = SwerveSubsystem.getInstance();
-    
-    driveController = new FieldCentricDriveController(controller , () -> controller.getR2Button() , 
-    0.4 , () -> SwerveSubsystem.getInstance().getFusedHeading());
-    angleAdjustController = new AngleAdjustController( () -> SwerveSubsystem.getInstance().getFusedHeading());
-    relativAngleAdjustController = new RelativAngleAdjustController(0 , () -> Vision.getInstance().getTx());
+
+    driveController = new FieldCentricDriveController(controller, () -> controller.getR2Button(),
+        0.4, () -> SwerveSubsystem.getInstance().getFusedHeading());
+    angleAdjustController = new AngleAdjustController(() -> SwerveSubsystem.getInstance().getFusedHeading(), 0);
+    relativAngleAdjustController = new RelativAngleAdjustController(0, () -> Vision.getInstance().getTx());
 
     xyControllerLog = new LoggedString("/Subsystems/Swerve/Controllers/XY Controller");
     theathControllerLog = new LoggedString("/Subsystems/Swerve/Controllers/Theath Controller");
@@ -44,7 +44,7 @@ public class TeleopSwerveController extends Command {
 
   @Override
   public void initialize() {
-  }   
+  }
 
   @Override
   public void execute() {
@@ -54,14 +54,17 @@ public class TeleopSwerveController extends Command {
     theathControllerLog.update("Drive Controller");
     robotSpeeds = driveControllerSpeeds;
 
-
-    
     swerve.drive(robotSpeeds);
   }
 
   @Override
   public void end(boolean interrupted) {
-
+    swerve.setModules(new SwerveModuleState[] {
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState(),
+        new SwerveModuleState()
+    });
   }
 
   @Override

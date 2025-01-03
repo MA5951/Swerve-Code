@@ -13,8 +13,6 @@ public class SwerveModuleData {
     private double driveVelocity;
     private double driveCurrent;
     private double driveVolts;
-    private double driveTemp;
-    private double steerTemp;
     private double steerPosition;
     private double steerCurrent;
     private double steerVolts;
@@ -28,8 +26,6 @@ public class SwerveModuleData {
         driveVelocity = 0;
         driveCurrent = 0;
         driveVolts = 0;
-        driveTemp = 0;
-        steerTemp = 0;
         steerPosition = 0;
         steerCurrent = 0;
         steerVolts = 0;
@@ -44,8 +40,6 @@ public class SwerveModuleData {
         double DriveVelocity,
         double DriveCurrent,
         double DriveVolts,
-        double DriveTemp,
-        double SteerTemp,
         double SteerPosition,
         double SteerCurrent,
         double SteerVolts,
@@ -58,8 +52,6 @@ public class SwerveModuleData {
         driveVelocity = DriveVelocity;
         driveCurrent = DriveCurrent;
         driveVolts = DriveVolts;
-        driveTemp = DriveTemp;
-        steerTemp = SteerTemp;
         steerPosition = SteerPosition;
         steerCurrent = SteerCurrent;
         steerVolts = SteerVolts;
@@ -74,8 +66,6 @@ public class SwerveModuleData {
         double DriveVelocity,
         double DriveCurrent,
         double DriveVolts,
-        double DriveTemp,
-        double SteerTemp,
         double SteerPosition,
         double SteerCurrent,
         double SteerVolts,
@@ -88,8 +78,6 @@ public class SwerveModuleData {
         driveVelocity = DriveVelocity;
         driveCurrent = DriveCurrent;
         driveVolts = DriveVolts;
-        driveTemp = DriveTemp;
-        steerTemp = SteerTemp;
         steerPosition = SteerPosition;
         steerCurrent = SteerCurrent;
         steerVolts = SteerVolts;
@@ -115,13 +103,7 @@ public class SwerveModuleData {
         return driveCurrent;
     }
 
-    public double getDriveTemp() {
-        return driveTemp;
-    }
-
-    public double getSteerTemp() {
-        return steerTemp;
-    }
+   
 
     public double getSteerPosition() {
         return steerPosition;

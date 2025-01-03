@@ -16,12 +16,12 @@ public class FieldCentricDriveController implements SwerveController {
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
     private PS5Controller controller;
     private Supplier<Boolean> reductionBoolean;
-    private static Supplier<Double> angleSupplier;
+    private Supplier<Double> angleSupplier;
     private double reductionPrecent = 1;
     private double xSpeed;
     private double ySpeed;
     private double turningSpeed;
-    private static double gyroOffset = 0d;
+    private double gyroOffset = 0d;
 
     public FieldCentricDriveController(PS5Controller Controller, Supplier<Boolean> ReductionSupplier,
             double ReductionPrecent,
@@ -59,7 +59,7 @@ public class FieldCentricDriveController implements SwerveController {
 
     }
 
-    public static void updateDriveHeading() {
+    public void updateDriveHeading() {
         gyroOffset = angleSupplier.get();
     }
 

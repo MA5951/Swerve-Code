@@ -27,7 +27,7 @@ public class AngleAdjustController  implements SwerveController {
    * 
    * @param getMeasurment Must be absolute.
    */
-  public AngleAdjustController(Supplier<Double> getMeasurment) {
+  public AngleAdjustController(Supplier<Double> getMeasurment , double setPointDrgrees) {
 
     pid = new PIDController(
       SwerveConstants.THATA_KP,
@@ -42,10 +42,10 @@ public class AngleAdjustController  implements SwerveController {
     angleLog = new LoggedDouble("/Subsystems/Swerve/Controllers/Odometry Adjust/Angle");
 
     measurment = getMeasurment;
+    pid.setSetpoint(setPointDrgrees);
     pid.setTolerance(SwerveConstants.ANGLE_PID_TOLORANCE);
     pid.enableContinuousInput(-Math.PI, Math.PI);
   }
-
 
   public ChassisSpeeds update() {
 
@@ -64,8 +64,12 @@ public class AngleAdjustController  implements SwerveController {
     return pid.atSetpoint();
   }
 
-  public void setSetPoint(double setPoint) {
-    pid.setSetpoint(setPoint);
+  public void setSetPoint(double setPointDrgrees) {
+    pid.setSetpoint(setPointDrgrees);
+  }
+
+  public void updatePID(PIDController pidController) {
+    pid = pidController;
   }
 
 

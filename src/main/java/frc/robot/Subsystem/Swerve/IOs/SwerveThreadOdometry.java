@@ -62,6 +62,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
     private ModuleLimits swerveLimits;
     private double avrageCurrent;
     private Debouncer currentDebouncer;
+    private boolean includeMeasurement;
 
     public SwerveThreadOdometry(OdometryConfig Config) {
         swerveSubsystem = SwerveSubsystem.getInstance();
@@ -102,7 +103,7 @@ public class SwerveThreadOdometry implements SwerveOdometry{
         
         odometryLock.unlock();
 
-        boolean includeMeasurement = true;
+        includeMeasurement = true;
 
         skidDetected = Math.abs(skidDetector.getSkiddingRatio() - 1) < config.skidRatio;
         collisionDetected = collisionDtector.getForceVectorSize() > config.collisionForce;

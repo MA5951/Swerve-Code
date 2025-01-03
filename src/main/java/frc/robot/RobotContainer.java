@@ -11,7 +11,6 @@ import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
 import frc.robot.Subsystem.Swerve.SwerveAutoFollower;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 import frc.robot.Subsystem.Vision.Vision;
-import frc.robot.commands.Swerve.FieldCentricDriveController;
 import frc.robot.commands.Swerve.TeleopSwerveController;
 
 public class RobotContainer extends DeafultRobotContainer{
@@ -40,7 +39,7 @@ public class RobotContainer extends DeafultRobotContainer{
   private void configureBindings() {
 
     //Update Offset
-    new Trigger(() -> driverController.getTriangleButton()).onTrue(new InstantCommand(() -> FieldCentricDriveController.updateDriveHeading()));
+    new Trigger(() -> driverController.getTriangleButton()).onTrue(new InstantCommand(() -> TeleopSwerveController.driveController.updateDriveHeading()));
 
     //Manuel Vision Update
     new Trigger(() -> driverController.getPSButton()).onTrue(new InstantCommand(() -> Vision.getInstance().updateOdometry()));

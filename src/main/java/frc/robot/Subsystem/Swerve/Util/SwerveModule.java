@@ -18,12 +18,6 @@ public interface SwerveModule {
     //Return meters per second
     double getDriveVelocity();
 
-    //Return Drive Motor Temp
-    double getDriveTemp();
-
-    //Return Steer Motroe Temp
-    double getSteerTemp();
-
     //Between 1 to -1
     void turningMotorSetPower(double power);
 

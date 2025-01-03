@@ -43,8 +43,6 @@ public class SwerveModuleSim extends SwerveModuleTalonFX {
                 getDriveVelocity(),
                 getDriveCurrent(),
                 getDriveVolts(),
-                getDriveTemp(),
-                getSteerTemp(),
                 getSteerPosition(),
                 getSteerCurrent(),
                 getSteerVolts(),
@@ -63,8 +61,6 @@ public class SwerveModuleSim extends SwerveModuleTalonFX {
         SteerCurrent.update(getSteerCurrent());
         SteerVolts.update(getSteerVolts());
         AbsAngle.update(getAbsolutePosition());
-        DriveTemp.update(getDriveTemp());
-        SteerTemp.update(getSteerTemp());
 
         return moduleData;
 

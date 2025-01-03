@@ -11,9 +11,9 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
-public class RelativAngleAdjustController implements SwerveController{
+public class RelativAngleAdjustController implements SwerveController {
 
-    private static PIDController pid;   
+    private static PIDController pid;
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
     private double omega;
     private Supplier<Double> measurment;
@@ -21,18 +21,16 @@ public class RelativAngleAdjustController implements SwerveController{
     private LoggedDouble omegaLog;
     private LoggedBool atPointLog;
 
-
-    public RelativAngleAdjustController(double setPoint , Supplier<Double> getMeasurment) {
+    public RelativAngleAdjustController(double setPointDrgrees, Supplier<Double> getMeasurment) {
         pid = new PIDController(
-        SwerveConstants.RELATIV_THATA_KP,
-        SwerveConstants.RELATIV_THATA_KI,
-        SwerveConstants.RELATIV_THATA_KD
-        );
+                SwerveConstants.RELATIV_THATA_KP,
+                SwerveConstants.RELATIV_THATA_KI,
+                SwerveConstants.RELATIV_THATA_KD);
         measurment = getMeasurment;
         omegaLog = new LoggedDouble("/Subsystems/Swerve/Controllers/Relativ Adjust/Omega Speed");
         atPointLog = new LoggedBool("/Subsystems/Swerve/Controllers/Relativ Adjust/At Point");
         pid.setTolerance(SwerveConstants.RELATIV_ANGLE_PID_TOLORANCE);
-        pid.setSetpoint(setPoint);
+        pid.setSetpoint(setPointDrgrees);
     }
 
     public ChassisSpeeds update() {
@@ -49,13 +47,16 @@ public class RelativAngleAdjustController implements SwerveController{
         return pid.atSetpoint();
     }
 
-    public void setSetPoint(double setPoint) {
-        pid.setSetpoint(setPoint);
+    public void setSetPoint(double setPointDrgrees) {
+        pid.setSetpoint(setPointDrgrees);
     }
 
     public void setMeasurment(Supplier<Double> getMeasurment) {
         measurment = getMeasurment;
     }
 
+    public void updatePID(PIDController pidController) {
+        pid = pidController;
+    }
+
 }
- 
