@@ -1,60 +1,52 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot;
 
-import com.ma5951.utils.Limelight;
 
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.wpilibj2.command.Command;
+import com.ma5951.utils.RobotControl.DeafultRobotContainer;
+
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
-import frc.robot.subsystems.swerve.SwerveDrivetrainSubsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
+import frc.robot.Subsystem.Swerve.SwerveAutoFollower;
+import frc.robot.Subsystem.Swerve.SwerveSubsystem;
+import frc.robot.Subsystem.Vision.Vision;
+import frc.robot.commands.Swerve.TeleopSwerveController;
 
-/**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
- */
-public class RobotContainer {
+public class RobotContainer extends DeafultRobotContainer{
 
-  public static final CommandPS4Controller ps4 = 
-    new CommandPS4Controller(PortMap.Controllers.driverJostick);
 
-  public static final Limelight LIMELIGHT = new Limelight(
-    "limelight", new Transform3d());
-
-  /**
-   * The container for the robot. Contains subsystems, OI devices, and commands.
-   */
   public RobotContainer() {
-    // Configure the trigger bindings
+    super(
+      PortMap.Controllers.driveID, 
+      PortMap.Controllers.operatorID, 
+      PortMap.Controllers.driveRumbleID,
+      PortMap.Controllers.operatorRumbleID);
+    SwerveSubsystem.getInstance();
+    Vision.getInstance();
+    PoseEstimator.getInstance();
+    SwerveAutoFollower.getInstance();
+    
     configureBindings();
+    setUpAutoCommands();
+    CommandScheduler.getInstance().setDefaultCommand(SwerveSubsystem.getInstance(), new TeleopSwerveController(driverController));
   }
 
+  public void setUpAutoCommands() {
+    //setAutoOptions(null);
+  }
 
   private void configureBindings() {
-    ps4.triangle().whileTrue(
-      new InstantCommand(SwerveDrivetrainSubsystem.getInstance()::updateOffset));
 
-    ps4.R2().whileTrue(
-      new InstantCommand(
-        () -> SwerveDrivetrainSubsystem.getInstance().FactorVelocityTo(0.4))
-    ).whileFalse(new InstantCommand(
-      () -> SwerveDrivetrainSubsystem.getInstance().FactorVelocityTo(1)));
+    //Update Offset
+    new Trigger(() -> driverController.getTriangleButton()).onTrue(new InstantCommand(() -> TeleopSwerveController.driveController.updateDriveHeading()));
+
+    //Manuel Vision Update
+    new Trigger(() -> driverController.getPSButton()).onTrue(new InstantCommand(() -> Vision.getInstance().updateOdometry()));
+
+    
+
+
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return null;
-  }
 }
