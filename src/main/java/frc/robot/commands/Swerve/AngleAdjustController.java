@@ -34,7 +34,7 @@ public class AngleAdjustController  implements SwerveController {
       SwerveConstants.THATA_KI,
       SwerveConstants.THATA_KD
     );
-
+    
 
     omegaLog = new LoggedDouble("/Subsystems/Swerve/Controllers/Odometry Adjust/Omega Speed");
     atPointLog = new LoggedBool("/Subsystems/Swerve/Controllers/Odometry Adjust/At Point");

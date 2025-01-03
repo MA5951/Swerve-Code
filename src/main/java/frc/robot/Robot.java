@@ -3,11 +3,13 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
+import com.ma5951.utils.DashBoard.DashboardPID;
 import com.ma5951.utils.Logger.LoggedPose2d;
 import com.ma5951.utils.Logger.MALog;
 import com.pathplanner.lib.commands.PathfindingCommand;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
@@ -26,6 +28,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   public static boolean isStartingPose = false;
   private LoggedPose2d simulationPose2d;
+  private DashboardPID pid;
   private MALog maLog;
 
   @Override
@@ -33,8 +36,10 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     simulationPose2d = new LoggedPose2d("/Simulation/Pose");
     maLog = MALog.getInstance(RobotConstants.COMP_LOG);
+    pid = new DashboardPID();
 
     PathfindingCommand.warmupCommand().schedule();
+    SmartDashboard.putData("Test",pid);
   }
 
   @Override
