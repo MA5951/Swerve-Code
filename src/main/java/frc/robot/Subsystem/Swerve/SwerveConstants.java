@@ -11,7 +11,6 @@ import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
 import frc.robot.Subsystem.Swerve.IOs.GyroSim;
 import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
 //import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
-import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSim;
 import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
 import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
 // import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
@@ -23,6 +22,12 @@ import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 
 public class SwerveConstants {
         public final static boolean optimize = true;
+
+        public final static double DRIVE_POSITION_CONVERSION = 1.0 / 4096.0;
+        public final static double DRIVE_VELOCITY_CONVERSION = 1.0 / 4096.0;
+
+        public final static double TURNING_POSITION_CONVERSION = 1.0 / 4096.0;
+        public final static double TURNING_VELOCITY_CONVERSION = 1.0 / 4096.0;
         
         
         // swerve constants
@@ -121,16 +126,9 @@ public class SwerveConstants {
                                 PortMap.CanBus.RioBus);
                         return new SwerveModule[] {
                 frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
+                } else {
+                    return new SwerveModule[0];
                 }
-
-                final SwerveModule frontLeftModule = new SwerveModuleSim("Front Left");
-                final SwerveModule frontRightModule = new SwerveModuleSim("Front Right");
-                final SwerveModule rearLeftModule = new SwerveModuleSim("Rear Left");
-                final SwerveModule rearRightModule = new SwerveModuleSim("Rear Right");
-
-                        return new SwerveModule[] {
-                frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
-
         }
 
         public static final Gyro getGyro() {

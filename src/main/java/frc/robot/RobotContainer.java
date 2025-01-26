@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Subsystem.PoseEstimation.PoseEstimator;
-import frc.robot.Subsystem.PoseEstimation.Vision;
 // import frc.robot.Subsystem.Swerve.SwerveAutoFollower;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 import frc.robot.commands.Swerve.FieldCentricDriveController;
@@ -35,7 +34,6 @@ public class RobotContainer {
 
   public RobotContainer() {
     SwerveSubsystem.getInstance();
-    Vision.getInstance();
     configureBindings();
     //new SwerveAutoFollower();
     

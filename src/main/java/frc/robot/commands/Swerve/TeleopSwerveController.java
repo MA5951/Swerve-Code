@@ -9,7 +9,6 @@ import com.ma5951.utils.Logger.LoggedString;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.PS5Controller;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Subsystem.PoseEstimation.Vision;
 import frc.robot.Subsystem.Swerve.SwerveSubsystem;
 
 public class TeleopSwerveController extends Command {
@@ -35,7 +34,6 @@ public class TeleopSwerveController extends Command {
     driveController = new FieldCentricDriveController(controller , () -> controller.getR2Button() , 
     0.4 , () -> SwerveSubsystem.getInstance().getFusedHeading());
     angleAdjustController = new AngleAdjustController( () -> SwerveSubsystem.getInstance().getFusedHeading());
-    relativAngleAdjustController = new RelativAngleAdjustController(0 , () -> Vision.getInstance().getTx());
 
     xyControllerLog = new LoggedString("/Swerve/Controllers/XY Controller");
     theathControllerLog = new LoggedString("/Swerve/Controllers/Theath Controller");

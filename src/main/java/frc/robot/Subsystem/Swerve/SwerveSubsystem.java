@@ -7,7 +7,7 @@ package frc.robot.Subsystem.Swerve;
 import com.ma5951.utils.RobotConstantsMAUtil;
 import com.ma5951.utils.Logger.LoggedDouble;
 import com.ma5951.utils.Logger.LoggedSwerveStates;
-import com.pathplanner.lib.util.DriveFeedforwards;
+// import com.pathplanner.lib.util.DriveFeedforward;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -172,13 +172,13 @@ public class SwerveSubsystem extends SubsystemBase {
     setModules(Optistates);
   }
 
-  public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
-    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
+  // public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
+  //   SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
-    SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
-    setPoinStatesLog.update(Optistates);
-    setModules(Optistates);
-  }
+  //   SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
+  //   setPoinStatesLog.update(Optistates);
+  //   setModules(Optistates);
+  // }
 
   public ModuleLimits getCurrentLimits() {
     return currentLimits;
