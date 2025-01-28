@@ -35,7 +35,7 @@ public class GyroData {
     }
 
     public void updateData(double Pitch, double Yaw, double Roll, double VeloYaw, double VeloPitch,
-    double VeloRoll, double AccelX, double AccelY, double AbsoluteYaw , Rotation2d[] YawPositionQueue) {
+    double VeloRoll, double AccelX, double AccelY, double AbsoluteYaw) {
         pitch = Pitch;
         yaw = Yaw;
         roll = Roll;
@@ -45,7 +45,6 @@ public class GyroData {
         accelX = AccelX;
         accelY = AccelY;
         absoluteYaw = AbsoluteYaw;
-        yawPositionQueue = YawPositionQueue;
     }
 
     public double getPitch() {

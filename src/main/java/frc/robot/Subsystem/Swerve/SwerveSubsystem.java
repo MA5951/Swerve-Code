@@ -5,9 +5,8 @@
 package frc.robot.Subsystem.Swerve;
 
 import com.ma5951.utils.RobotConstantsMAUtil;
-import com.ma5951.utils.Logger.LoggedDouble;
-import com.ma5951.utils.Logger.LoggedSwerveStates;
 // import com.pathplanner.lib.util.DriveFeedforward;
+import com.pathplanner.lib.util.DriveFeedforwards;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -25,7 +24,6 @@ import frc.robot.Utils.ModuleLimits;
 import frc.robot.Utils.SwerveSetpoint;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
 import frc.robot.Subsystem.Swerve.Util.SwerveModuleData;
-import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
 import frc.robot.Subsystem.Swerve.Util.GyroData;
 
@@ -33,16 +31,9 @@ public class SwerveSubsystem extends SubsystemBase {
   private static SwerveSubsystem swerveSubsystem;
 
   private SwerveSetpointGenerator setpointGenerator;
-  private LoggedSwerveStates currenStatesLog;
-  private LoggedSwerveStates setPoinStatesLog;
-  private LoggedDouble swerevXvelocityLog;
-  private LoggedDouble swerevYvelocityLog;
-  private LoggedDouble swerevTheatavelocityLog;
-  
 
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
   private final Gyro gyro = SwerveConstants.getGyro();
-  private static SwerveOdometry odometry;
   private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
   private SwerveModuleState[] optimizedSetpointStates = new SwerveModuleState[4];
   private SwerveModuleState[] currentStates = new SwerveModuleState[4];
@@ -71,19 +62,10 @@ public class SwerveSubsystem extends SubsystemBase {
       SwerveConstants.rearRightLocation
     });
 
-
-    currenStatesLog = new LoggedSwerveStates("/Swerve/States/Current States");
-    setPoinStatesLog = new LoggedSwerveStates("/Swerve/States/SetPoint States");
-    swerevXvelocityLog = new LoggedDouble("/Swerve/Chassis Speed/X Velocity");
-    swerevYvelocityLog = new LoggedDouble("/Swerve/Chassis Speed/Y Velocity");
-    swerevTheatavelocityLog = new LoggedDouble("/Swerve/Chassis Speed/Theat Velocity");
-
     for (int i = 0; i < 4 ; i++) {
       modulesArry[i].setNeutralModeDrive(true);
       modulesArry[i].setNeutralModeTurn(true);
     }
-
-    
 
     gyro.reset();
   }
@@ -168,17 +150,15 @@ public class SwerveSubsystem extends SubsystemBase {
     states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
     SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
-    setPoinStatesLog.update(Optistates);
     setModules(Optistates);
   }
 
-  // public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
-  //   SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
+  public void drive(ChassisSpeeds chassisSpeeds , DriveFeedforwards feedforwards) {
+    SwerveModuleState[] states = generateStates(chassisSpeeds, SwerveConstants.optimize);
 
-  //   SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
-  //   setPoinStatesLog.update(Optistates);
-  //   setModules(Optistates);
-  // }
+    SwerveModuleState[] Optistates = new SwerveModuleState[] {states[1] , states[3] , states[0] , states[2]};
+    setModules(Optistates);
+  }
 
   public ModuleLimits getCurrentLimits() {
     return currentLimits;
@@ -211,22 +191,11 @@ public class SwerveSubsystem extends SubsystemBase {
   public static SwerveSubsystem getInstance() {
     if (swerveSubsystem == null) {
       swerveSubsystem = new SwerveSubsystem();
-      odometry = SwerveConstants.getOdometry();
     }
     return swerveSubsystem;
     }
 
   @Override
   public void periodic() {
-    odometry.updateOdometry();
-
-    currenStatesLog.update(currentStates);
-    
-    swerevXvelocityLog.update(currentChassisSpeeds.vxMetersPerSecond);
-    swerevYvelocityLog.update(currentChassisSpeeds.vyMetersPerSecond);
-    swerevTheatavelocityLog.update(currentChassisSpeeds.omegaRadiansPerSecond);
-   
-
-    
   }
 }

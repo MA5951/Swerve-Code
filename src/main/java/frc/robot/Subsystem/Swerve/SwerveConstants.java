@@ -5,29 +5,14 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import frc.robot.PortMap;
-import frc.robot.Robot;
 import frc.robot.Utils.ModuleLimits;
 import frc.robot.Subsystem.Swerve.IOs.GyroPiegon2;
-import frc.robot.Subsystem.Swerve.IOs.GyroSim;
-import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
-//import frc.robot.Subsystem.Swerve.IOs.Swerve50HzOdometry;
-import frc.robot.Subsystem.Swerve.IOs.SwerveModuleTalonFX;
-import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
-// import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
-//import frc.robot.Subsystem.Swerve.IOs.SwerveThreadOdometry;
+import frc.robot.Subsystem.Swerve.IOs.SwerveModuleSparkMax;
 import frc.robot.Subsystem.Swerve.Util.Gyro;
-import frc.robot.Subsystem.Swerve.Util.OdometryConfig;
 import frc.robot.Subsystem.Swerve.Util.SwerveModule;
-import frc.robot.Subsystem.Swerve.Util.SwerveOdometry;
 
 public class SwerveConstants {
         public final static boolean optimize = true;
-
-        public final static double DRIVE_POSITION_CONVERSION = 1.0 / 4096.0;
-        public final static double DRIVE_VELOCITY_CONVERSION = 1.0 / 4096.0;
-
-        public final static double TURNING_POSITION_CONVERSION = 1.0 / 4096.0;
-        public final static double TURNING_VELOCITY_CONVERSION = 1.0 / 4096.0;
         
         
         // swerve constants
@@ -41,6 +26,12 @@ public class SwerveConstants {
         public final static double DRIVE_GEAR_RATIO = 6.12;
         public final static double WHEEL_RADIUS = 0.0508 ;
         public final static double WHEEL_CIRCUMFERENCE =  2 *WHEEL_RADIUS * Math.PI;
+
+        public final static double DRIVE_POSITION_CONVERSION = WHEEL_CIRCUMFERENCE;
+        public final static double DRIVE_VELOCITY_CONVERSION = 2 * Math.PI * WHEEL_RADIUS / 60;
+
+        public final static double TURNING_POSITION_CONVERSION = 360.0 / TURNING_GEAR_RATIO;
+        public final static double TURNING_VELOCITY_CONVERSION = 1.0;
 
         public final static double VELOCITY_TIME_UNIT_IN_SECONDS = 1;
 
@@ -88,65 +79,44 @@ public class SwerveConstants {
 
         //IOs
         public static final SwerveModule[] getModulesArry() {
-                if (Robot.isReal()) {
-                        final SwerveModule frontLeftModule = new SwerveModuleTalonFX(
-                                "Front Left",
-                                PortMap.Swerve.leftFrontDriveID,
-                                PortMap.Swerve.leftFrontTurningID,
-                                PortMap.Swerve.leftFrontAbsoluteEncoder,
-                                SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                PortMap.CanBus.RioBus);
+                final SwerveModule frontLeftModule = new SwerveModuleSparkMax(
+                        "Front Left",
+                        PortMap.Swerve.leftFrontDriveID,
+                        PortMap.Swerve.leftFrontTurningID,
+                        SwerveConstants.FRONT_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                        SwerveConstants.FRONT_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED
+                );
 
-                        final SwerveModule frontRightModule = new SwerveModuleTalonFX(
-                        "Front Right",
-                                PortMap.Swerve.rightFrontDriveID,
-                                PortMap.Swerve.rightFrontTurningID,
-                                PortMap.Swerve.rightFrontAbsoluteEncoder,
-                                SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                PortMap.CanBus.RioBus);
+                final SwerveModule frontRightModule = new SwerveModuleSparkMax(
+                "Front Right",
+                        PortMap.Swerve.rightFrontDriveID,
+                        PortMap.Swerve.rightFrontTurningID,
+                        SwerveConstants.FRONT_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                        SwerveConstants.FRONT_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED
+                );
 
-                        final SwerveModule rearLeftModule = new SwerveModuleTalonFX(
-                                "Rear Left",
-                                PortMap.Swerve.leftBackDriveID,
-                                PortMap.Swerve.leftBackTurningID,
-                                PortMap.Swerve.leftBackAbsoluteEncoder,
-                                SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                PortMap.CanBus.RioBus);
+                final SwerveModule rearLeftModule = new SwerveModuleSparkMax(
+                        "Rear Left",
+                        PortMap.Swerve.leftBackDriveID,
+                        PortMap.Swerve.leftBackTurningID,
+                        SwerveConstants.REAR_LEFT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                        SwerveConstants.REAR_LEFT_MODULES_IS_TURNING_MOTOR_REVERSED
+                );
 
-                        final SwerveModule rearRightModule = new SwerveModuleTalonFX(
-                                "Rear Right",
-                                PortMap.Swerve.rightBackDriveID,
-                                PortMap.Swerve.rightBackTurningID,
-                                PortMap.Swerve.rightBackAbsoluteEncoder,
-                                SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
-                                SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED,
-                                PortMap.CanBus.RioBus);
-                        return new SwerveModule[] {
-                frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
-                } else {
-                    return new SwerveModule[0];
-                }
+                final SwerveModule rearRightModule = new SwerveModuleSparkMax(
+                        "Rear Right",
+                        PortMap.Swerve.rightBackDriveID,
+                        PortMap.Swerve.rightBackTurningID,
+                        SwerveConstants.REAR_RIGHT_MOUDLE_IS_DRIVE_MOTOR_REVERSED,
+                        SwerveConstants.REAR_RIGHT_MODULES_IS_TURNING_MOTOR_REVERSED
+                );
+                return new SwerveModule[] {
+        frontLeftModule , frontRightModule , rearLeftModule , rearRightModule};
         }
 
         public static final Gyro getGyro() {
-                if (Robot.isReal()) {
-                        return new GyroPiegon2("Piegon 2", PortMap.CanBus.RioBus , PortMap.Swerve.Pigeon2ID);
-                } 
-
-                return new GyroSim("Gyro Sim");
+                return new GyroPiegon2("Piegon 2", PortMap.CanBus.RioBus , PortMap.Swerve.Pigeon2ID);
         }
-
-        public static final SwerveOdometry getOdometry() {
-                if (Robot.isReal()) {
-                        return new SwerveThreadOdometry(ODOMETRY_CONFIG);
-                }
-
-                return new Swerve50HzOdometry(ODOMETRY_CONFIG);
-        }
-
 
         // Modules config
         public final static int SLOT_CONFIG = 0;
@@ -173,7 +143,7 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_kP = 0;
+        public final static double DRIVE_kP = 90;
         public final static double DRIVE_kI = 0;
         public final static double DRIVE_kD = 0;
         public final static double DRIVE_kS = 0;
@@ -196,12 +166,6 @@ public class SwerveConstants {
 
         //Module Limits 
         public final static ModuleLimits DEFUALT =  new ModuleLimits(5.2, Units.feetToMeters(65) , Units.degreesToRadians(700));
-
-        //Odometry
-        public final static double ODOMETRY_UPDATE_RATE = 200;
-        public final static OdometryConfig ODOMETRY_CONFIG = new OdometryConfig(
-                true, true, 0.15 , 1.85);
-
         //Swerve controllers
 
         //Swerve AngleAdjust

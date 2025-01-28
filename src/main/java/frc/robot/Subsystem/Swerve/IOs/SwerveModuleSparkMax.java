@@ -30,9 +30,11 @@ public class SwerveModuleSparkMax implements SwerveModule {
         this.isDriveMotorReversed = isDriveMotorReversed;
         this.isTurningMotorReversed = isTurningMotorReversed;
 
+        System.out.println("moduleName " + moduleName + " " + "driveID " + driveID + " " + "turningID " + turningID);
+
         configureDriveMotor();
         configureTurningMotor();
-    }
+    } 
 
     private void configureDriveMotor() {
         SparkMaxConfig driveConfig = new SparkMaxConfig();
@@ -45,7 +47,7 @@ public class SwerveModuleSparkMax implements SwerveModule {
             .positionConversionFactor(SwerveConstants.DRIVE_POSITION_CONVERSION)
             .velocityConversionFactor(SwerveConstants.DRIVE_VELOCITY_CONVERSION);
 
-        driveConfig.closedLoop
+        driveConfig.closedLoop.velocityFF(10)
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(SwerveConstants.DRIVE_kP, SwerveConstants.DRIVE_kI, SwerveConstants.DRIVE_kD);
 
@@ -102,12 +104,14 @@ public class SwerveModuleSparkMax implements SwerveModule {
     @Override
     public void turningUsingPID(double setPointRadians) {
         turningMotor.getClosedLoopController().setReference(Units.radiansToDegrees(setPointRadians), ControlType.kPosition);
-    }
+        System.out.println(setPointRadians);
+    }   
 
     @Override
-    public void driveUsingPID(double setPointMPS, double feedForward) {
-        double rpsDriveSetPoint = (setPointMPS / SwerveConstants.WHEEL_RADIUS) / (2 * Math.PI);
-        driveMotor.getClosedLoopController().setReference(rpsDriveSetPoint, ControlType.kVelocity);
+    public void driveUsingPID(double setPointMPS, double feedForward) {  
+        // System.out.println(setPointMPS);    
+        // driveMotor.set(setPointMPS);
+        driveMotor.getClosedLoopController().setReference(setPointMPS, ControlType.kVelocity);
     }
 
     @Override

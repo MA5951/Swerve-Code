@@ -7,15 +7,13 @@ import com.ma5951.utils.Swerve.SwerveController;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PS5Controller;
-import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Subsystem.Swerve.SwerveConstants;
 
 public class FieldCentricDriveController implements SwerveController{
 
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds();
-    private PS5Controller controller;
+    private XboxController controller;
     private Supplier<Boolean> reductionBoolean;
     private static Supplier<Double> angleSupplier;
     private double reductionPrecent = 1;
@@ -25,7 +23,7 @@ public class FieldCentricDriveController implements SwerveController{
     private static double gyroOffset = 0;
     public static boolean slow = false;
 
-    public FieldCentricDriveController(PS5Controller Controller , Supplier<Boolean> ReductionSupplier , double ReductionPrecent ,
+    public FieldCentricDriveController(XboxController Controller , Supplier<Boolean> ReductionSupplier , double ReductionPrecent ,
     Supplier<Double> AngleSupplier) {
         controller = Controller;
         reductionBoolean = ReductionSupplier;

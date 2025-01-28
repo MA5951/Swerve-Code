@@ -18,8 +18,7 @@ public class GenericSuperStracture {
     private double xDis;
     private double yDis;
 
-    public GenericSuperStracture(Supplier<Pose2d> RobotPoseSupplier , Supplier<Double> robotVelocityVectorSupplier) {
-        currentPoseSupplier = RobotPoseSupplier;
+    public GenericSuperStracture(Supplier<Double> robotVelocityVectorSupplier) {
     }
 
     /**
