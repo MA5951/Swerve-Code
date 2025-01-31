@@ -23,18 +23,21 @@ public class SwerveModuleSparkMax implements SwerveModule {
     private final boolean isDriveMotorReversed;
     private final boolean isTurningMotorReversed;
 
-    public SwerveModuleSparkMax(String moduleName, int driveID, int turningID, boolean isDriveMotorReversed, boolean isTurningMotorReversed) {
+    public SwerveModuleSparkMax(String moduleName, int driveID, int turningID,
+                                boolean isDriveMotorReversed, boolean isTurningMotorReversed) {
         this.driveMotor = new SparkMax(driveID, MotorType.kBrushless);
         this.turningMotor = new SparkMax(turningID, MotorType.kBrushless);
 
         this.isDriveMotorReversed = isDriveMotorReversed;
         this.isTurningMotorReversed = isTurningMotorReversed;
 
-        System.out.println("moduleName " + moduleName + " " + "driveID " + driveID + " " + "turningID " + turningID);
+        System.out.println("moduleName " + moduleName +
+                           " driveID " + driveID + 
+                           " turningID " + turningID);
 
         configureDriveMotor();
         configureTurningMotor();
-    } 
+    }
 
     private void configureDriveMotor() {
         SparkMaxConfig driveConfig = new SparkMaxConfig();
@@ -43,15 +46,24 @@ public class SwerveModuleSparkMax implements SwerveModule {
             .inverted(isDriveMotorReversed)
             .idleMode(IdleMode.kBrake);
 
+        // IMPORTANT: Make sure these conversion factors 
+        // actually convert to "meters" for position and "meters/second" for velocity
         driveConfig.encoder
-            .positionConversionFactor(SwerveConstants.DRIVE_POSITION_CONVERSION)
-            .velocityConversionFactor(SwerveConstants.DRIVE_VELOCITY_CONVERSION);
+            .positionConversionFactor(SwerveConstants.DRIVE_POSITION_CONVERSION)  // e.g. meters per rotation
+            .velocityConversionFactor(SwerveConstants.DRIVE_VELOCITY_CONVERSION); // e.g. meters/sec per RPM
 
-        driveConfig.closedLoop.velocityFF(10)
+        // Typical fix: Start with a small feedforward or 0, 
+        // and ensure kP is not zero for velocity control
+        driveConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(SwerveConstants.DRIVE_kP, SwerveConstants.DRIVE_kI, SwerveConstants.DRIVE_kD);
+            .pid(SwerveConstants.DRIVE_kP, SwerveConstants.DRIVE_kI, SwerveConstants.DRIVE_kD)
+            .velocityFF(0);  // or just .velocityFF(0.0)
 
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // Use NO_RESET so we don't keep resetting safe parameters each time
+        driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        // If you want them saved to flash so they survive power cycles:
+        // driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     private void configureTurningMotor() {
@@ -61,6 +73,7 @@ public class SwerveModuleSparkMax implements SwerveModule {
             .inverted(isTurningMotorReversed)
             .idleMode(IdleMode.kBrake);
 
+        // Must convert position from "rotations" to "degrees" (if you’re using degrees)
         turningConfig.encoder
             .positionConversionFactor(SwerveConstants.TURNING_POSITION_CONVERSION)
             .velocityConversionFactor(SwerveConstants.TURNING_VELOCITY_CONVERSION);
@@ -68,8 +81,11 @@ public class SwerveModuleSparkMax implements SwerveModule {
         turningConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(SwerveConstants.TURNING_kP, SwerveConstants.TURNING_kI, SwerveConstants.TURNING_kD);
+            // For turning, you may also want positionWrapping if the angle crosses 0°-360°:
+            // .positionWrappingEnabled(true)
+            // .positionWrappingInputRange(0, 360);
 
-        turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        turningMotor.configure(turningConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     @Override
@@ -84,6 +100,8 @@ public class SwerveModuleSparkMax implements SwerveModule {
 
     @Override
     public double getSteerPosition() {
+        // If the turning motor is configured in “degrees,” 
+        // convert to radians if your code uses radians externally
         return Units.degreesToRadians(turningMotor.getEncoder().getPosition());
     }
 
@@ -103,15 +121,16 @@ public class SwerveModuleSparkMax implements SwerveModule {
 
     @Override
     public void turningUsingPID(double setPointRadians) {
-        turningMotor.getClosedLoopController().setReference(Units.radiansToDegrees(setPointRadians), ControlType.kPosition);
-        System.out.println(setPointRadians);
-    }   
+        // If the turning encoder is in degrees, convert your radian setpoint to degrees:
+        double degrees = Units.radiansToDegrees(setPointRadians);
+        turningMotor.getClosedLoopController().setReference(degrees, ControlType.kPosition);
+        System.out.println("Turn setpoint [rad->deg]: " + degrees);
+    }
 
     @Override
     public void driveUsingPID(double setPointMPS, double feedForward) {  
-        // System.out.println(setPointMPS);    
-        // driveMotor.set(setPointMPS);
         driveMotor.getClosedLoopController().setReference(setPointMPS, ControlType.kVelocity);
+        System.out.println("Drive velocity setpoint (m/s): " + setPointMPS);
     }
 
     @Override
@@ -123,14 +142,14 @@ public class SwerveModuleSparkMax implements SwerveModule {
     public void setNeutralModeDrive(Boolean isBrake) {
         SparkMaxConfig driveConfig = new SparkMaxConfig();
         driveConfig.idleMode(isBrake ? IdleMode.kBrake : IdleMode.kCoast);
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        driveMotor.configure(driveConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     @Override
     public void setNeutralModeTurn(Boolean isBrake) {
         SparkMaxConfig turningConfig = new SparkMaxConfig();
         turningConfig.idleMode(isBrake ? IdleMode.kBrake : IdleMode.kCoast);
-        turningMotor.configure(turningConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        turningMotor.configure(turningConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     @Override

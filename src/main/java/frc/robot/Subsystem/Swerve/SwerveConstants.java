@@ -122,7 +122,7 @@ public class SwerveConstants {
         public final static int SLOT_CONFIG = 0;
         
         // MotionMagic PID
-        public final static double TURNING_kP = 90;
+        public final static double TURNING_kP = 0.1;
         public final static double TURNING_kI = 0;
         public final static double TURNING_kD = 0;
         public final static double TURNING_kS = 0;
@@ -133,7 +133,7 @@ public class SwerveConstants {
         public final static double TURNING_JERK = 0;
 
         // Ramp
-        public final static double OPEN_LOOP_RAMP = 0.25;
+        public final static double OPEN_LOOP_RAMP = 0.2;
         public final static double CLOSED_LOOP_RAMP = 0;
         // Current Limit
         public final static int TURNING_CURRENT_LIMIT = 50;
@@ -143,11 +143,11 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_kP = 90;
+        public final static double DRIVE_kP = 0.15;
         public final static double DRIVE_kI = 0;
         public final static double DRIVE_kD = 0;
         public final static double DRIVE_kS = 0;
-        public final static double DRIVE_kV = 0.800 ;//857
+        public final static double DRIVE_kV = 0 ;//857
         public final static double DRIVE_kA = 0;
         
         // Current Limit
