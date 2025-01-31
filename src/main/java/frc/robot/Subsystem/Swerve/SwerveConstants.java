@@ -28,7 +28,7 @@ public class SwerveConstants {
         public final static double WHEEL_CIRCUMFERENCE =  2 *WHEEL_RADIUS * Math.PI;
 
         public final static double DRIVE_POSITION_CONVERSION = WHEEL_CIRCUMFERENCE;
-        public final static double DRIVE_VELOCITY_CONVERSION = 2 * Math.PI * WHEEL_RADIUS / 60;
+        public final static double DRIVE_VELOCITY_CONVERSION = 2 * Math.PI * WHEEL_RADIUS / 60/DRIVE_GEAR_RATIO;
 
         public final static double TURNING_POSITION_CONVERSION = 360.0 / TURNING_GEAR_RATIO;
         public final static double TURNING_VELOCITY_CONVERSION = 1.0;
@@ -122,9 +122,9 @@ public class SwerveConstants {
         public final static int SLOT_CONFIG = 0;
         
         // MotionMagic PID
-        public final static double TURNING_kP = 0.1;
+        public final static double TURNING_kP = 0.02;
         public final static double TURNING_kI = 0;
-        public final static double TURNING_kD = 0;
+        public final static double TURNING_kD = 0.0015;
         public final static double TURNING_kS = 0;
         public final static double TURNING_kV = 0;
         public final static double TURNING_kA = 0;
@@ -143,7 +143,7 @@ public class SwerveConstants {
 
         // Modules drive config
         // PID
-        public final static double DRIVE_kP = 0.15;
+        public final static double DRIVE_kP = 0.00000009;
         public final static double DRIVE_kI = 0;
         public final static double DRIVE_kD = 0;
         public final static double DRIVE_kS = 0;

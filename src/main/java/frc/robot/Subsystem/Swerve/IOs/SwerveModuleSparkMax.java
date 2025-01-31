@@ -1,5 +1,6 @@
 package frc.robot.Subsystem.Swerve.IOs;
 
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -71,7 +72,7 @@ public class SwerveModuleSparkMax implements SwerveModule {
 
         turningConfig
             .inverted(isTurningMotorReversed)
-            .idleMode(IdleMode.kBrake);
+            .idleMode(IdleMode.kCoast);
 
         // Must convert position from "rotations" to "degrees" (if you’re using degrees)
         turningConfig.encoder
@@ -80,10 +81,10 @@ public class SwerveModuleSparkMax implements SwerveModule {
 
         turningConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            .pid(SwerveConstants.TURNING_kP, SwerveConstants.TURNING_kI, SwerveConstants.TURNING_kD);
+            .pid(SwerveConstants.TURNING_kP, SwerveConstants.TURNING_kI, SwerveConstants.TURNING_kD)
             // For turning, you may also want positionWrapping if the angle crosses 0°-360°:
-            // .positionWrappingEnabled(true)
-            // .positionWrappingInputRange(0, 360);
+            .positionWrappingEnabled(true)
+            .positionWrappingInputRange(0, 360);
 
         turningMotor.configure(turningConfig, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -124,12 +125,12 @@ public class SwerveModuleSparkMax implements SwerveModule {
         // If the turning encoder is in degrees, convert your radian setpoint to degrees:
         double degrees = Units.radiansToDegrees(setPointRadians);
         turningMotor.getClosedLoopController().setReference(degrees, ControlType.kPosition);
-        System.out.println("Turn setpoint [rad->deg]: " + degrees);
+        //System.out.println("Turn setpoint [rad->deg]: " + degrees);
     }
 
     @Override
     public void driveUsingPID(double setPointMPS, double feedForward) {  
-        driveMotor.getClosedLoopController().setReference(setPointMPS, ControlType.kVelocity);
+        driveMotor.getClosedLoopController().setReference(setPointMPS, ControlType.kVelocity , ClosedLoopSlot.kSlot0 ,(setPointMPS/SwerveConstants.MAX_VELOCITY)*12);
         System.out.println("Drive velocity setpoint (m/s): " + setPointMPS);
     }
 
