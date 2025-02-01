@@ -5,6 +5,7 @@
 package frc.robot.Subsystem.Swerve;
 
 import com.ma5951.utils.RobotConstantsMAUtil;
+import com.ma5951.utils.Logger.LoggedDouble;
 // import com.pathplanner.lib.util.DriveFeedforward;
 import com.pathplanner.lib.util.DriveFeedforwards;
 
@@ -34,6 +35,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   private SwerveSetpointGenerator setpointGenerator;
 
+  private LoggedDouble TurnPositionLog;
+
+  private LoggedDouble VelocityLog;
+
   private final SwerveModule[] modulesArry = SwerveConstants.getModulesArry();
   private final Gyro gyro = SwerveConstants.getGyro();
   private final SwerveDriveKinematics kinematics = SwerveConstants.kinematics;
@@ -56,6 +61,9 @@ public class SwerveSubsystem extends SubsystemBase {
   });
 
   public SwerveSubsystem() {
+
+    TurnPositionLog = new LoggedDouble("/Swerve/SwerveModuleSparkMax/Turn Position");
+    VelocityLog = new LoggedDouble("/Swerve/SwerveModuleSparkMax/Velociyy");
 
     setpointGenerator = new SwerveSetpointGenerator(kinematics , new Translation2d[] {
       SwerveConstants.frontLeftLocation,
@@ -199,7 +207,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    TurnPositionLog.update((Units.radiansToDegrees(modulesArry[0].getSteerPosition()))%360);
+    VelocityLog.update(modulesArry[0].getDriveVelocity());
     //System.out.println((Units.radiansToDegrees(modulesArry[0].getSteerPosition()))%360);
-    System.out.println(modulesArry[0].getDriveVelocity());
+    //System.out.println(modulesArry[0].getDriveVelocity());
   }
 }

@@ -1,5 +1,6 @@
 package frc.robot.Subsystem.Swerve.IOs;
 
+import com.ma5951.utils.Logger.LoggedDouble;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -24,10 +25,20 @@ public class SwerveModuleSparkMax implements SwerveModule {
     private final boolean isDriveMotorReversed;
     private final boolean isTurningMotorReversed;
 
+    private LoggedDouble TurnSetPointLog;
+
+    private LoggedDouble velocitySetPointLog;;
+
+    private double TurnSetPoint;
+    private double VelocitySetPoint;
+
     public SwerveModuleSparkMax(String moduleName, int driveID, int turningID,
                                 boolean isDriveMotorReversed, boolean isTurningMotorReversed) {
         this.driveMotor = new SparkMax(driveID, MotorType.kBrushless);
         this.turningMotor = new SparkMax(turningID, MotorType.kBrushless);
+
+        TurnSetPointLog = new LoggedDouble("/Swerve/SwerveModuleSparkMax/Turn Set Point");
+        velocitySetPointLog = new LoggedDouble("/Swerve/SwerveModuleSparkMax/Velocity Set Point");
 
         this.isDriveMotorReversed = isDriveMotorReversed;
         this.isTurningMotorReversed = isTurningMotorReversed;
@@ -72,7 +83,7 @@ public class SwerveModuleSparkMax implements SwerveModule {
 
         turningConfig
             .inverted(isTurningMotorReversed)
-            .idleMode(IdleMode.kCoast);
+            .idleMode(IdleMode.kBrake);
 
         // Must convert position from "rotations" to "degrees" (if you’re using degrees)
         turningConfig.encoder
@@ -124,14 +135,17 @@ public class SwerveModuleSparkMax implements SwerveModule {
     public void turningUsingPID(double setPointRadians) {
         // If the turning encoder is in degrees, convert your radian setpoint to degrees:
         double degrees = Units.radiansToDegrees(setPointRadians);
+        TurnSetPointLog.update(setPointRadians);
         turningMotor.getClosedLoopController().setReference(degrees, ControlType.kPosition);
         //System.out.println("Turn setpoint [rad->deg]: " + degrees);
+        
     }
 
     @Override
     public void driveUsingPID(double setPointMPS, double feedForward) {  
         driveMotor.getClosedLoopController().setReference(setPointMPS, ControlType.kVelocity , ClosedLoopSlot.kSlot0 ,(setPointMPS/SwerveConstants.MAX_VELOCITY)*12);
-        System.out.println("Drive velocity setpoint (m/s): " + setPointMPS);
+        velocitySetPointLog.update(setPointMPS);
+        //System.out.println("Drive velocity setpoint (m/s): " + setPointMPS);
     }
 
     @Override
